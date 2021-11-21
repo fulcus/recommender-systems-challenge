@@ -1,7 +1,6 @@
 
 from Recommenders.Recommender_import_list import *
 
-from Data_manager.Movielens.Movielens1MReader import Movielens1MReader
 from Data_manager.TVShows.TVShowsReader import TVShowsReader
 from Data_manager.DataSplitter_leave_k_out import DataSplitter_leave_k_out
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping

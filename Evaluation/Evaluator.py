@@ -256,7 +256,7 @@ class Evaluator(object):
         """
         :param recommender_object: the trained recommender object, a BaseRecommender subclass
         :param URM_test_list: list of URMs to test the recommender against, or a single URM object
-        :param cutoff_list: list of cutoffs to be use to report the scores, or a single cutoff
+        :param cutoff_list: list of cutoffs to be used to report the scores, or a single cutoff
         :return results_df: dataframe with index the cutoff and columns the metric
         :return results_run_string: printable result string
         """

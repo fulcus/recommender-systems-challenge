@@ -21,10 +21,10 @@ def _loadURM(URM_path):
     return URM_all_dataframe
 
 def load_target(path):
-    df_original = pd.read_csv(filepath_or_buffer="path", sep=',', header=0, dtype={'user_id': np.int32})
+    df_original = pd.read_csv(filepath_or_buffer=path, sep=',', header=0, dtype={'user_id': np.int32})
 
-    df_original.columns = ['user']
-    user_id_list = df_original['user'].values
+    df_original.columns = ['UserID']
+    user_id_list = df_original['UserID'].values
     user_id_unique = np.unique(user_id_list)
     return user_id_unique
 

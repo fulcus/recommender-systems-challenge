@@ -116,6 +116,11 @@ def run_all_data_train():
 
             results_run_1, results_run_string_1 = evaluator.evaluateRecommender(recommender_object)
 
+            # added for prediction
+            item_list = recommender_object.recommend(target_ids, cutoff=10)
+            create_csv(target_ids, item_list, recommender_class.RECOMMENDER_NAME)
+
+
             recommender_object.save_model(output_root_path, file_name="temp_model.zip")
 
             recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
@@ -125,15 +130,12 @@ def run_all_data_train():
 
             results_run_2, results_run_string_2 = evaluator.evaluateRecommender(recommender_object)
 
-            # added for prediction
-            item_list = recommender_object.recommend(target_ids, cutoff=10)
-            create_csv(target_ids, item_list, str(recommender_class))
 
             if recommender_class not in [Random]:
                 assert results_run_1.equals(results_run_2)
 
-            print("Algorithm: {}, results: \n{}".format(recommender_class, results_run_string_1))
-            logFile.write("Algorithm: {}, results: \n{}\n".format(recommender_class, results_run_string_1))
+            print("Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
+            logFile.write("Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
             logFile.flush()
 
 

@@ -59,13 +59,13 @@ if __name__ == '__main__':
         ]
 
 
-    evaluator = EvaluatorHoldout(URM_test, [5, 20], exclude_seen=True)
+    evaluator = EvaluatorHoldout(URM_test, [10], exclude_seen=True)
 
     # from MatrixFactorization.PyTorch.MF_MSE_PyTorch import MF_MSE_PyTorch
 
     earlystopping_keywargs = {"validation_every_n": 5,
                               "stop_on_validation": True,
-                              "evaluator_object": EvaluatorHoldout(URM_validation, [20], exclude_seen=True),
+                              "evaluator_object": EvaluatorHoldout(URM_validation, [10], exclude_seen=True),
                               "lower_validations_allowed": 5,
                               "validation_metric": "MAP",
                               }
@@ -102,8 +102,10 @@ if __name__ == '__main__':
             recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
             recommender_object.load_model(output_root_path, file_name = "temp_model.zip")
 
+            # maybe remove: let's keep weights
             os.remove(output_root_path + "temp_model.zip")
 
+            # maybe remove: consistency check
             results_run_2, results_run_string_2 = evaluator.evaluateRecommender(recommender_object)
 
             if recommender_class not in [Random]:

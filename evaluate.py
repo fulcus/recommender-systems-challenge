@@ -1,7 +1,7 @@
 import os
 import traceback
-from datetime import datetime
 
+import numpy as np
 import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
@@ -45,21 +45,31 @@ if not os.path.exists(output_root_path):
 logFile = open(output_root_path + "result_all_algorithms.txt", "a")
 
 
-def create_csv(target_ids, results, rec_name):
-    exp_dir = os.path.join(res_dir, rec_name)
-    if not os.path.exists(exp_dir):
-        os.makedirs(exp_dir)
+def train_test_holdout(URM_all, train_perc=0.8):
+    numInteractions = URM_all.nnz
+    URM_all = URM_all.tocoo()
+    shape = URM_all.shape
 
-    csv_fname = 'results_' + datetime.now().strftime('%b%d_%H-%M-%S') + '.csv'
+    train_mask = np.random.choice([True, False], numInteractions, p=[train_perc, 1 - train_perc])
 
-    with open(os.path.join(exp_dir, csv_fname), 'w') as f:
-        f.write('user_id,item_list\n')
-        for target_id, result in zip(target_ids, results):
-            f.write(str(target_id) + ', ' + ' '.join(map(str, result)) + '\n')
+    URM_train = sps.coo_matrix((URM_all.data[train_mask], (URM_all.row[train_mask], URM_all.col[train_mask])),
+                               shape=shape)
+    URM_train = URM_train.tocsr()
+
+    test_mask = np.logical_not(train_mask)
+
+    URM_test = sps.coo_matrix((URM_all.data[test_mask], (URM_all.row[test_mask], URM_all.col[test_mask])), shape=shape)
+    URM_test = URM_test.tocsr()
+
+    return URM_train, URM_test
 
 
-def run_prediction_all_recommenders(URM_all, ICM_all):
-    evaluator = EvaluatorHoldout(URM_all, cutoff_list=[10], exclude_seen=True)
+def evaluate_all_recommenders(URM_all, ICM_all):
+    # modificato qui per trainare su tutto x sub kaggle -> non si vedono le metriche durante il training
+    URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85)
+
+    # todo check URM_test, URM_train are consistently placed
+    evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10], exclude_seen=True)
 
     earlystopping_keywargs = {"validation_every_n": 2,
                               "stop_on_validation": True,
@@ -72,7 +82,7 @@ def run_prediction_all_recommenders(URM_all, ICM_all):
 
         try:
             print("Algorithm: {}".format(recommender_class.RECOMMENDER_NAME))
-            recommender_object = _get_instance(recommender_class, URM_all, ICM_all)
+            recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
 
             if isinstance(recommender_object, Incremental_Training_Early_Stopping):
                 fit_params = {"epochs": 15, **earlystopping_keywargs}
@@ -87,8 +97,7 @@ def run_prediction_all_recommenders(URM_all, ICM_all):
             item_list = recommender_object.recommend(target_ids, cutoff=10, remove_seen_flag=True)
             create_csv(target_ids, item_list, recommender_class.RECOMMENDER_NAME)
 
-            # todo understand purpose
-            recommender_object = _get_instance(recommender_class, URM_all, ICM_all)
+            recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
             recommender_object.load_model(output_root_path, file_name="temp_model.zip")
             os.remove(output_root_path + "temp_model.zip")
 
@@ -119,4 +128,4 @@ if __name__ == '__main__':
 
     ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
 
-    run_prediction_all_recommenders(URM_all, ICM_all)
+    evaluate_all_recommenders(URM_all, ICM_all)

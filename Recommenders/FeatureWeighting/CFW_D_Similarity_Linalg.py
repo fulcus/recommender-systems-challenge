@@ -6,7 +6,7 @@ Created on 08/09/17
 @author: Maurizio Ferrari Dacrema
 """
 
-from FeatureWeighting.Cython.CFW_D_Similarity_Cython import CFW_D_Similarity_Cython
+from Recommenders.FeatureWeighting.Cython.CFW_D_Similarity_Cython import CFW_D_Similarity_Cython
 
 
 from scipy.sparse import linalg

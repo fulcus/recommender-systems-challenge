@@ -10,32 +10,34 @@ from Evaluation.Evaluator import Evaluator, EvaluatorHoldout
 from Recommenders.BaseRecommender import BaseRecommender
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 from Recommenders.Recommender_import_list import *
-from reader import load_urm, load_icm_asset, load_target
+from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
 
 res_dir = 'Results'
 
 recommender_class_list = [
-    Random,
+    UserKNNCBFRecommender,
+    ItemKNNCBFRecommender,
+    UserKNN_CFCBF_Hybrid_Recommender,
+    ItemKNN_CFCBF_Hybrid_Recommender,
+    #Random,
     TopPop,
     #GlobalEffects,
-    SLIMElasticNetRecommender,
+    #SLIMElasticNetRecommender, #commented because too long training
     UserKNNCFRecommender,
     IALSRecommender,
     MatrixFactorization_BPR_Cython,
-    MatrixFactorization_FunkSVD_Cython,
-    MatrixFactorization_AsySVD_Cython,
-    EASE_R_Recommender,
+    #MatrixFactorization_FunkSVD_Cython, #da fixare low values
+    #MatrixFactorization_AsySVD_Cython,
+    #EASE_R_Recommender,
     ItemKNNCFRecommender,
     P3alphaRecommender,
     SLIM_BPR_Cython,
     RP3betaRecommender,
     PureSVDRecommender,
     NMFRecommender,
-    UserKNNCBFRecommender,
-    ItemKNNCBFRecommender,
-    UserKNN_CFCBF_Hybrid_Recommender,
-    ItemKNN_CFCBF_Hybrid_Recommender,
+
+
     LightFMCFRecommender,
     LightFMUserHybridRecommender,
     LightFMItemHybridRecommender,
@@ -87,10 +89,15 @@ def create_csv(target_ids, results, rec_name):
 
 def run_all_data_train():
     URM_all, user_id_unique, item_id_unique = load_urm()
-    ICM_all = load_icm_asset()
+    ICM_genre = load_icm("data_ICM_genre.csv")
+    ICM_subgenre = load_icm("data_ICM_subgenre.csv")
+    ICM_channel = load_icm("data_ICM_channel.csv")
+    ICM_event = load_icm("data_ICM_event.csv")
+    ICM_all= sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
     target_ids = load_target()
 
     URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85) #modificato qui per trainare su tutto x sub kaggle -> non si vedono le metriche durante il training
+
 
     evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10], exclude_seen=True)
 

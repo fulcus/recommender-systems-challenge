@@ -3,9 +3,8 @@ import scipy.sparse as sps
 import numpy as np
 
 urm_path = "Data_manager_split_datasets/TVShows/data_train.csv"
-icm_asset_path = "Data_manager_split_datasets/TVShows/data_ICM_genre.csv"
+icm_path = "Data_manager_split_datasets/TVShows/"
 target_path = "Data_manager_split_datasets/TVShows/data_target_users_test.csv"
-
 
 
 def load_urm():
@@ -32,6 +31,7 @@ def load_urm():
 
     return csr_matrix, user_id_unique, item_id_unique
 
+
 def load_target():
     df_original = pd.read_csv(filepath_or_buffer=target_path, sep=',', header=0,
                               dtype={'UserID': np.int32})
@@ -49,8 +49,9 @@ def load_target():
 
     return user_id_unique
 
-def load_icm_asset():
-    df_original = pd.read_csv(filepath_or_buffer=icm_asset_path, sep=',', header=0,
+
+def load_icm(icm_file):
+    df_original = pd.read_csv(filepath_or_buffer=icm_path+icm_file, sep=',', header=0,
                               dtype={'ItemID': np.int32, 'Feature': np.int32, 'Data': np.int32})
 
     df_original.columns = ['ItemID', 'Feature', 'Data']
@@ -68,9 +69,10 @@ def load_icm_asset():
 
     return csr_matrix
 
-def load_urm_icm():
+
+def load_urm_icm(): #elimina
     urm, _, _ = load_urm()
-    icm = load_icm_asset()
+    icm = load_icm("data_ICM_subgenre.csv")
     urm_icm = sps.vstack([urm, icm.T])
     urm_icm = urm_icm.tocsr()
 

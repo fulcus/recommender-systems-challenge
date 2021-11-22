@@ -11,9 +11,9 @@ import traceback, os
 def _get_instance(recommender_class, URM_train, ICM_all, UCM_all=None):
     if issubclass(recommender_class, BaseItemCBFRecommender):
         recommender_object = recommender_class(URM_train, ICM_all)
-    # elif issubclass(recommender_class, BaseUserCBFRecommender):
     # todo No UCM => No CBF
-    # recommender_object = recommender_class(URM_train, UCM_all)
+    # elif issubclass(recommender_class, BaseUserCBFRecommender):
+    #     recommender_object = recommender_class(URM_train, UCM_all)
     else:
         recommender_object = recommender_class(URM_train)
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     for recommender_class in recommender_class_list:
 
         try:
-            print("Algorithm: {}".format(recommender_class))
+            print("Algorithm: {}".format(recommender_class.RECOMMENDER_NAME))
 
             recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
 
@@ -105,12 +105,12 @@ if __name__ == '__main__':
             if recommender_class not in [Random]:
                 assert results_run_1.equals(results_run_2)
 
-            print("Algorithm: {}, results: \n{}".format(recommender_class, results_run_string_1))
-            logFile.write("Algorithm: {}, results: \n{}\n".format(recommender_class, results_run_string_1))
+            print("Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
+            logFile.write("Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
             logFile.flush()
 
 
         except Exception as e:
             traceback.print_exc()
-            logFile.write("Algorithm: {} - Exception: {}\n".format(recommender_class, str(e)))
+            logFile.write("Algorithm: {} - Exception: {}\n".format(recommender_class.RECOMMENDER_NAME, str(e)))
             logFile.flush()

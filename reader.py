@@ -51,14 +51,14 @@ def load_target():
 
 
 def load_icm(icm_file, weight=1):
-    df_original = pd.read_csv(filepath_or_buffer=icm_path+icm_file, sep=',', header=0,
+    df_original = pd.read_csv(filepath_or_buffer=icm_path + icm_file, sep=',', header=0,
                               dtype={'ItemID': np.int32, 'Feature': np.int32, 'Data': np.int32})
 
     df_original.columns = ['ItemID', 'Feature', 'Data']
 
     item_id_list = df_original['ItemID'].values
     feature_id_list = df_original['Feature'].values
-    data_id_list = df_original['Data'].values * weight #weight che cambia a seconda della icm
+    data_id_list = df_original['Data'].values * weight
 
     csr_matrix = sps.csr_matrix((data_id_list, (item_id_list, feature_id_list)))
 
@@ -70,7 +70,8 @@ def load_icm(icm_file, weight=1):
     return csr_matrix
 
 
-def load_urm_icm(): #elimina
+# to delete
+def load_urm_icm():
     urm, _, _ = load_urm()
     icm = load_icm("data_ICM_subgenre.csv", 1)
     urm_icm = sps.vstack([urm, icm.T])

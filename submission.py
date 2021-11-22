@@ -89,10 +89,10 @@ def create_csv(target_ids, results, rec_name):
 
 def run_all_data_train():
     URM_all, user_id_unique, item_id_unique = load_urm()
-    ICM_genre = load_icm("data_ICM_genre.csv")
-    ICM_subgenre = load_icm("data_ICM_subgenre.csv")
-    ICM_channel = load_icm("data_ICM_channel.csv")
-    ICM_event = load_icm("data_ICM_event.csv")
+    ICM_genre = load_icm("data_ICM_genre.csv", 3) #attenzione pesi a caso
+    ICM_subgenre = load_icm("data_ICM_subgenre.csv", 1)
+    ICM_channel = load_icm("data_ICM_channel.csv", 2)
+    ICM_event = load_icm("data_ICM_event.csv",1 )
     ICM_all= sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
     target_ids = load_target()
 

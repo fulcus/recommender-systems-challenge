@@ -18,7 +18,7 @@ res_dir = 'Results'
 recommender_class_list = [
     Random,
     TopPop,
-    GlobalEffects,
+    #GlobalEffects,
     SLIMElasticNetRecommender,
     UserKNNCFRecommender,
     IALSRecommender,
@@ -90,7 +90,7 @@ def run_all_data_train():
     ICM_all = load_icm_asset()
     target_ids = load_target()
 
-    URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.999) #modificato qui per trainare su tutto x sub kaggle -> non si vedono le metriche durante il training
+    URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85) #modificato qui per trainare su tutto x sub kaggle -> non si vedono le metriche durante il training
 
     evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10], exclude_seen=True)
 
@@ -117,7 +117,7 @@ def run_all_data_train():
             results_run_1, results_run_string_1 = evaluator.evaluateRecommender(recommender_object)
 
             # added for prediction
-            item_list = recommender_object.recommend(target_ids, cutoff=10)
+            item_list = recommender_object.recommend(target_ids, cutoff=10, remove_seen_flag=True)
             create_csv(target_ids, item_list, recommender_class.RECOMMENDER_NAME)
 
 

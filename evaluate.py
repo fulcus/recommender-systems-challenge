@@ -9,6 +9,7 @@ from Recommenders.Incremental_Training_Early_Stopping import Incremental_Trainin
 from Recommenders.Recommender_import_list import *
 from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
+from submission import create_csv
 
 res_dir = 'result_experiments/csv'
 
@@ -16,24 +17,24 @@ recommender_class_list = [
     # UserKNNCBFRecommender, # UCM needed
     ItemKNNCBFRecommender,
     # UserKNN_CFCBF_Hybrid_Recommender, # UCM needed
-    ItemKNN_CFCBF_Hybrid_Recommender,
+    # ItemKNN_CFCBF_Hybrid_Recommender,
     # SLIMElasticNetRecommender, # too slow to train
-    UserKNNCFRecommender,
-    IALSRecommender,
-    MatrixFactorization_BPR_Cython,
+    # UserKNNCFRecommender,
+    # IALSRecommender,
+    # MatrixFactorization_BPR_Cython,
     # MatrixFactorization_FunkSVD_Cython, # fix low values
     # MatrixFactorization_AsySVD_Cython, # fix low values
     # EASE_R_Recommender, # fix low values
-    ItemKNNCFRecommender,
-    P3alphaRecommender,
-    SLIM_BPR_Cython,
-    RP3betaRecommender,
-    PureSVDRecommender,
-    NMFRecommender,
+    # ItemKNNCFRecommender,
+    # P3alphaRecommender,
+    # SLIM_BPR_Cython,
+    # RP3betaRecommender,
+    # PureSVDRecommender,
+    # NMFRecommender,
 
-    LightFMCFRecommender,
+    # LightFMCFRecommender,
     # LightFMUserHybridRecommender, # UCM needed
-    LightFMItemHybridRecommender,
+    # LightFMItemHybridRecommender,
 ]
 
 output_root_path = "./result_experiments/"
@@ -120,9 +121,9 @@ def evaluate_all_recommenders(URM_all, ICM_all):
 
 if __name__ == '__main__':
     URM_all, user_id_unique, item_id_unique = load_urm()
-    ICM_genre = load_icm("data_ICM_genre.csv", weight=3)
+    ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
     ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
-    ICM_channel = load_icm("data_ICM_channel.csv", weight=2)
+    ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
     ICM_event = load_icm("data_ICM_event.csv", weight=1)
     target_ids = load_target()
 

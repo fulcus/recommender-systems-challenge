@@ -66,7 +66,7 @@ class BaseRecommender(object):
 
         assert self.URM_train.shape == URM_train_new.shape, "{}: set_URM_train old and new URM train have different shapes".format(self.RECOMMENDER_NAME)
 
-        if len(kwargs)>0:
+        if len(kwargs) > 0:
             self._print("set_URM_train keyword arguments not supported for this recommender class. Received: {}".format(kwargs))
 
         self.URM_train = check_matrix(URM_train_new.copy(), 'csr', dtype=np.float32)

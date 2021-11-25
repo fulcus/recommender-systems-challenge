@@ -65,7 +65,7 @@ def TF_IDF(dataMatrix):
     assert np.all(dataMatrix.data >= 0.0),\
         "TF_IDF: Data matrix contains {} negative values, computing the square root is not possible.".format(np.sum(dataMatrix.data < 0.0))
 
-    # TFIDF each row of a sparse amtrix
+    # TFIDF each row of a sparse matrix
     dataMatrix = sps.coo_matrix(dataMatrix)
     N = float(dataMatrix.shape[0])
 

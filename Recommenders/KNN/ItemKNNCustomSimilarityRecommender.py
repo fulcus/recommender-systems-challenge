@@ -28,4 +28,5 @@ class ItemKNNCustomSimilarityRecommender(BaseItemSimilarityMatrixRecommender):
         if selectTopK:
             W_sparse = similarityMatrixTopK(W_sparse, k=topK)
 
+
         self.W_sparse = check_matrix(W_sparse, format='csr')

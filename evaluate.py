@@ -6,21 +6,24 @@ import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
+from Recommenders.KNN.CustomizedSimilarityItemKNNCBFRecommender import CustomizedSimilarityItemKNNCBFRecommender
 from Recommenders.Recommender_import_list import *
 from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
 from submission import create_csv
 
 res_dir = 'result_experiments/csv'
+output_root_path = "./result_experiments/"
 
 recommender_class_list = [
     # UserKNNCBFRecommender, # UCM needed
-    ItemKNNCBFRecommender,
+    # ItemKNNCBFRecommender,
+    CustomizedSimilarityItemKNNCBFRecommender, #new
     # UserKNN_CFCBF_Hybrid_Recommender, # UCM needed
     # ItemKNN_CFCBF_Hybrid_Recommender,
-    # SLIMElasticNetRecommender, # too slow to train
+    # SLIMElasticNetRecommender,  # too slow to train
     # UserKNNCFRecommender,
-    # IALSRecommender,
+    IALSRecommender,
     # MatrixFactorization_BPR_Cython,
     # MatrixFactorization_FunkSVD_Cython, # fix low values
     # MatrixFactorization_AsySVD_Cython, # fix low values
@@ -36,8 +39,6 @@ recommender_class_list = [
     # LightFMUserHybridRecommender, # UCM needed
     # LightFMItemHybridRecommender,
 ]
-
-output_root_path = "./result_experiments/"
 
 # If directory does not exist, create
 if not os.path.exists(output_root_path):
@@ -65,8 +66,10 @@ def train_test_holdout(URM_all, train_perc=0.8):
     return URM_train, URM_test
 
 
-def evaluate_all_recommenders(URM_all, ICM_all):
-    # modificato qui per trainare su tutto x sub kaggle -> non si vedono le metriche durante il training
+def evaluate_all_recommenders(URM_all, *ICMs):
+
+    ICM_all = ICMs[4]
+
     URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85)
 
     # todo check URM_test, URM_train are consistently placed
@@ -86,7 +89,15 @@ def evaluate_all_recommenders(URM_all, ICM_all):
             recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
 
             if isinstance(recommender_object, Incremental_Training_Early_Stopping):
-                fit_params = {"epochs": 15, **earlystopping_keywargs}
+                fit_params = {"epochs": 200, **earlystopping_keywargs}
+            elif isinstance(recommender_object, CustomizedSimilarityItemKNNCBFRecommender):
+                fit_params = {"ICMs": ICMs}
+            elif isinstance(recommender_object, ItemKNNCFRecommender):
+                fit_params = {"topK": 200, "shrink": 200, "feature_weighting": "TF-IDF"}
+            elif isinstance(recommender_object, SLIMElasticNetRecommender):
+                fit_params = {"topK": 463, 'l1_ratio': 0.0014760781357350578, 'alpha': 0.8618057479552595}
+            elif isinstance(recommender_object, IALSRecommender):
+                fit_params = {'num_factors': 55, 'epochs': 50, 'confidence_scaling': 'log', 'alpha': 0.06164752624981533 , 'epsilon': 0.21164021855039056, 'reg': 0.002507116338282967}
             else:
                 fit_params = {}
 
@@ -94,22 +105,22 @@ def evaluate_all_recommenders(URM_all, ICM_all):
             results_run_1, results_run_string_1 = evaluator.evaluateRecommender(recommender_object)
             recommender_object.save_model(output_root_path, file_name="temp_model.zip")
 
-            # added for prediction
-            item_list = recommender_object.recommend(target_ids, cutoff=10, remove_seen_flag=True)
-            create_csv(target_ids, item_list, recommender_class.RECOMMENDER_NAME)
-
             recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
             recommender_object.load_model(output_root_path, file_name="temp_model.zip")
             os.remove(output_root_path + "temp_model.zip")
 
             results_run_2, results_run_string_2 = evaluator.evaluateRecommender(recommender_object)
 
+
+            print("1-Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
+            logFile.write(
+                "1-Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
+
+            print("2-Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_2))
+            logFile.write(
+                "2-Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_2))
             if recommender_class not in [Random]:
                 assert results_run_1.equals(results_run_2)
-
-            print("Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
-            logFile.write(
-                "Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
             logFile.flush()
 
 
@@ -117,6 +128,24 @@ def evaluate_all_recommenders(URM_all, ICM_all):
             traceback.print_exc()
             logFile.write("Algorithm: {} - Exception: {}\n".format(recommender_class.RECOMMENDER_NAME, str(e)))
             logFile.flush()
+
+
+def evaluate_best_saved_model(URM_all):
+
+    URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85)
+    evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10])
+
+    # set here the recommender you want to use
+    recommender_object = SLIMElasticNetRecommender(URM_train)
+
+    # rec_best_model_last.zip is the output of the run_hyperparameter_search (one best model for each rec class)
+    recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
+
+    results_run_1, results_run_string_1 = evaluator.evaluateRecommender(recommender_object)
+
+    print("1-Algorithm: {}, results: \n{}".format(recommender_object.RECOMMENDER_NAME, results_run_string_1))
+    logFile.write(
+        "1-Algorithm: {}, results: \n{}\n".format(recommender_object.RECOMMENDER_NAME, results_run_string_1))
 
 
 if __name__ == '__main__':
@@ -129,4 +158,7 @@ if __name__ == '__main__':
 
     ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
 
-    evaluate_all_recommenders(URM_all, ICM_all)
+    ICMs = [ICM_genre, ICM_subgenre, ICM_channel, ICM_event, ICM_all]
+
+    # evaluate_best_saved_model(URM_all)
+    evaluate_all_recommenders(URM_all, *ICMs)

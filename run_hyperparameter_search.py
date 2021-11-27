@@ -7,16 +7,16 @@ Created on 22/11/17
 """
 
 from Recommenders.Recommender_import_list import *
+from reader import load_urm, load_icm
 
 import traceback
 
 import os, multiprocessing
 from functools import partial
 
-
-
 from Data_manager.Movielens.Movielens1MReader import Movielens1MReader
-from Data_manager.split_functions.split_train_validation_random_holdout import split_train_in_two_percentage_global_sample
+from Data_manager.split_functions.split_train_validation_random_holdout import \
+    split_train_in_two_percentage_global_sample
 
 from HyperparameterTuning.run_hyperparameter_search import runHyperparameterSearch_Collaborative
 
@@ -33,30 +33,22 @@ def read_data_split_and_search():
         - A _best_result_test file which contains a dictionary with the results, on the test set, of the best solution chosen using the validation set
     """
 
+    # dataReader = Movielens1MReader()
+    # dataset = dataReader.load_data()
 
-
-    dataReader = Movielens1MReader()
-    dataset = dataReader.load_data()
-
-    URM_train, URM_test = split_train_in_two_percentage_global_sample(dataset.get_URM_all(), train_percentage = 0.80)
-    URM_train, URM_validation = split_train_in_two_percentage_global_sample(URM_train, train_percentage = 0.80)
+    URM_all, user_id_unique, item_id_unique = load_urm()
+    URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.80)
+    URM_train, URM_validation = split_train_in_two_percentage_global_sample(URM_train, train_percentage=0.80)
 
     output_folder_path = "result_experiments/"
-
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
         os.makedirs(output_folder_path)
 
-
-
-
-
-
-
     collaborative_algorithm_list = [
-        Random,
-        TopPop,
+        # Random,
+        # TopPop,
         P3alphaRecommender,
         RP3betaRecommender,
         ItemKNNCFRecommender,
@@ -65,11 +57,9 @@ def read_data_split_and_search():
         MatrixFactorization_FunkSVD_Cython,
         PureSVDRecommender,
         SLIM_BPR_Cython,
-        SLIMElasticNetRecommender
+        SLIMElasticNetRecommender,
+        IALSRecommender
     ]
-
-
-
 
     from Evaluation.Evaluator import EvaluatorHoldout
 
@@ -78,29 +68,24 @@ def read_data_split_and_search():
     cutoff_to_optimize = 10
 
     n_cases = 10
-    n_random_starts = int(n_cases/3)
+    n_random_starts = int(n_cases / 3)
 
-    evaluator_validation = EvaluatorHoldout(URM_validation, cutoff_list = cutoff_list)
-    evaluator_test = EvaluatorHoldout(URM_test, cutoff_list = cutoff_list)
-
+    evaluator_validation = EvaluatorHoldout(URM_validation, cutoff_list=cutoff_list)
+    evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=cutoff_list)
 
     runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
-                                                       URM_train = URM_train,
-                                                       metric_to_optimize = metric_to_optimize,
-                                                       cutoff_to_optimize = cutoff_to_optimize,
-                                                       n_cases = n_cases,
-                                                       n_random_starts = n_random_starts,
-                                                       evaluator_validation_earlystopping = evaluator_validation,
-                                                       evaluator_validation = evaluator_validation,
-                                                       evaluator_test = evaluator_test,
-                                                       output_folder_path = output_folder_path,
-                                                       resume_from_saved = True,
-                                                       similarity_type_list = ["cosine"],
-                                                       parallelizeKNN = False)
-
-
-
-
+                                                       URM_train=URM_train,
+                                                       metric_to_optimize=metric_to_optimize,
+                                                       cutoff_to_optimize=cutoff_to_optimize,
+                                                       n_cases=n_cases,
+                                                       n_random_starts=n_random_starts,
+                                                       evaluator_validation_earlystopping=evaluator_validation,
+                                                       evaluator_validation=evaluator_validation,
+                                                       evaluator_test=evaluator_test,
+                                                       output_folder_path=output_folder_path,
+                                                       resume_from_saved=True,
+                                                       similarity_type_list=["cosine"],
+                                                       parallelizeKNN=False)
 
     pool = multiprocessing.Pool(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
     pool.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)
@@ -120,12 +105,5 @@ def read_data_split_and_search():
     #
 
 
-
-
-
-
-
 if __name__ == '__main__':
-
-
     read_data_split_and_search()

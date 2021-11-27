@@ -9,6 +9,7 @@ import traceback, os
 
 
 def _get_instance(recommender_class, URM_train, ICM_all, UCM_all=None):
+
     if issubclass(recommender_class, BaseItemCBFRecommender):
         recommender_object = recommender_class(URM_train, ICM_all)
     # todo No UCM => No CBF
@@ -16,6 +17,7 @@ def _get_instance(recommender_class, URM_train, ICM_all, UCM_all=None):
     #     recommender_object = recommender_class(URM_train, UCM_all)
     else:
         recommender_object = recommender_class(URM_train)
+        print('URM ONLY')
 
     return recommender_object
 

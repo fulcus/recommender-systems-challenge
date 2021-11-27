@@ -11,13 +11,14 @@ from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
 
 res_dir = 'result_experiments/csv'
+output_root_path = "./result_experiments/"
 
 recommender_class_list = [
     # UserKNNCBFRecommender, # UCM needed
-    ItemKNNCBFRecommender,
+    # ItemKNNCBFRecommender,
     # UserKNN_CFCBF_Hybrid_Recommender, # UCM needed
     # ItemKNN_CFCBF_Hybrid_Recommender,
-    # SLIMElasticNetRecommender, # too slow to train
+    SLIMElasticNetRecommender,  # too slow to train
     # UserKNNCFRecommender,
     # IALSRecommender,
     # MatrixFactorization_BPR_Cython,
@@ -35,8 +36,6 @@ recommender_class_list = [
     # LightFMUserHybridRecommender, # UCM needed
     # LightFMItemHybridRecommender,
 ]
-
-output_root_path = "./result_experiments/"
 
 # If directory does not exist, create
 if not os.path.exists(output_root_path):
@@ -77,6 +76,8 @@ def run_prediction_all_recommenders(URM_all, ICM_all):
 
             if isinstance(recommender_object, Incremental_Training_Early_Stopping):
                 fit_params = {"epochs": 15, **earlystopping_keywargs}
+            elif isinstance(recommender_object, SLIMElasticNetRecommender):
+                fit_params = {"topK": 463, 'l1_ratio': 0.0014760781357350578, 'alpha': 0.8618057479552595}
             else:
                 fit_params = {}
 
@@ -108,6 +109,20 @@ def run_prediction_all_recommenders(URM_all, ICM_all):
             traceback.print_exc()
             logFile.write("Algorithm: {} - Exception: {}\n".format(recommender_class.RECOMMENDER_NAME, str(e)))
             logFile.flush()
+
+
+# Method to create prediction using a saved best model of a specific recommender class
+
+def run_prediction_best_saved_model(URM_all, ICM_all):
+    # set here the recommender you want to use
+    recommender_object = P3alphaRecommender(URM_all)
+
+    # rec_best_model_last.zip is the output of the run_hyperparameter_search (one best model for each rec class)
+    recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
+
+    # added for prediction
+    item_list = recommender_object.recommend(target_ids, cutoff=10, remove_seen_flag=True)
+    create_csv(target_ids, item_list, recommender_object.RECOMMENDER_NAME)
 
 
 if __name__ == '__main__':

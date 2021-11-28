@@ -7,7 +7,7 @@ import numpy as np
 from Recommenders.Similarity.Compute_Similarity import Compute_Similarity
 
 
-class ItemKNNCBFCustomizedSimilarityRecommender(BaseItemCBFRecommender, BaseItemSimilarityMatrixRecommender):
+class ItemKNNCBFWeightedSimilarityRecommender(BaseItemCBFRecommender, BaseItemSimilarityMatrixRecommender):
     """ ItemKNN recommender"""
 
     RECOMMENDER_NAME = "ItemKNNCBFCustomizedSimilarityRecommender"
@@ -15,7 +15,7 @@ class ItemKNNCBFCustomizedSimilarityRecommender(BaseItemCBFRecommender, BaseItem
     FEATURE_WEIGHTING_VALUES = ["BM25", "TF-IDF", "none"]
 
     def __init__(self, URM_train, ICM_train, verbose=True):
-        super(ItemKNNCBFCustomizedSimilarityRecommender, self).__init__(URM_train, ICM_train, verbose=verbose)
+        super(ItemKNNCBFWeightedSimilarityRecommender, self).__init__(URM_train, ICM_train, verbose=verbose)
 
     def fit(self, topK=50, shrink=100, similarity='cosine', normalize=True, feature_weighting="none", ICM_bias=None,
             ICMs=None, ICMs_weights=None,

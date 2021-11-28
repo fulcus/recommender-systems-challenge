@@ -5,12 +5,14 @@ Created on 22/11/17
 
 @author: Maurizio Ferrari Dacrema
 """
-
+from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
+from Recommenders.KNN.ItemKNNCustomSimilarityRecommender import ItemKNNCustomSimilarityRecommender
 from Recommenders.Recommender_import_list import *
 from reader import load_urm, load_icm
+from Evaluation.Evaluator import EvaluatorHoldout
 
 import traceback
-
+import scipy.sparse as sps
 import os, multiprocessing
 from functools import partial
 
@@ -18,7 +20,8 @@ from Data_manager.Movielens.Movielens1MReader import Movielens1MReader
 from Data_manager.split_functions.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 
-from HyperparameterTuning.run_hyperparameter_search import runHyperparameterSearch_Collaborative
+from HyperparameterTuning.run_hyperparameter_search import runHyperparameterSearch_Collaborative, \
+    runHyperparameterSearch_Content
 
 
 def read_data_split_and_search():
@@ -39,6 +42,12 @@ def read_data_split_and_search():
     URM_all, user_id_unique, item_id_unique = load_urm()
     URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.90)
     URM_train, URM_validation = split_train_in_two_percentage_global_sample(URM_train, train_percentage=0.80)
+    ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
+    ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
+    ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
+    ICM_event = load_icm("data_ICM_event.csv", weight=1)
+
+    ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
 
     output_folder_path = "result_experiments/"
 
@@ -47,19 +56,22 @@ def read_data_split_and_search():
         os.makedirs(output_folder_path)
 
     collaborative_algorithm_list = [
-        P3alphaRecommender,
-        RP3betaRecommender,
-        ItemKNNCFRecommender,
-        UserKNNCFRecommender,
-        MatrixFactorization_BPR_Cython,  # bad
-        MatrixFactorization_FunkSVD_Cython,
-        PureSVDRecommender,
-        SLIM_BPR_Cython,
-        SLIMElasticNetRecommender,
-        IALSRecommender
+        # P3alphaRecommender,
+        # RP3betaRecommender,
+        # ItemKNNCFRecommender,
+        # UserKNNCFRecommender,
+        # MatrixFactorization_BPR_Cython,  # bad
+        # MatrixFactorization_FunkSVD_Cython,
+        # PureSVDRecommender,
+        # SLIM_BPR_Cython,
+        # SLIMElasticNetRecommender,
+        # IALSRecommender
     ]
 
-    from Evaluation.Evaluator import EvaluatorHoldout
+    content_algorithm_list = [
+        ItemKNNCBFRecommender,
+        ItemKNNCBFWeightedSimilarityRecommender,
+    ]
 
     cutoff_list = [10]
     metric_to_optimize = "MAP"
@@ -85,19 +97,26 @@ def read_data_split_and_search():
                                                        similarity_type_list=["cosine"],
                                                        parallelizeKNN=False)
 
-    pool = multiprocessing.Pool(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
-    pool.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)
+    pool_collab = multiprocessing.Pool(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
+    pool_collab.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)
 
-    # for recommender_class in collaborative_algorithm_list:
+    # runParameterSearch_Content_partial = partial(runHyperparameterSearch_Content,
+    #                                              URM_train=URM_train,
+    #                                              ICM_object=ICM_all,
+    #                                              ICM_name="ICM_all",
+    #                                              metric_to_optimize=metric_to_optimize,
+    #                                              cutoff_to_optimize=cutoff_to_optimize,
+    #                                              n_cases=n_cases,
+    #                                              n_random_starts=n_random_starts,
+    #                                              evaluator_validation=evaluator_validation,
+    #                                              evaluator_test=evaluator_test,
+    #                                              output_folder_path=output_folder_path,
+    #                                              resume_from_saved=True,
+    #                                              similarity_type_list=["cosine"],
+    #                                              parallelizeKNN=False)
     #
-    #     try:
-    #
-    #         runParameterSearch_Collaborative_partial(recommender_class)
-    #
-    #     except Exception as e:
-    #
-    #         print("On recommender {} Exception {}".format(recommender_class, str(e)))
-    #         traceback.print_exc()
+    # pool_content = multiprocessing.Pool(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
+    # pool_content.map(runParameterSearch_Content_partial, content_algorithm_list)
 
 
 if __name__ == '__main__':

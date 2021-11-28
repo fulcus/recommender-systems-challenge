@@ -6,7 +6,7 @@ import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
-from Recommenders.KNN.ItemKNNCBFCustomizedSimilarityRecommender import ItemKNNCBFCustomizedSimilarityRecommender
+from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
 from Recommenders.Recommender_import_list import *
 from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
@@ -17,7 +17,7 @@ output_root_path = "./result_experiments/"
 recommender_class_list = [
     # UserKNNCBFRecommender, # UCM needed
     # ItemKNNCBFRecommender,
-    ItemKNNCBFCustomizedSimilarityRecommender,  # new
+    ItemKNNCBFWeightedSimilarityRecommender,  # new
     # UserKNN_CFCBF_Hybrid_Recommender, # UCM needed
     # ItemKNN_CFCBF_Hybrid_Recommender,
     # SLIMElasticNetRecommender,  # too slow to train
@@ -88,7 +88,7 @@ def evaluate_all_recommenders(URM_all, *ICMs):
 
             if isinstance(recommender_object, Incremental_Training_Early_Stopping):
                 fit_params = {"epochs": 200, **earlystopping_keywargs}
-            elif isinstance(recommender_object, ItemKNNCBFCustomizedSimilarityRecommender):
+            elif isinstance(recommender_object, ItemKNNCBFWeightedSimilarityRecommender):
                 fit_params = {"ICMs": ICMs}
             elif isinstance(recommender_object, ItemKNNCFRecommender):
                 fit_params = {"topK": 200, "shrink": 200, "feature_weighting": "TF-IDF"}
@@ -147,15 +147,16 @@ def evaluate_best_saved_model(URM_all):
 
 if __name__ == '__main__':
     URM_all, user_id_unique, item_id_unique = load_urm()
+
     ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
     ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
     ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
     ICM_event = load_icm("data_ICM_event.csv", weight=1)
-    target_ids = load_target()
 
     ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
-
     ICMs = [ICM_genre, ICM_subgenre, ICM_channel, ICM_event, ICM_all]
+
+    target_ids = load_target()
 
     # evaluate_best_saved_model(URM_all)
     evaluate_all_recommenders(URM_all, *ICMs)

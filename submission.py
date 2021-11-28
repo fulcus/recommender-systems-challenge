@@ -14,26 +14,23 @@ res_dir = 'result_experiments/csv'
 output_root_path = "./result_experiments/"
 
 recommender_class_list = [
-    # UserKNNCBFRecommender, # UCM needed
     # ItemKNNCBFRecommender,
-    # UserKNN_CFCBF_Hybrid_Recommender, # UCM needed
     # ItemKNN_CFCBF_Hybrid_Recommender,
-    SLIMElasticNetRecommender,  # too slow to train
+    SLIMElasticNetRecommender,  # slow to train, good
     # UserKNNCFRecommender,
-    # IALSRecommender,
+    # IALSRecommender, # good
     # MatrixFactorization_BPR_Cython,
     # MatrixFactorization_FunkSVD_Cython, # fix low values
     # MatrixFactorization_AsySVD_Cython, # fix low values
     # EASE_R_Recommender, # fix low values
     # ItemKNNCFRecommender,
     # P3alphaRecommender,
-    # SLIM_BPR_Cython,
-    # RP3betaRecommender,
+    # SLIM_BPR_Python,
+    # RP3betaRecommender, # good
     # PureSVDRecommender,
     # NMFRecommender,
 
     # LightFMCFRecommender,
-    # LightFMUserHybridRecommender, # UCM needed
     # LightFMItemHybridRecommender,
 ]
 
@@ -41,7 +38,7 @@ recommender_class_list = [
 if not os.path.exists(output_root_path):
     os.makedirs(output_root_path)
 
-logFile = open(output_root_path + "result_all_algorithms.txt", "a")
+logFile = open(output_root_path + "submission_all_algorithms.txt", "a")
 
 
 def create_csv(target_ids, results, rec_name):
@@ -65,7 +62,6 @@ def run_prediction_all_recommenders(URM_all, ICM_all):
                               "evaluator_object": evaluator,
                               "lower_validations_allowed": 3,
                               "validation_metric": "MAP",
-
                               }
 
     for recommender_class in recommender_class_list:
@@ -82,28 +78,9 @@ def run_prediction_all_recommenders(URM_all, ICM_all):
                 fit_params = {}
 
             recommender_object.fit(**fit_params)
-            results_run_1, results_run_string_1 = evaluator.evaluateRecommender(recommender_object)
-            recommender_object.save_model(output_root_path, file_name="temp_model.zip")
 
-            # added for prediction
             item_list = recommender_object.recommend(target_ids, cutoff=10, remove_seen_flag=True)
             create_csv(target_ids, item_list, recommender_class.RECOMMENDER_NAME)
-
-            # todo understand purpose
-            recommender_object = _get_instance(recommender_class, URM_all, ICM_all)
-            recommender_object.load_model(output_root_path, file_name="temp_model.zip")
-            os.remove(output_root_path + "temp_model.zip")
-
-            results_run_2, results_run_string_2 = evaluator.evaluateRecommender(recommender_object)
-
-            if recommender_class not in [Random]:
-                assert results_run_1.equals(results_run_2)
-
-            print("Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
-            logFile.write(
-                "Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
-            logFile.flush()
-
 
         except Exception as e:
             traceback.print_exc()
@@ -114,7 +91,7 @@ def run_prediction_all_recommenders(URM_all, ICM_all):
 # Method to create prediction using a saved best model of a specific recommender class
 
 def run_prediction_best_saved_model(URM_all, ICM_all):
-    # set here the recommender you want to use
+    # ******** set here the recommender you want to use
     recommender_object = P3alphaRecommender(URM_all)
 
     # rec_best_model_last.zip is the output of the run_hyperparameter_search (one best model for each rec class)

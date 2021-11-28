@@ -412,7 +412,7 @@ cdef class Compute_Similarity_Cython:
 
     def compute_similarity(self, start_col=None, end_col=None):
         """
-        Compute the similarity for the given dataset
+        Compute the similarity for the given Data_manager_split_datasets
         :param self:
         :param start_col: column to begin with
         :param end_col: column to stop before, end_col is excluded

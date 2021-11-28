@@ -175,7 +175,7 @@ class DatasetMapperManager(object):
 
     def add_URM(self, URM_dataframe:pd.DataFrame, URM_name):
         """
-        Adds the URM_dataframe to the current dataset object
+        Adds the URM_dataframe to the current Data_manager_split_datasets object
         :param URM_dataframe:   Expected columns: UserID, ItemID, Data
         :param URM_name:        String with the name of the URM
         :return:
@@ -189,7 +189,7 @@ class DatasetMapperManager(object):
 
     def add_ICM(self, ICM_dataframe:pd.DataFrame, ICM_name):
         """
-        Adds the ICM_dataframe to the current dataset object
+        Adds the ICM_dataframe to the current Data_manager_split_datasets object
         :param ICM_dataframe:   Expected columns: ItemID, FeatureID, Data
         :param ICM_name:        String with the name of the ICM
         :return:
@@ -204,7 +204,7 @@ class DatasetMapperManager(object):
 
     def add_UCM(self, UCM_dataframe:pd.DataFrame, UCM_name):
         """
-        Adds the UCM_dataframe to the current dataset object
+        Adds the UCM_dataframe to the current Data_manager_split_datasets object
         :param UCM_dataframe:   Expected columns: UserID, FeatureID, Data
         :param UCM_name:        String with the name of the UCM
         :return:

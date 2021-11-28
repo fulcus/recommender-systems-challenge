@@ -20,10 +20,10 @@ from Data_manager.data_consistency_check import assert_disjoint_matrices, assert
 
 class DataSplitter_leave_k_out(_DataSplitter):
     """
-    The splitter tries to load from the specific folder related to a dataset, a split in the format corresponding to
+    The splitter tries to load from the specific folder related to a Data_manager_split_datasets, a split in the format corresponding to
     the splitter class. Basically each split is in a different subfolder
-    - The "original" subfolder contains the whole dataset, is composed by a single URM with all data and may contain
-        ICMs as well, either one or many, depending on the dataset
+    - The "original" subfolder contains the whole Data_manager_split_datasets, is composed by a single URM with all data and may contain
+        ICMs as well, either one or many, depending on the Data_manager_split_datasets
     - The other subfolders "warm", "cold" ecc contains the splitted data.
 
     The dataReader class involvement is limited to the following cased:

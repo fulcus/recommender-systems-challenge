@@ -11,10 +11,10 @@ from Data_manager.DataReader import DataReader
 
 class DataSplitter(object):
     """
-    The splitter tries to load from the specific folder related to a dataset, a split in the format corresponding to
+    The splitter tries to load from the specific folder related to a Data_manager_split_datasets, a split in the format corresponding to
     the splitter class. Basically each split is in a different subfolder
-    - The "original" subfolder contains the whole dataset, is composed by a single URM with all data and may contain
-        ICMs as well, either one or many, depending on the dataset
+    - The "original" subfolder contains the whole Data_manager_split_datasets, is composed by a single URM with all data and may contain
+        ICMs as well, either one or many, depending on the Data_manager_split_datasets
     - The other subfolders "warm", "cold" ecc contains the splitted data.
 
     The dataReader class involvement is limited to the following cased:
@@ -129,7 +129,7 @@ class DataSplitter(object):
     def load_data(self, save_folder_path = None):
         """
 
-        :param save_folder_path:    path in which to save the loaded dataset
+        :param save_folder_path:    path in which to save the loaded Data_manager_split_datasets
                                     None    use default "dataset_name/split_name/"
                                     False   do not save
         :return:
@@ -217,13 +217,13 @@ class DataSplitter(object):
         """
         :return: Dataset_name/split_name/
         """
-        raise NotImplementedError("{}: _get_split_subfolder_name was not implemented for the required dataset. Impossible to load the data".format(self.DATA_SPLITTER_NAME))
+        raise NotImplementedError("{}: _get_split_subfolder_name was not implemented for the required Data_manager_split_datasets. Impossible to load the data".format(self.DATA_SPLITTER_NAME))
 
 
 
 
     def _split_data_from_original_dataset(self, save_folder_path):
-        raise NotImplementedError("{}: _split_data_from_original_dataset was not implemented for the required dataset. Impossible to load the data".format(self.DATA_SPLITTER_NAME))
+        raise NotImplementedError("{}: _split_data_from_original_dataset was not implemented for the required Data_manager_split_datasets. Impossible to load the data".format(self.DATA_SPLITTER_NAME))
 
 
     def _load_previously_built_split_and_attributes(self, save_folder_path):
@@ -231,18 +231,18 @@ class DataSplitter(object):
         Loads all URM and ICM
         :return:
         """
-        raise NotImplementedError("{}: _load_previously_built_split_and_attributes was not implemented for the required dataset. Impossible to load the data".format(self.DATA_SPLITTER_NAME))
+        raise NotImplementedError("{}: _load_previously_built_split_and_attributes was not implemented for the required Data_manager_split_datasets. Impossible to load the data".format(self.DATA_SPLITTER_NAME))
 
 
     def get_statistics_URM(self):
 
-        raise NotImplementedError("{}: get_statistics_URM was not implemented for the required dataset. Impossible to load the data".format(self.DATA_SPLITTER_NAME))
+        raise NotImplementedError("{}: get_statistics_URM was not implemented for the required Data_manager_split_datasets. Impossible to load the data".format(self.DATA_SPLITTER_NAME))
 
 
 
     def get_statistics_ICM(self):
 
-        raise NotImplementedError("{}: get_statistics_ICM was not implemented for the required dataset. Impossible to load the data".format(self.DATA_SPLITTER_NAME))
+        raise NotImplementedError("{}: get_statistics_ICM was not implemented for the required Data_manager_split_datasets. Impossible to load the data".format(self.DATA_SPLITTER_NAME))
 
 
     #########################################################################################################

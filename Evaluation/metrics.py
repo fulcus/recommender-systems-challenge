@@ -165,7 +165,7 @@ class HIT_RATE(_Metrics_Object):
     It is bounded at 1 and is strictly increases as the recommendation list length increases.
 
     Note that this is different w.r.t. COVERAGE_USER_CORRECT, COVERAGE_USER_CORRECT uses as denominator
-    all the users in the dataset, HR only those for which a recommendation was computed.
+    all the users in the Data_manager_split_datasets, HR only those for which a recommendation was computed.
     In this framework if a user has no possible correct recommendations then it is skipped.
     Therefore HR = COVERAGE_USER_CORRECT / COVERAGE_USER
 

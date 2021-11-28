@@ -41,12 +41,12 @@ class Dataset(object):
     # Available URM split
     AVAILABLE_URM = {}
 
-    # Available ICM for the given dataset, there might be no ICM, one or many
+    # Available ICM for the given Data_manager_split_datasets, there might be no ICM, one or many
     AVAILABLE_ICM = {}
     AVAILABLE_ICM_feature_mapper = {}
     _HAS_ICM = False
 
-    # Available UCM for the given dataset, there might be no UCM, one or many
+    # Available UCM for the given Data_manager_split_datasets, there might be no UCM, one or many
     AVAILABLE_UCM = {}
     AVAILABLE_UCM_feature_mapper = {}
     _HAS_UCM = False
@@ -59,7 +59,7 @@ class Dataset(object):
 
     _IS_IMPLICIT = False
 
-    # Mappers specific for a given dataset, they might be related to more complex data structures or FEATURE_TOKENs
+    # Mappers specific for a given Data_manager_split_datasets, they might be related to more complex data structures or FEATURE_TOKENs
     DATASET_SPECIFIC_MAPPER = []
 
 
@@ -265,7 +265,7 @@ class Dataset(object):
         min_interactions_per_item = item_profile_length.min()
 
 
-        print("DataReader: current dataset is: {}\n"
+        print("DataReader: current Data_manager_split_datasets is: {}\n"
               "\tNumber of items: {}\n"
               "\tNumber of users: {}\n"
               "\tNumber of interactions in URM_all: {}\n"

@@ -39,7 +39,7 @@ class RP3betaRecommender(BaseItemSimilarityMatrixRecommender):
 
         
         # if X.dtype != np.float32:
-        #     print("RP3beta fit: For memory usage reasons, we suggest to use np.float32 as dtype for the dataset")
+        #     print("RP3beta fit: For memory usage reasons, we suggest to use np.float32 as dtype for the Data_manager_split_datasets")
 
         if self.min_rating > 0:
             self.URM_train.data[self.URM_train.data < self.min_rating] = 0

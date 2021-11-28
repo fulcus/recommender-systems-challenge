@@ -34,10 +34,10 @@ def read_data_split_and_search():
     """
 
     # dataReader = Movielens1MReader()
-    # dataset = dataReader.load_data()
+    # Data_manager_split_datasets = dataReader.load_data()
 
     URM_all, user_id_unique, item_id_unique = load_urm()
-    URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.80)
+    URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.90)
     URM_train, URM_validation = split_train_in_two_percentage_global_sample(URM_train, train_percentage=0.80)
 
     output_folder_path = "result_experiments/"
@@ -47,13 +47,11 @@ def read_data_split_and_search():
         os.makedirs(output_folder_path)
 
     collaborative_algorithm_list = [
-        # Random,
-        # TopPop,
         P3alphaRecommender,
         RP3betaRecommender,
         ItemKNNCFRecommender,
         UserKNNCFRecommender,
-        MatrixFactorization_BPR_Cython,
+        MatrixFactorization_BPR_Cython,  # bad
         MatrixFactorization_FunkSVD_Cython,
         PureSVDRecommender,
         SLIM_BPR_Cython,
@@ -63,7 +61,7 @@ def read_data_split_and_search():
 
     from Evaluation.Evaluator import EvaluatorHoldout
 
-    cutoff_list = [5, 10, 20]
+    cutoff_list = [10]
     metric_to_optimize = "MAP"
     cutoff_to_optimize = 10
 
@@ -90,8 +88,6 @@ def read_data_split_and_search():
     pool = multiprocessing.Pool(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
     pool.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)
 
-    #
-    #
     # for recommender_class in collaborative_algorithm_list:
     #
     #     try:
@@ -102,7 +98,6 @@ def read_data_split_and_search():
     #
     #         print("On recommender {} Exception {}".format(recommender_class, str(e)))
     #         traceback.print_exc()
-    #
 
 
 if __name__ == '__main__':

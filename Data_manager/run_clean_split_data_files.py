@@ -10,7 +10,7 @@ from Data_manager.DataReader import DataReader
 
 if __name__ == '__main__':
 
-    print("This script removes all split data from Data_manager_split_datasets without removing the 'original' folders or the downloaded dataset")
+    print("This script removes all split data from Data_manager_split_datasets without removing the 'original' folders or the downloaded Data_manager_split_datasets")
 
     input_proceed = input("Proceed? (y/n): ")
 
@@ -22,7 +22,7 @@ if __name__ == '__main__':
         #walk_generator = os.walk("../" + DataReader.DATASET_SPLIT_ROOT_FOLDER)
         dir_list = os.listdir("../" + DataReader.DATASET_SPLIT_ROOT_FOLDER)
 
-        print("Fount {} dataset drectories: {}".format(len(dir_list), dir_list))
+        print("Fount {} Data_manager_split_datasets drectories: {}".format(len(dir_list), dir_list))
 
         input_proceed = input("Remove pre-splitted files? (y/n): ")
 

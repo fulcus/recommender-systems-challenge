@@ -58,7 +58,7 @@ class DataSplitter_Holdout(_DataSplitter):
         :param n_folds:
         :param force_new_split:
         :param forbid_new_split:
-        :param save_folder_path:    path in which to save the loaded dataset
+        :param save_folder_path:    path in which to save the loaded Data_manager_split_datasets
                                     None    use default "dataset_name/split_name/"
                                     False   do not save
         """

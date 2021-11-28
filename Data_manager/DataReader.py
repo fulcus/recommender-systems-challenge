@@ -20,9 +20,9 @@ from Data_manager.Dataset import Dataset
 
 class DataReader(object):
     """
-    Abstract class for the DataReaders, each shoud be implemented for a specific dataset
+    Abstract class for the DataReaders, each shoud be implemented for a specific Data_manager_split_datasets
     DataReader has the following functions:
-     - It loads the data of the original dataset and saves it into sparse matrices
+     - It loads the data of the original Data_manager_split_datasets and saves it into sparse matrices
      - It exposes the following functions
         - load_data(save_folder_path = None)        loads the data and saves into the specified folder, if None uses default, if False des not save
         - get_URM_all()                             returns a copy of the whole URM
@@ -45,11 +45,11 @@ class DataReader(object):
     # Available URM split
     AVAILABLE_URM = ["URM_all"]
 
-    # Available ICM for the given dataset, there might be no ICM, one or many
+    # Available ICM for the given Data_manager_split_datasets, there might be no ICM, one or many
     AVAILABLE_ICM = []
     AVAILABLE_UCM = []
 
-    # This flag specifies if the given dataset contains implicit preferences or explicit ratings
+    # This flag specifies if the given Data_manager_split_datasets contains implicit preferences or explicit ratings
     IS_IMPLICIT = True
 
     _DATA_READER_NAME = "DataReader"
@@ -79,23 +79,23 @@ class DataReader(object):
         return self.AVAILABLE_UCM.copy()
 
     def _load_from_original_file(self):
-        raise NotImplementedError("{}: _load_from_original_file was not implemented for the required dataset. Impossible to load the data".format(self._DATA_READER_NAME))
+        raise NotImplementedError("{}: _load_from_original_file was not implemented for the required Data_manager_split_datasets. Impossible to load the data".format(self._DATA_READER_NAME))
 
 
     def _get_dataset_name_root(self):
         """
-        Returns the root of the folder tree which contains all of the dataset data/splits and files
+        Returns the root of the folder tree which contains all of the Data_manager_split_datasets data/splits and files
 
         :return: Dataset_name/
         """
-        raise NotImplementedError("{}:_get_dataset_name_root was not implemented for the required dataset. Impossible to load the data".format(self._DATA_READER_NAME))
+        raise NotImplementedError("{}:_get_dataset_name_root was not implemented for the required Data_manager_split_datasets. Impossible to load the data".format(self._DATA_READER_NAME))
 
 
 
 
     def _get_dataset_name_data_subfolder(self):
         """
-        Returns the subfolder inside the dataset folder tree which contains the specific data to be loaded
+        Returns the subfolder inside the Data_manager_split_datasets folder tree which contains the specific data to be loaded
         This method must be overridden by any data post processing object like k-cores / user sampling / interaction sampling etc
         to be applied before the data split
 
@@ -106,7 +106,7 @@ class DataReader(object):
 
     def load_data(self, save_folder_path = None):
         """
-        :param save_folder_path:    path in which to save the loaded dataset
+        :param save_folder_path:    path in which to save the loaded Data_manager_split_datasets
                                     None    use default "dataset_name/original/"
                                     False   do not save
         :return:

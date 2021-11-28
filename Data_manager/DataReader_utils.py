@@ -104,7 +104,7 @@ def remove_Dataframe_duplicates(dataframe, unique_values_in_columns = ['UserID',
     # # Remove duplicates.
 
     # This way of removing the duplicates keeping the last timemstamp without removing other columns
-    # would be the simplest, but it is so slow to the point of being unusable on any dataset but ML100k
+    # would be the simplest, but it is so slow to the point of being unusable on any Data_manager_split_datasets but ML100k
     # idxs = df_original.groupby(by=['UserID', 'ItemID'], as_index=False)["timestamp"].idxmax()
     # df_original = df_original.loc[idxs]
 
@@ -236,7 +236,7 @@ def load_CSV_into_SparseBuilder (filePath, header = False, separator="::", times
             # # Remove duplicates.
 
             # This way of removing the duplicates keeping the last tiemstamp without removing other columns
-            # would be the simplest, but it is so slow to the point of being unusable on any dataset but ML100k
+            # would be the simplest, but it is so slow to the point of being unusable on any Data_manager_split_datasets but ML100k
             # idxs = df_original.groupby(by=['userId', 'itemId'], as_index=False)["timestamp"].idxmax()
             # df_original = df_original.loc[idxs]
 

@@ -6,11 +6,10 @@ import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
-from Recommenders.KNN.CustomizedSimilarityItemKNNCBFRecommender import CustomizedSimilarityItemKNNCBFRecommender
+from Recommenders.KNN.ItemKNNCBFCustomizedSimilarityRecommender import ItemKNNCBFCustomizedSimilarityRecommender
 from Recommenders.Recommender_import_list import *
 from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
-from submission import create_csv
 
 res_dir = 'result_experiments/csv'
 output_root_path = "./result_experiments/"
@@ -18,7 +17,7 @@ output_root_path = "./result_experiments/"
 recommender_class_list = [
     # UserKNNCBFRecommender, # UCM needed
     # ItemKNNCBFRecommender,
-    CustomizedSimilarityItemKNNCBFRecommender, #new
+    ItemKNNCBFCustomizedSimilarityRecommender,  # new
     # UserKNN_CFCBF_Hybrid_Recommender, # UCM needed
     # ItemKNN_CFCBF_Hybrid_Recommender,
     # SLIMElasticNetRecommender,  # too slow to train
@@ -67,7 +66,6 @@ def train_test_holdout(URM_all, train_perc=0.8):
 
 
 def evaluate_all_recommenders(URM_all, *ICMs):
-
     ICM_all = ICMs[4]
 
     URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85)
@@ -90,14 +88,15 @@ def evaluate_all_recommenders(URM_all, *ICMs):
 
             if isinstance(recommender_object, Incremental_Training_Early_Stopping):
                 fit_params = {"epochs": 200, **earlystopping_keywargs}
-            elif isinstance(recommender_object, CustomizedSimilarityItemKNNCBFRecommender):
+            elif isinstance(recommender_object, ItemKNNCBFCustomizedSimilarityRecommender):
                 fit_params = {"ICMs": ICMs}
             elif isinstance(recommender_object, ItemKNNCFRecommender):
                 fit_params = {"topK": 200, "shrink": 200, "feature_weighting": "TF-IDF"}
             elif isinstance(recommender_object, SLIMElasticNetRecommender):
                 fit_params = {"topK": 463, 'l1_ratio': 0.0014760781357350578, 'alpha': 0.8618057479552595}
             elif isinstance(recommender_object, IALSRecommender):
-                fit_params = {'num_factors': 55, 'epochs': 50, 'confidence_scaling': 'log', 'alpha': 0.06164752624981533 , 'epsilon': 0.21164021855039056, 'reg': 0.002507116338282967}
+                fit_params = {'num_factors': 55, 'epochs': 50, 'confidence_scaling': 'log',
+                              'alpha': 0.06164752624981533, 'epsilon': 0.21164021855039056, 'reg': 0.002507116338282967}
             else:
                 fit_params = {}
 
@@ -110,7 +109,6 @@ def evaluate_all_recommenders(URM_all, *ICMs):
             os.remove(output_root_path + "temp_model.zip")
 
             results_run_2, results_run_string_2 = evaluator.evaluateRecommender(recommender_object)
-
 
             print("1-Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
             logFile.write(
@@ -131,7 +129,6 @@ def evaluate_all_recommenders(URM_all, *ICMs):
 
 
 def evaluate_best_saved_model(URM_all):
-
     URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85)
     evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10])
 

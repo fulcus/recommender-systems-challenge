@@ -17,7 +17,6 @@ def _get_instance(recommender_class, URM_train, ICM_all, UCM_all=None):
     #     recommender_object = recommender_class(URM_train, UCM_all)
     else:
         recommender_object = recommender_class(URM_train)
-        print('URM ONLY')
 
     return recommender_object
 

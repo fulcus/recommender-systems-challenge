@@ -7,15 +7,15 @@ import numpy as np
 from Recommenders.Similarity.Compute_Similarity import Compute_Similarity
 
 
-class CustomizedSimilarityItemKNNCBFRecommender(BaseItemCBFRecommender, BaseItemSimilarityMatrixRecommender):
+class ItemKNNCBFCustomizedSimilarityRecommender(BaseItemCBFRecommender, BaseItemSimilarityMatrixRecommender):
     """ ItemKNN recommender"""
 
-    RECOMMENDER_NAME = "CustomizedSimilarityItemKNNCBFRecommender"
+    RECOMMENDER_NAME = "ItemKNNCBFCustomizedSimilarityRecommender"
 
     FEATURE_WEIGHTING_VALUES = ["BM25", "TF-IDF", "none"]
 
     def __init__(self, URM_train, ICM_train, verbose=True):
-        super(CustomizedSimilarityItemKNNCBFRecommender, self).__init__(URM_train, ICM_train, verbose=verbose)
+        super(ItemKNNCBFCustomizedSimilarityRecommender, self).__init__(URM_train, ICM_train, verbose=verbose)
 
     def fit(self, topK=50, shrink=100, similarity='cosine', normalize=True, feature_weighting="none", ICM_bias=None,
             ICMs=None, ICMs_weights=None,
@@ -49,10 +49,7 @@ class CustomizedSimilarityItemKNNCBFRecommender(BaseItemCBFRecommender, BaseItem
             i = check_matrix(i.copy(), 'csr', dtype=np.float32)
             i.eliminate_zeros()
 
-        ICM_genre = ICMs[0]
-        ICM_subgenre = ICMs[1]
-        ICM_channel = ICMs[2]
-        ICM_event = ICMs[3]
+        ICM_genre, ICM_subgenre, ICM_channel, ICM_event, _ = ICMs
 
         similarity_genre = Compute_Similarity(ICM_genre.T, shrink=shrink, topK=topK, normalize=normalize,
                                               similarity=similarity, **similarity_args)

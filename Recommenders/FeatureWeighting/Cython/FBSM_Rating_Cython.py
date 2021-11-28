@@ -58,7 +58,7 @@ class FBSM_Rating_Cython(BaseItemCBFRecommender, BaseItemSimilarityMatrixRecomme
         if initialization_mode_D not in self.INIT_TYPE_VALUES:
            raise ValueError("Value for 'initialization_mode_D' not recognized. Acceptable values are {}, provided was '{}'".format(self.INIT_TYPE_VALUES, initialization_mode_D))
 
-        from FeatureWeighting.Cython.FBSM_Rating_Cython_SGD import FBSM_Rating_Cython_SGD
+        from Recommenders.FeatureWeighting.Cython.FBSM_Rating_Cython_SGD import FBSM_Rating_Cython_SGD
 
         self.n_factors = n_factors
         self.learning_rate = learning_rate

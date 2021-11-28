@@ -105,7 +105,7 @@ class CFW_D_Similarity_Cython(BaseItemCBFRecommender, BaseItemSimilarityMatrixRe
 
 
         # Import compiled module
-        from FeatureWeighting.Cython.CFW_D_Similarity_Cython_SGD import CFW_D_Similarity_Cython_SGD
+        from Recommenders.FeatureWeighting.Cython.CFW_D_Similarity_Cython_SGD import CFW_D_Similarity_Cython_SGD
 
         self.show_max_performance = show_max_performance
         self.normalize_similarity = normalize_similarity

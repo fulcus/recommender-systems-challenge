@@ -77,7 +77,7 @@ class HP3_Similarity_Cython(BaseItemCBFRecommender, BaseItemSimilarityMatrixReco
             print(self.RECOMMENDER_NAME + ": Invalid init value, using default (" + str(self.INIT_VALUE) + ")")
 
         # Import compiled module
-        from FeatureWeighting.Cython.HP3_Similarity_Cython_SGD import HP3_Similarity_Cython_SGD
+        from Recommenders.FeatureWeighting.Cython.HP3_Similarity_Cython_SGD import HP3_Similarity_Cython_SGD
 
         self.log_file = log_file
         self.show_max_performance = show_max_performance

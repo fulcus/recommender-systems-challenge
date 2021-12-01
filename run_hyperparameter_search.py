@@ -8,6 +8,7 @@ Created on 22/11/17
 from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
 from Recommenders.KNN.ItemKNNCustomSimilarityRecommender import ItemKNNCustomSimilarityRecommender
 from Recommenders.Recommender_import_list import *
+from Recommenders.Recommender_utils import check_matrix
 from reader import load_urm, load_icm
 from Evaluation.Evaluator import EvaluatorHoldout
 
@@ -57,14 +58,14 @@ def read_data_split_and_search():
 
     collaborative_algorithm_list = [
         # P3alphaRecommender,
-        # RP3betaRecommender,
+        RP3betaRecommender,
         # ItemKNNCFRecommender,
         # UserKNNCFRecommender,
         # MatrixFactorization_BPR_Cython,  # bad
         # MatrixFactorization_FunkSVD_Cython,
         # PureSVDRecommender,
         # SLIM_BPR_Cython,
-        # SLIMElasticNetRecommender,
+        SLIMElasticNetRecommender,
         # IALSRecommender
     ]
 
@@ -82,6 +83,10 @@ def read_data_split_and_search():
 
     evaluator_validation = EvaluatorHoldout(URM_validation, cutoff_list=cutoff_list)
     evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=cutoff_list)
+
+    # tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
+    # tmp = tmp.multiply(14)
+    # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
                                                        URM_train=URM_train,

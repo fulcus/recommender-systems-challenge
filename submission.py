@@ -2,11 +2,13 @@ import os
 import traceback
 from datetime import datetime
 
+import numpy as np
 import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 from Recommenders.Recommender_import_list import *
+from Recommenders.Recommender_utils import check_matrix
 from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
 
@@ -55,10 +57,14 @@ def create_csv(target_ids, results, rec_name):
 
 
 def run_prediction_all_recommenders(URM_all, ICM_all):
+    tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
+    tmp = tmp.multiply(14)
+    URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
+
     evaluator = EvaluatorHoldout(URM_all, cutoff_list=[10], exclude_seen=True)
 
     earlystopping_keywargs = {"validation_every_n": 2,
-                              "stop_on_validation": True,
+                              "stop_on_validation": False,
                               "evaluator_object": evaluator,
                               "lower_validations_allowed": 3,
                               "validation_metric": "MAP",
@@ -71,9 +77,13 @@ def run_prediction_all_recommenders(URM_all, ICM_all):
             recommender_object = _get_instance(recommender_class, URM_all, ICM_all)
 
             if isinstance(recommender_object, Incremental_Training_Early_Stopping):
-                fit_params = {"epochs": 15, **earlystopping_keywargs}
+                fit_params = {'num_factors': 167, 'epochs': 25, 'confidence_scaling': 'log',
+                              'alpha': 2.7491082249169008, 'epsilon': 0.2892328524505224, 'reg': 0.0003152844014605245}
             elif isinstance(recommender_object, SLIMElasticNetRecommender):
-                fit_params = {"topK": 463, 'l1_ratio': 0.0014760781357350578, 'alpha': 0.8618057479552595}
+                fit_params = {"topK": 453, 'l1_ratio': 0.00029920499017254754, 'alpha': 0.10734084960757517}
+            elif isinstance(recommender_object, IALSRecommender):
+                fit_params = {'num_factors': 167, 'epochs': 25, 'confidence_scaling': 'log',
+                              'alpha': 2.7491082249169008, 'epsilon': 0.2892328524505224, 'reg': 0.0003152844014605245}
             else:
                 fit_params = {}
 

@@ -5,12 +5,15 @@ import numpy as np
 import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
+from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
+from Recommenders.KNN.ItemKNNCustomSimilarityRecommender import ItemKNNCustomSimilarityRecommender
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
 from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
+from sklearn import feature_extraction
 
 res_dir = 'result_experiments/csv'
 output_root_path = "./result_experiments/"
@@ -18,12 +21,12 @@ output_root_path = "./result_experiments/"
 recommender_class_list = [
     # UserKNNCBFRecommender, # UCM needed
     # ItemKNNCBFRecommender,
-    ItemKNNCBFWeightedSimilarityRecommender,  # new
+    # ItemKNNCBFWeightedSimilarityRecommender,  # new
     # UserKNN_CFCBF_Hybrid_Recommender, # UCM needed
     # ItemKNN_CFCBF_Hybrid_Recommender,
     # SLIMElasticNetRecommender,  # too slow to train
     # UserKNNCFRecommender,
-    IALSRecommender,
+    # IALSRecommender,
     # MatrixFactorization_BPR_Cython,
     # MatrixFactorization_FunkSVD_Cython, # fix low values
     # MatrixFactorization_AsySVD_Cython, # fix low values
@@ -38,6 +41,8 @@ recommender_class_list = [
     # LightFMCFRecommender,
     # LightFMUserHybridRecommender, # UCM needed
     # LightFMItemHybridRecommender,
+
+    Hybrid_SlimElastic_Rp3
 ]
 
 # If directory does not exist, create
@@ -71,9 +76,9 @@ def evaluate_all_recommenders(URM_all, *ICMs):
 
     URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85)
 
-    # tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
+    tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
-    # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
+    URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     # todo check URM_test, URM_train are consistently placed
     evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10], exclude_seen=True)
@@ -89,19 +94,22 @@ def evaluate_all_recommenders(URM_all, *ICMs):
 
         try:
             print("Algorithm: {}".format(recommender_class.RECOMMENDER_NAME))
+            # URM_tfidf = feature_extraction.text.TfidfTransformer().fit_transform(URM_train)
             recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
 
-            if isinstance(recommender_object, Incremental_Training_Early_Stopping):
-                fit_params = {"epochs": 200, **earlystopping_keywargs}
-            elif isinstance(recommender_object, ItemKNNCBFWeightedSimilarityRecommender):
+            if isinstance(recommender_object, ItemKNNCBFWeightedSimilarityRecommender):
                 fit_params = {"ICMs": ICMs}
             elif isinstance(recommender_object, ItemKNNCFRecommender):
                 fit_params = {"topK": 200, "shrink": 200, "feature_weighting": "TF-IDF"}
             elif isinstance(recommender_object, SLIMElasticNetRecommender):
-                fit_params = {"topK": 463, 'l1_ratio': 0.0014760781357350578, 'alpha': 0.8618057479552595}
+                fit_params = {"topK": 453, 'l1_ratio': 0.00029920499017254754, 'alpha': 0.10734084960757517}
             elif isinstance(recommender_object, IALSRecommender):
                 fit_params = {'num_factors': 55, 'epochs': 50, 'confidence_scaling': 'log',
                               'alpha': 0.06164752624981533, 'epsilon': 0.21164021855039056, 'reg': 0.002507116338282967}
+            elif isinstance(recommender_object, Incremental_Training_Early_Stopping):
+                fit_params = {"epochs": 200, **earlystopping_keywargs}
+            elif isinstance(recommender_object, RP3betaRecommender):
+                fit_params = {'topK': 40, 'alpha': 0.4208737801266599, 'beta': 0.5251543657397256,'normalize_similarity': True}
             else:
                 fit_params = {}
 

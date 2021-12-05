@@ -6,6 +6,8 @@ import numpy as np
 import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
+from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
+from Recommenders.Hybrids.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
@@ -18,7 +20,7 @@ output_root_path = "./result_experiments/"
 recommender_class_list = [
     # ItemKNNCBFRecommender,
     # ItemKNN_CFCBF_Hybrid_Recommender,
-    SLIMElasticNetRecommender,  # slow to train, good
+    # SLIMElasticNetRecommender,  # slow to train, good
     # UserKNNCFRecommender,
     # IALSRecommender, # good
     # MatrixFactorization_BPR_Cython,
@@ -34,6 +36,9 @@ recommender_class_list = [
 
     # LightFMCFRecommender,
     # LightFMItemHybridRecommender,
+
+    # ScoresHybridRP3betaKNNCBF
+    Hybrid_SlimElastic_Rp3
 ]
 
 # If directory does not exist, create
@@ -56,10 +61,18 @@ def create_csv(target_ids, results, rec_name):
             f.write(str(target_id) + ', ' + ' '.join(map(str, result)) + '\n')
 
 
-def run_prediction_all_recommenders(URM_all, ICM_all):
-    tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
-    tmp = tmp.multiply(14)
+def run_prediction_all_recommenders(URM_all, *ICMs):
+    ICM_all = ICMs[4]
+
+
+
+    tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
+    # tmp = tmp.multiply(14)
     URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
+
+    # tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
+    # tmp = tmp.multiply(14)
+    # URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
 
     evaluator = EvaluatorHoldout(URM_all, cutoff_list=[10], exclude_seen=True)
 
@@ -74,16 +87,18 @@ def run_prediction_all_recommenders(URM_all, ICM_all):
 
         try:
             print("Algorithm: {}".format(recommender_class.RECOMMENDER_NAME))
-            recommender_object = _get_instance(recommender_class, URM_all, ICM_all)
+            recommender_object = _get_instance(recommender_class, URM_all, ICM_channel)
 
-            if isinstance(recommender_object, Incremental_Training_Early_Stopping):
-                fit_params = {'num_factors': 167, 'epochs': 25, 'confidence_scaling': 'log',
-                              'alpha': 2.7491082249169008, 'epsilon': 0.2892328524505224, 'reg': 0.0003152844014605245}
-            elif isinstance(recommender_object, SLIMElasticNetRecommender):
+            # if isinstance(recommender_object, Incremental_Training_Early_Stopping):
+            #    fit_params = {'num_factors': 167, 'epochs': 25, 'confidence_scaling': 'log',
+            #                  'alpha': 2.7491082249169008, 'epsilon': 0.2892328524505224, 'reg': 0.0003152844014605245}
+            if isinstance(recommender_object, SLIMElasticNetRecommender):
                 fit_params = {"topK": 453, 'l1_ratio': 0.00029920499017254754, 'alpha': 0.10734084960757517}
             elif isinstance(recommender_object, IALSRecommender):
                 fit_params = {'num_factors': 167, 'epochs': 25, 'confidence_scaling': 'log',
                               'alpha': 2.7491082249169008, 'epsilon': 0.2892328524505224, 'reg': 0.0003152844014605245}
+            elif isinstance(recommender_object, ScoresHybridRP3betaKNNCBF):
+                fit_params = {'topK_P': 479, 'alpha_P': 0.66439892057927, 'normalize_similarity_P': False, 'topK': 1761, 'shrink': 4028, 'similarity': 'tversky', 'normalize': True, 'alpha': 0.9435088940853401, 'beta_P': 0.38444510929214876, 'feature_weighting': 'none'}
             else:
                 fit_params = {}
 
@@ -121,5 +136,6 @@ if __name__ == '__main__':
     target_ids = load_target()
 
     ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
+    ICMs = [ICM_genre, ICM_subgenre, ICM_channel, ICM_event, ICM_all]
 
-    run_prediction_all_recommenders(URM_all, ICM_all)
+    run_prediction_all_recommenders(URM_all, *ICMs)

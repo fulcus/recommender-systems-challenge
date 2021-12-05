@@ -1,3 +1,4 @@
+from Recommenders.Hybrids.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
 from Recommenders.Recommender_import_list import *
 
 from Data_manager.TVShows.TVShowsReader import TVShowsReader
@@ -15,6 +16,8 @@ def _get_instance(recommender_class, URM_train, ICM_all, UCM_all=None):
     # todo No UCM => No CBF
     # elif issubclass(recommender_class, BaseUserCBFRecommender):
     #     recommender_object = recommender_class(URM_train, UCM_all)
+    elif issubclass(recommender_class, ScoresHybridRP3betaKNNCBF):
+        recommender_object = recommender_class(URM_train, ICM_all)
     else:
         recommender_object = recommender_class(URM_train)
 

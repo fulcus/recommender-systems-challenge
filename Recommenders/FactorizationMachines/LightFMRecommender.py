@@ -10,7 +10,7 @@ from Recommenders.Incremental_Training_Early_Stopping import Incremental_Trainin
 from Recommenders.BaseRecommender import BaseRecommender
 from Recommenders.DataIO import DataIO
 from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender, BaseUserCBFRecommender
-from lightfm import LightFM
+# from lightfm import LightFM
 import numpy as np
 from copy import deepcopy
 import scipy.sparse as sps

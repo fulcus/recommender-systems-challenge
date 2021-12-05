@@ -14,6 +14,14 @@ from functools import partial
 ##########                  PURE COLLABORATIVE              ##########
 ##########                                                  ##########
 ######################################################################
+from Recommenders.FeatureWeighting import CFW_D_Similarity_Linalg
+from Recommenders.Hybrids.RankingHybrid import RankingHybrid
+from Recommenders.Hybrids.ScoresHybridKNNCFKNNCBF import ScoresHybridKNNCFKNNCBF
+from Recommenders.Hybrids.ScoresHybridP3alphaKNNCBF import ScoresHybridP3alphaKNNCBF
+from Recommenders.Hybrids.ScoresHybridP3alphaPureSVD import ScoresHybridP3alphaPureSVD
+from Recommenders.Hybrids.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
+from Recommenders.Hybrids.ScoresHybridSpecializedAdaptive import ScoresHybridSpecializedAdaptive
+from Recommenders.Hybrids.ScoresHybridUserKNNCFKNNCBF import ScoresHybridUserKNNCFKNNCBF
 from Recommenders.NonPersonalizedRecommender import TopPop, Random, GlobalEffects
 
 # KNN
@@ -182,7 +190,7 @@ def runHyperparameterSearch_FeatureWeighting(recommender_class, URM_train, W_tra
                                 cutoff_to_optimize=cutoff_to_optimize)
 
 
-def runHyperparameterSearch_Hybrid(recommender_class, URM_train, ICM_object, ICM_name, URM_train_last_test=None,
+def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_object, ICM_name, URM_train_last_test=None,
                                    n_cases=None, n_random_starts=None, resume_from_saved=False,
                                    save_model="best", evaluate_on_test="best", max_total_time=None,
                                    evaluator_validation_earlystopping=None,
@@ -241,6 +249,152 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, ICM_object, ICM
         hyperparameterSearch = SearchBayesianSkopt(recommender_class, evaluator_validation=evaluator_validation,
                                                    evaluator_test=evaluator_test)
 
+        ##########################################################################################################
+
+        if recommender_class in [ScoresHybridP3alphaKNNCBF, ScoresHybridRP3betaKNNCBF]:
+                                # , ScoresHybridSpecialized,
+                                 # ScoresHybridSpecializedCold, ScoresHybridSpecializedV2Cold,
+                                # ScoresHybridSpecializedV2Mid, ScoresHybridSpecializedV2Warm,
+                                # ScoresHybridSpecializedV2Mid12, ScoresHybridSpecializedV2Warm12,
+                                # ScoresHybridSpecializedV3Cold, ScoresHybridSpecializedV3Warm]:
+
+            hyperparameters_range_dictionary = {}
+            hyperparameters_range_dictionary["topK_P"] = Integer(5, 3000)
+            hyperparameters_range_dictionary["alpha_P"] = Real(low=0, high=2, prior='uniform')
+            hyperparameters_range_dictionary["normalize_similarity_P"] = Categorical([False])
+            hyperparameters_range_dictionary["topK"] = Integer(5, 3000)
+            hyperparameters_range_dictionary["shrink"] = Integer(0, 5000)
+            hyperparameters_range_dictionary["similarity"] = Categorical(
+                ["tversky", "tanimoto", 'cosine', 'asymmetric'])
+            hyperparameters_range_dictionary["normalize"] = Categorical([True, False])
+            hyperparameters_range_dictionary["alpha"] = Real(low=0, high=2, prior='uniform')
+            if recommender_class is ScoresHybridRP3betaKNNCBF:
+                hyperparameters_range_dictionary["beta_P"] = Real(low=0, high=2, prior='uniform')
+
+            if allow_weighting:
+                hyperparameters_range_dictionary["feature_weighting"] = Categorical(["none", "BM25", "TF-IDF"])
+
+            recommender_input_args = SearchInputRecommenderArgs(
+                CONSTRUCTOR_POSITIONAL_ARGS=[URM_train, ICM_object],
+                CONSTRUCTOR_KEYWORD_ARGS={},
+                FIT_POSITIONAL_ARGS=[],
+                FIT_KEYWORD_ARGS={}
+            )
+
+        ##########################################################################################################
+
+        if recommender_class in [ScoresHybridKNNCFKNNCBF, ScoresHybridUserKNNCFKNNCBF]:
+
+            hyperparameters_range_dictionary = {}
+            hyperparameters_range_dictionary["topK_CF"] = Integer(5, 1500)
+            hyperparameters_range_dictionary["shrink_CF"] = Integer(0, 1500)
+            hyperparameters_range_dictionary["similarity_CF"] = Categorical(
+                ["tversky", "tanimoto", 'cosine', 'asymmetric'])
+            hyperparameters_range_dictionary["normalize_CF"] = Categorical([True, False])
+            hyperparameters_range_dictionary["topK"] = Integer(5, 1500)
+            hyperparameters_range_dictionary["shrink"] = Integer(0, 1500)
+            hyperparameters_range_dictionary["similarity"] = Categorical(
+                ["tversky", "tanimoto", 'cosine', 'asymmetric'])
+            hyperparameters_range_dictionary["normalize"] = Categorical([True, False])
+            hyperparameters_range_dictionary["alpha"] = Real(low=0, high=1, prior='uniform')
+
+            if allow_weighting:
+                hyperparameters_range_dictionary["feature_weighting"] = Categorical(["none", "BM25", "TF-IDF"])
+
+            recommender_input_args = SearchInputRecommenderArgs(
+                CONSTRUCTOR_POSITIONAL_ARGS=[URM_train, ICM_object],
+                CONSTRUCTOR_KEYWORD_ARGS={},
+                FIT_POSITIONAL_ARGS=[],
+                FIT_KEYWORD_ARGS={}
+            )
+        ##########################################################################################################
+
+        if recommender_class is ScoresHybridSpecializedAdaptive:
+
+            hyperparameters_range_dictionary = {}
+            # Cold users hybrid
+            hyperparameters_range_dictionary["topK_P_C"] = Integer(5, 1500)
+            hyperparameters_range_dictionary["alpha_P_C"] = Real(low=0, high=2, prior='uniform')
+            hyperparameters_range_dictionary["beta_P_C"] = Real(low=0, high=2, prior='uniform')
+            hyperparameters_range_dictionary["normalize_similarity_P_C"] = Categorical([False])
+            hyperparameters_range_dictionary["topK_C"] = Integer(5, 1500)
+            hyperparameters_range_dictionary["shrink_C"] = Integer(0, 1500)
+            hyperparameters_range_dictionary["similarity_C"] = Categorical(
+                ["tversky", "tanimoto", 'cosine', 'asymmetric'])
+            hyperparameters_range_dictionary["normalize_C"] = Categorical([True, False])
+            # hyperparameters_range_dictionary["alpha_C"] = Real(low=0, high=1, prior='uniform')
+            if allow_weighting:
+                hyperparameters_range_dictionary["feature_weighting_C"] = Categorical(["none", "BM25", "TF-IDF"])
+
+            # Warm users hybrid
+            hyperparameters_range_dictionary["topK_P"] = Integer(5, 1500)
+            hyperparameters_range_dictionary["alpha_P"] = Real(low=0, high=2, prior='uniform')
+            hyperparameters_range_dictionary["beta_P"] = Real(low=0, high=2, prior='uniform')
+            hyperparameters_range_dictionary["normalize_similarity_P"] = Categorical([False])
+            hyperparameters_range_dictionary["topK"] = Integer(5, 1500)
+            hyperparameters_range_dictionary["shrink"] = Integer(0, 1500)
+            hyperparameters_range_dictionary["similarity"] = Categorical(
+                ["tversky", "tanimoto", 'cosine', 'asymmetric'])
+            hyperparameters_range_dictionary["normalize"] = Categorical([True, False])
+            # hyperparameters_range_dictionary["alpha"] = Real(low=0, high=1, prior='uniform')
+            if allow_weighting:
+                hyperparameters_range_dictionary["feature_weighting"] = Categorical(["none", "BM25", "TF-IDF"])
+
+            hyperparameters_range_dictionary["threshold"] = Integer(1, 30)
+
+            recommender_input_args = SearchInputRecommenderArgs(
+                CONSTRUCTOR_POSITIONAL_ARGS=[URM_train, ICM_object],
+                CONSTRUCTOR_KEYWORD_ARGS={},
+                FIT_POSITIONAL_ARGS=[],
+                FIT_KEYWORD_ARGS={}
+            )
+
+        ##########################################################################################################
+
+        if recommender_class is ScoresHybridP3alphaPureSVD:
+            hyperparameters_range_dictionary = {}
+            hyperparameters_range_dictionary["topK_P"] = Integer(5, 1000)
+            hyperparameters_range_dictionary["alpha_P"] = Real(low=0, high=2, prior='uniform')
+            hyperparameters_range_dictionary["normalize_similarity_P"] = Categorical([False])
+            hyperparameters_range_dictionary["num_factors"] = Integer(1, 500)
+
+            recommender_input_args = SearchInputRecommenderArgs(
+                CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
+                CONSTRUCTOR_KEYWORD_ARGS={},
+                FIT_POSITIONAL_ARGS=[],
+                FIT_KEYWORD_ARGS={}
+            )
+
+        ##########################################################################################################
+
+        if recommender_class is CFW_D_Similarity_Linalg:
+            hyperparameters_range_dictionary = {}
+            hyperparameters_range_dictionary["topK"] = Integer(5, 1000)
+            hyperparameters_range_dictionary["add_zeros_quota"] = Real(low=0, high=1, prior='uniform')
+            hyperparameters_range_dictionary["normalize_similarity"] = Categorical([True, False])
+
+            recommender_input_args = SearchInputRecommenderArgs(
+                CONSTRUCTOR_POSITIONAL_ARGS=[URM_train, ICM_object, W_train],
+                CONSTRUCTOR_KEYWORD_ARGS={},
+                FIT_POSITIONAL_ARGS=[],
+                FIT_KEYWORD_ARGS={}
+            )
+
+        #########################################################################################################
+
+        if recommender_class is RankingHybrid:
+            hyperparameters_range_dictionary = {}
+            hyperparameters_range_dictionary["Recommender_1"] = SLIMElasticNetRecommender
+            hyperparameters_range_dictionary["Recommender_2"] = RP3betaRecommender
+
+
+            recommender_input_args = SearchInputRecommenderArgs(
+                CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
+                CONSTRUCTOR_KEYWORD_ARGS={},
+                FIT_POSITIONAL_ARGS=[],
+                FIT_KEYWORD_ARGS={}
+            )
+        #########################################################################################################
         if recommender_class in [ItemKNN_CFCBF_Hybrid_Recommender, UserKNN_CFCBF_Hybrid_Recommender]:
 
             if similarity_type_list is None:

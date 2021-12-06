@@ -76,9 +76,9 @@ def evaluate_all_recommenders(URM_all, *ICMs):
 
     URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85)
 
-    tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
+    # tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
-    URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
+    # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     # todo check URM_test, URM_train are consistently placed
     evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10], exclude_seen=True)
@@ -95,7 +95,7 @@ def evaluate_all_recommenders(URM_all, *ICMs):
         try:
             print("Algorithm: {}".format(recommender_class.RECOMMENDER_NAME))
             # URM_tfidf = feature_extraction.text.TfidfTransformer().fit_transform(URM_train)
-            recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
+            recommender_object = _get_instance(recommender_class, URM_train, ICMs[2])
 
             if isinstance(recommender_object, ItemKNNCBFWeightedSimilarityRecommender):
                 fit_params = {"ICMs": ICMs}
@@ -110,6 +110,8 @@ def evaluate_all_recommenders(URM_all, *ICMs):
                 fit_params = {"epochs": 200, **earlystopping_keywargs}
             elif isinstance(recommender_object, RP3betaRecommender):
                 fit_params = {'topK': 40, 'alpha': 0.4208737801266599, 'beta': 0.5251543657397256,'normalize_similarity': True}
+            elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
+                fit_params = {'alpha': 0.9}
             else:
                 fit_params = {}
 
@@ -143,13 +145,14 @@ def evaluate_all_recommenders(URM_all, *ICMs):
 
 def evaluate_best_saved_model(URM_all):
     URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85)
-    evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10])
+    evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10], exclude_seen=True)
 
     # set here the recommender you want to use
     recommender_object = SLIMElasticNetRecommender(URM_train)
 
     # rec_best_model_last.zip is the output of the run_hyperparameter_search (one best model for each rec class)
-    recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
+    # recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
+    recommender_object.load_model(output_root_path, file_name="saved_slim.zip")
 
     results_run_1, results_run_string_1 = evaluator.evaluateRecommender(recommender_object)
 

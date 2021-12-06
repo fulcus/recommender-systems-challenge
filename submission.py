@@ -99,6 +99,8 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
                               'alpha': 2.7491082249169008, 'epsilon': 0.2892328524505224, 'reg': 0.0003152844014605245}
             elif isinstance(recommender_object, ScoresHybridRP3betaKNNCBF):
                 fit_params = {'topK_P': 479, 'alpha_P': 0.66439892057927, 'normalize_similarity_P': False, 'topK': 1761, 'shrink': 4028, 'similarity': 'tversky', 'normalize': True, 'alpha': 0.9435088940853401, 'beta_P': 0.38444510929214876, 'feature_weighting': 'none'}
+            elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
+                fit_params = {'alpha': 0.9}
             else:
                 fit_params = {}
 

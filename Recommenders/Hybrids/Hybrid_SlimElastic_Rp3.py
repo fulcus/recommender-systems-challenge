@@ -19,6 +19,8 @@ from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
 from sklearn import feature_extraction
 
+output_root_path = "./result_experiments/"
+
 
 class Hybrid_SlimElastic_Rp3(BaseRecommender):
     """Hybrid_SlimElastic_Rp3"""
@@ -30,17 +32,14 @@ class Hybrid_SlimElastic_Rp3(BaseRecommender):
 
         self.URM_train = check_matrix(URM_train.copy(), 'csr')
         self.slim = SLIMElasticNetRecommender(
-            URM_train)  # ItemKNNCFRecommender(URM_train) #IALSRecommender(URM_train)# SLIMElasticNetRecommender(URM_train)
+            URM_train)
         self.rp3 = RP3betaRecommender(URM_train)
 
     def fit(self, alpha=0.5):
-        # self.slim.load_model('', 'slim_saved')
-        # self.slim.fit( num_factors= 55, epochs=50, confidence_scaling='log',
-        # alpha=0.06164752624981533, epsilon= 0.21164021855039056, reg=0.002507116338282967)
-        # self.slim.fit(topK= 200, shrink= 200, feature_weighting="TF-IDF")
+        # self.slim.load_model(output_root_path, file_name="saved_slim.zip")
+
         self.slim.fit(topK=453, l1_ratio=0.00029920499017254754, alpha=0.10734084960757517)
         self.rp3.fit(topK=40, alpha=0.4208737801266599, beta=0.5251543657397256, normalize_similarity=True)
-
         self.fit_no_cached(path_slim=None, path_rp3=None, alpha=alpha)
 
     def fit_cached(self, path_slim, path_rp3, alpha=0.5):
@@ -64,14 +63,14 @@ class Hybrid_SlimElastic_Rp3(BaseRecommender):
         mat_scores_slim = np.stack(list_slim, axis=0)
         mat_scores_rp3 = np.stack(list_rp3, axis=0)
 
-        '''print("slim scores stats:")
+        print("slim scores stats:")
         print("min = {}".format(mat_scores_slim.min()))
         print("max = {}".format(mat_scores_slim.max()))
         print("average = {}".format(mat_scores_slim.mean()))
         print("rp3 scores stats:")
         print("min = {}".format(mat_scores_rp3.min()))
         print("max = {}".format(mat_scores_rp3.max()))
-        print("average = {}".format(mat_scores_rp3.mean()))'''
+        print("average = {}".format(mat_scores_rp3.mean()))
 
         # normalization
         mat_scores_slim /= mat_scores_slim.max()
@@ -80,14 +79,14 @@ class Hybrid_SlimElastic_Rp3(BaseRecommender):
         self.mat_scores_slim = mat_scores_slim
         self.mat_scores_rp3 = mat_scores_rp3
 
-        '''print("slim scores stats:")
+        print("slim scores stats:")
         print("min = {}".format(mat_scores_slim.min()))
         print("max = {}".format(mat_scores_slim.max()))
         print("average = {}".format(mat_scores_slim.mean()))
         print("rp3 scores stats:")
         print("min = {}".format(mat_scores_rp3.min()))
         print("max = {}".format(mat_scores_rp3.max()))
-        print("average = {}".format(mat_scores_rp3.mean()))'''
+        print("average = {}".format(mat_scores_rp3.mean()))
 
         # np.save(path_slim, arr=mat_scores_slim)
         # np.save(path_rp3, arr=mat_scores_rp3)

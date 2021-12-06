@@ -15,6 +15,7 @@ from functools import partial
 ##########                                                  ##########
 ######################################################################
 from Recommenders.FeatureWeighting import CFW_D_Similarity_Linalg
+from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.RankingHybrid import RankingHybrid
 from Recommenders.Hybrids.ScoresHybridKNNCFKNNCBF import ScoresHybridKNNCFKNNCBF
 from Recommenders.Hybrids.ScoresHybridP3alphaKNNCBF import ScoresHybridP3alphaKNNCBF
@@ -190,7 +191,8 @@ def runHyperparameterSearch_FeatureWeighting(recommender_class, URM_train, W_tra
                                 cutoff_to_optimize=cutoff_to_optimize)
 
 
-def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_object, ICM_name, URM_train_last_test=None,
+def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_object, ICM_name,
+                                   URM_train_last_test=None,
                                    n_cases=None, n_random_starts=None, resume_from_saved=False,
                                    save_model="best", evaluate_on_test="best", max_total_time=None,
                                    evaluator_validation_earlystopping=None,
@@ -252,11 +254,11 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
         ##########################################################################################################
 
         if recommender_class in [ScoresHybridP3alphaKNNCBF, ScoresHybridRP3betaKNNCBF]:
-                                # , ScoresHybridSpecialized,
-                                 # ScoresHybridSpecializedCold, ScoresHybridSpecializedV2Cold,
-                                # ScoresHybridSpecializedV2Mid, ScoresHybridSpecializedV2Warm,
-                                # ScoresHybridSpecializedV2Mid12, ScoresHybridSpecializedV2Warm12,
-                                # ScoresHybridSpecializedV3Cold, ScoresHybridSpecializedV3Warm]:
+            # , ScoresHybridSpecialized,
+            # ScoresHybridSpecializedCold, ScoresHybridSpecializedV2Cold,
+            # ScoresHybridSpecializedV2Mid, ScoresHybridSpecializedV2Warm,
+            # ScoresHybridSpecializedV2Mid12, ScoresHybridSpecializedV2Warm12,
+            # ScoresHybridSpecializedV3Cold, ScoresHybridSpecializedV3Warm]:
 
             hyperparameters_range_dictionary = {}
             hyperparameters_range_dictionary["topK_P"] = Integer(5, 3000)
@@ -387,7 +389,6 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
             hyperparameters_range_dictionary["Recommender_1"] = SLIMElasticNetRecommender
             hyperparameters_range_dictionary["Recommender_2"] = RP3betaRecommender
 
-
             recommender_input_args = SearchInputRecommenderArgs(
                 CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
                 CONSTRUCTOR_KEYWORD_ARGS={},
@@ -395,6 +396,20 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
                 FIT_KEYWORD_ARGS={}
             )
         #########################################################################################################
+
+        if recommender_class is Hybrid_SlimElastic_Rp3:
+            hyperparameters_range_dictionary = {}
+            hyperparameters_range_dictionary["alfa"] = Real(low=0, high=1, prior='uniform')
+
+            recommender_input_args = SearchInputRecommenderArgs(
+                CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
+                CONSTRUCTOR_KEYWORD_ARGS={},
+                FIT_POSITIONAL_ARGS=[],
+                FIT_KEYWORD_ARGS={}
+            )
+
+        #########################################################################################################
+
         if recommender_class in [ItemKNN_CFCBF_Hybrid_Recommender, UserKNN_CFCBF_Hybrid_Recommender]:
 
             if similarity_type_list is None:
@@ -841,8 +856,8 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
         if recommender_class is RP3betaRecommender:
             hyperparameters_range_dictionary = {
                 "topK": Integer(5, 1000),
-                "alpha": Real(low=0, high=2, prior='uniform'),
-                "beta": Real(low=0, high=2, prior='uniform'),
+                "alpha": Real(low=0, high=0.8, prior='uniform'),
+                "beta": Real(low=0, high=0.8, prior='uniform'),
                 "normalize_similarity": Categorical([True, False]),
             }
 
@@ -1018,9 +1033,10 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
 
         if recommender_class is SLIMElasticNetRecommender or recommender_class is MultiThreadSLIM_SLIMElasticNetRecommender:
             hyperparameters_range_dictionary = {
-                "topK": Integer(400, 750), # (5, 1000),
-                "l1_ratio": Real(low=1e-4, high=1e-2, prior='log-uniform'), # (low=1e-5, high=1.0, prior='log-uniform'),
-                "alpha": Real(low=0.01, high=0.8, prior='uniform'), #(low=1e-3, high=1.0, prior='uniform'),
+                "topK": Integer(400, 750),  # (5, 1000),
+                "l1_ratio": Real(low=1e-4, high=1e-2, prior='log-uniform'),
+                # (low=1e-5, high=1.0, prior='log-uniform'),
+                "alpha": Real(low=0.01, high=0.8, prior='uniform'),  # (low=1e-3, high=1.0, prior='uniform'),
             }
 
             recommender_input_args = SearchInputRecommenderArgs(

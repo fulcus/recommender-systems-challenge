@@ -7,6 +7,7 @@ import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
+from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_ItemKNNCF import Hybrid_SlimElastic_Rp3_ItemKNNCF
 from Recommenders.Hybrids.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 from Recommenders.Recommender_import_list import *
@@ -39,6 +40,7 @@ recommender_class_list = [
 
     # ScoresHybridRP3betaKNNCBF
     Hybrid_SlimElastic_Rp3
+    # Hybrid_SlimElastic_Rp3_ItemKNNCF
 ]
 
 # If directory does not exist, create
@@ -64,15 +66,9 @@ def create_csv(target_ids, results, rec_name):
 def run_prediction_all_recommenders(URM_all, *ICMs):
     ICM_all = ICMs[4]
 
-
-
     tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
     URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
-
-    # tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
-    # tmp = tmp.multiply(14)
-    # URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
 
     evaluator = EvaluatorHoldout(URM_all, cutoff_list=[10], exclude_seen=True)
 
@@ -108,6 +104,7 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
 
             item_list = recommender_object.recommend(target_ids, cutoff=10, remove_seen_flag=True)
             create_csv(target_ids, item_list, recommender_class.RECOMMENDER_NAME)
+            # recommender_object.save_model(output_root_path, file_name="hybridslimrp3cf.zip")
 
         except Exception as e:
             traceback.print_exc()

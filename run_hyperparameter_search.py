@@ -86,7 +86,7 @@ def read_data_split_and_search():
         # PureSVDRecommender,
         # SLIM_BPR_Cython,
         # SLIMElasticNetRecommender,
-        IALSRecommender
+        # IALSRecommender
     ]
 
     content_algorithm_list = [

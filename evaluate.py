@@ -6,6 +6,7 @@ import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
+from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_ItemKNNCF import Hybrid_SlimElastic_Rp3_ItemKNNCF
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
 from Recommenders.KNN.ItemKNNCustomSimilarityRecommender import ItemKNNCustomSimilarityRecommender
@@ -42,7 +43,8 @@ recommender_class_list = [
     # LightFMUserHybridRecommender, # UCM needed
     # LightFMItemHybridRecommender,
 
-    Hybrid_SlimElastic_Rp3
+    # Hybrid_SlimElastic_Rp3,
+    # Hybrid_SlimElastic_Rp3_ItemKNNCF
 ]
 
 # If directory does not exist, create

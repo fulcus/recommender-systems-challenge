@@ -5,16 +5,14 @@ import numpy as np
 import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
+from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
-from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_ItemKNNCF import Hybrid_SlimElastic_Rp3_ItemKNNCF
+from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
-from Recommenders.KNN.ItemKNNCustomSimilarityRecommender import ItemKNNCustomSimilarityRecommender
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
-from reader import load_urm, load_icm, load_target
-from run_all_algorithms import _get_instance
-from sklearn import feature_extraction
+from reader import load_urm, load_icm, load_target, load_merged_icm
 
 res_dir = 'result_experiments/csv'
 output_root_path = "./result_experiments/"
@@ -35,7 +33,7 @@ recommender_class_list = [
     # ItemKNNCFRecommender,
     # P3alphaRecommender,
     # SLIM_BPR_Cython,
-    # RP3betaRecommender,
+    RP3betaRecommender,
     # PureSVDRecommender,
     # NMFRecommender,
 
@@ -73,12 +71,25 @@ def train_test_holdout(URM_all, train_perc=0.8):
     return URM_train, URM_test
 
 
+def _get_instance(recommender_class, URM_train, ICM_all):
+    if issubclass(recommender_class, BaseItemCBFRecommender):
+        recommender_object = recommender_class(URM_train, ICM_all)
+    elif issubclass(recommender_class, ScoresHybridRP3betaKNNCBF):
+        recommender_object = recommender_class(URM_train, ICM_all)
+    else:
+        recommender_object = recommender_class(URM_train)
+        print('only using URM')
+
+    return recommender_object
+
+
 def evaluate_all_recommenders(URM_all, *ICMs):
-    ICM_all = ICMs[4]
+    ICM_genre, ICM_subgenre, ICM_channel, ICM_event, ICM_all = ICMs
+    # ICM_merged = load_merged_icm("ICM_merged.csv")
 
     URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85)
 
-    # tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
+    # tmp = check_matrix(ICM_subgenre.T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
     # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
@@ -97,7 +108,7 @@ def evaluate_all_recommenders(URM_all, *ICMs):
         try:
             print("Algorithm: {}".format(recommender_class.RECOMMENDER_NAME))
             # URM_tfidf = feature_extraction.text.TfidfTransformer().fit_transform(URM_train)
-            recommender_object = _get_instance(recommender_class, URM_train, ICMs[2])
+            recommender_object = _get_instance(recommender_class, URM_train, ICM_channel)
 
             if isinstance(recommender_object, ItemKNNCBFWeightedSimilarityRecommender):
                 fit_params = {"ICMs": ICMs}
@@ -111,7 +122,8 @@ def evaluate_all_recommenders(URM_all, *ICMs):
             elif isinstance(recommender_object, Incremental_Training_Early_Stopping):
                 fit_params = {"epochs": 200, **earlystopping_keywargs}
             elif isinstance(recommender_object, RP3betaRecommender):
-                fit_params = {'topK': 40, 'alpha': 0.4208737801266599, 'beta': 0.5251543657397256,'normalize_similarity': True}
+                fit_params = {'topK': 40, 'alpha': 0.4208737801266599, 'beta': 0.5251543657397256,
+                              'normalize_similarity': True}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
                 fit_params = {'alpha': 0.9}
             else:
@@ -119,23 +131,23 @@ def evaluate_all_recommenders(URM_all, *ICMs):
 
             recommender_object.fit(**fit_params)
             results_run_1, results_run_string_1 = evaluator.evaluateRecommender(recommender_object)
-            recommender_object.save_model(output_root_path, file_name="temp_model.zip")
-
-            recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
-            recommender_object.load_model(output_root_path, file_name="temp_model.zip")
-            os.remove(output_root_path + "temp_model.zip")
-
-            results_run_2, results_run_string_2 = evaluator.evaluateRecommender(recommender_object)
+            # recommender_object.save_model(output_root_path, file_name="temp_model.zip")
+            #
+            # recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
+            # recommender_object.load_model(output_root_path, file_name="temp_model.zip")
+            # os.remove(output_root_path + "temp_model.zip")
+            #
+            # results_run_2, results_run_string_2 = evaluator.evaluateRecommender(recommender_object)
 
             print("1-Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
             logFile.write(
                 "1-Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
 
-            print("2-Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_2))
-            logFile.write(
-                "2-Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_2))
-            if recommender_class not in [Random]:
-                assert results_run_1.equals(results_run_2)
+            # print("2-Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_2))
+            # logFile.write(
+            #     "2-Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_2))
+            # if recommender_class not in [Random]:
+            #     assert results_run_1.equals(results_run_2)
             logFile.flush()
 
 

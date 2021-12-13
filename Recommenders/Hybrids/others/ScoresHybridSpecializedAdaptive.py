@@ -1,6 +1,6 @@
 from Recommenders.BaseSimilarityMatrixRecommender import BaseItemSimilarityMatrixRecommender
 from Recommenders.Recommender_utils import check_matrix
-from Recommenders.Hybrids import ScoresHybridRP3betaKNNCBF
+from Recommenders.Hybrids.others import ScoresHybridRP3betaKNNCBF
 from Recommenders.DataIO import DataIO
 from Utils.PoolWithSubprocess import PoolWithSubprocess
 import multiprocessing

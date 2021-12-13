@@ -17,12 +17,12 @@ from functools import partial
 from Recommenders.FeatureWeighting import CFW_D_Similarity_Linalg
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.RankingHybrid import RankingHybrid
-from Recommenders.Hybrids.ScoresHybridKNNCFKNNCBF import ScoresHybridKNNCFKNNCBF
-from Recommenders.Hybrids.ScoresHybridP3alphaKNNCBF import ScoresHybridP3alphaKNNCBF
-from Recommenders.Hybrids.ScoresHybridP3alphaPureSVD import ScoresHybridP3alphaPureSVD
-from Recommenders.Hybrids.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
-from Recommenders.Hybrids.ScoresHybridSpecializedAdaptive import ScoresHybridSpecializedAdaptive
-from Recommenders.Hybrids.ScoresHybridUserKNNCFKNNCBF import ScoresHybridUserKNNCFKNNCBF
+from Recommenders.Hybrids.others.ScoresHybridKNNCFKNNCBF import ScoresHybridKNNCFKNNCBF
+from Recommenders.Hybrids.others.ScoresHybridP3alphaKNNCBF import ScoresHybridP3alphaKNNCBF
+from Recommenders.Hybrids.others.ScoresHybridP3alphaPureSVD import ScoresHybridP3alphaPureSVD
+from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
+from Recommenders.Hybrids.others.ScoresHybridSpecializedAdaptive import ScoresHybridSpecializedAdaptive
+from Recommenders.Hybrids.others.ScoresHybridUserKNNCFKNNCBF import ScoresHybridUserKNNCFKNNCBF
 from Recommenders.NonPersonalizedRecommender import TopPop, Random, GlobalEffects
 
 # KNN
@@ -34,8 +34,7 @@ from Recommenders.EASE_R.EASE_R_Recommender import EASE_R_Recommender
 
 # KNN machine learning
 from Recommenders.SLIM.Cython.SLIM_BPR_Cython import SLIM_BPR_Cython
-from Recommenders.SLIM.SLIMElasticNetRecommender import SLIMElasticNetRecommender, \
-    MultiThreadSLIM_SLIMElasticNetRecommender
+from Recommenders.SLIM.SLIMElasticNetRecommender import SLIMElasticNetRecommender # MultiThreadSLIM_SLIMElasticNetRecommender
 
 # Matrix Factorization
 from Recommenders.MatrixFactorization.PureSVDRecommender import PureSVDRecommender, PureSVDItemRecommender
@@ -1031,7 +1030,7 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
 
         ##########################################################################################################
 
-        if recommender_class is SLIMElasticNetRecommender or recommender_class is MultiThreadSLIM_SLIMElasticNetRecommender:
+        if recommender_class is SLIMElasticNetRecommender: #or recommender_class is MultiThreadSLIM_SLIMElasticNetRecommender:
             hyperparameters_range_dictionary = {
                 "topK": Integer(400, 750),  # (5, 1000),
                 "l1_ratio": Real(low=1e-4, high=1e-2, prior='log-uniform'),

@@ -1,10 +1,10 @@
-from Recommenders.Hybrids.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
+from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
 from Recommenders.Recommender_import_list import *
 
 from Data_manager.TVShows.TVShowsReader import TVShowsReader
 from Data_manager.DataSplitter_leave_k_out import DataSplitter_leave_k_out
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
-from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender, BaseUserCBFRecommender
+from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender
 from Evaluation.Evaluator import EvaluatorHoldout
 import traceback, os
 

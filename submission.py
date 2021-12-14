@@ -13,9 +13,6 @@ from Recommenders.Recommender_utils import check_matrix
 from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
 
-res_dir = 'result_experiments/csv'
-output_root_path = "./result_experiments/"
-
 recommender_class_list = [
     # ItemKNNCBFRecommender,
     # ItemKNN_CFCBF_Hybrid_Recommender,
@@ -40,6 +37,9 @@ recommender_class_list = [
     Hybrid_SlimElastic_Rp3
     # Hybrid_SlimElastic_Rp3_ItemKNNCF
 ]
+
+output_root_path = os.path.join(os.path.dirname(__file__), "result_experiments/")
+res_dir = os.path.join(output_root_path, "csv")
 
 # If directory does not exist, create
 if not os.path.exists(output_root_path):

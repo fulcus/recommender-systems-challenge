@@ -52,7 +52,7 @@ def read_data_split_and_search():
     # tmp = tmp.multiply(14)
     # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
-    output_folder_path = "result_experiments/"
+    output_folder_path = os.path.join(os.path.dirname(__file__), "result_experiments/")
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):

@@ -14,8 +14,8 @@ from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
 from reader import load_urm, load_icm, load_target, load_merged_icm
 
-res_dir = 'result_experiments/csv'
-output_root_path = "./result_experiments/"
+output_root_path = os.path.join(os.path.dirname(__file__), "result_experiments/")
+res_dir = os.path.join(output_root_path, "csv")
 
 recommender_class_list = [
     # UserKNNCBFRecommender, # UCM needed

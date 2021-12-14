@@ -30,10 +30,7 @@ def _get_recommender_instance(recommender_class, URM_train, ICM_train):
 
 
 def run_recommender(recommender_class):
-
-
-
-    temp_save_file_folder = "./result_experiments/__temp_model/"
+    temp_save_file_folder = os.path.join(os.path.dirname(__file__), "result_experiments/__temp_model/")
 
     if not os.path.isdir(temp_save_file_folder):
         os.makedirs(temp_save_file_folder)
@@ -133,7 +130,7 @@ from Recommenders.KNN.ItemKNNCBFRecommender import ItemKNNCBFRecommender
 
 if __name__ == '__main__':
 
-    output_folder_path = "./result_experiments/rec_test/"
+    output_folder_path = os.path.join(os.path.dirname(__file__), "result_experiments/rec_test/")
     log_file_name = "run_test_recommender.txt"
 
 

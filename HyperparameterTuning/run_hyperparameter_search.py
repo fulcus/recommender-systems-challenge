@@ -86,6 +86,8 @@ def runHyperparameterSearch_FeatureWeighting(recommender_class, URM_train, W_tra
                                              save_model="best",
                                              output_folder_path="result_experiments/",
                                              similarity_type_list=None):
+    output_folder_path = os.path.join(os.path.dirname(__file__), output_folder_path)
+
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
         os.makedirs(output_folder_path)
@@ -223,6 +225,7 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
     :param allow_weighting:     Boolean value, if True it enables the use of TF-IDF and BM25 to weight features, users and items in KNNs
     :param similarity_type_list: List of strings with the similarity heuristics to be used for the KNNs
     """
+    output_folder_path = os.path.join(os.path.dirname(__file__), output_folder_path)
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
@@ -623,6 +626,7 @@ def runHyperparameterSearch_Content(recommender_class, URM_train, ICM_object, IC
     :param allow_bias_ICM:      Boolean value, if True it enables the use of bias to shift the values of the ICM
     :param similarity_type_list: List of strings with the similarity heuristics to be used for the KNNs
     """
+    output_folder_path = os.path.join(os.path.dirname(__file__), output_folder_path)
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
@@ -723,6 +727,7 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
     :param allow_dropout_MF:    Boolean value, if True it enables the use of dropout on the latent factors of MF algorithms
     :param similarity_type_list: List of strings with the similarity heuristics to be used for the KNNs
     """
+    output_folder_path = os.path.join(os.path.dirname(__file__), output_folder_path)
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
@@ -1168,7 +1173,7 @@ def read_data_split_and_search():
 
     URM_train, URM_validation, URM_test = dataSplitter.get_holdout_split()
 
-    output_folder_path = "result_experiments/SKOPT_prova/"
+    output_folder_path = os.path.join(os.path.dirname(__file__), "result_experiments/SKOPT_prova/")
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):

@@ -67,9 +67,9 @@ def read_data_split_and_search():
         # MatrixFactorization_FunkSVD_Cython,
         # PureSVDRecommender,
         # SLIM_BPR_Cython,
-        SLIMElasticNetRecommender,
-        # IALSRecommender
-        # MultVAERecommender
+        # SLIMElasticNetRecommender,
+        # IALSRecommender,
+        MultVAERecommender
     ]
 
     content_algorithm_list = [

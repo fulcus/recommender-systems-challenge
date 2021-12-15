@@ -695,7 +695,7 @@ def runHyperparameterSearch_Content(recommender_class, URM_train, ICM_object, IC
 
 
 def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_train_last_test=None,
-                                          n_cases=None, n_random_starts=None, resume_from_saved=False,
+                                          n_cases=None, n_random_starts=None, resume_from_saved=True,
                                           save_model="best", evaluate_on_test="best", max_total_time=None,
                                           evaluator_validation=None, evaluator_test=None,
                                           evaluator_validation_earlystopping=None,

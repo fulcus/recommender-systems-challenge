@@ -23,9 +23,7 @@ recommender_class_list = [
     # ItemKNNCBFWeightedSimilarityRecommender,  # new
     # UserKNN_CFCBF_Hybrid_Recommender, # UCM needed
     # ItemKNN_CFCBF_Hybrid_Recommender,
-    # SLIMElasticNetRecommender,  # too slow to train
     # UserKNNCFRecommender,
-    # IALSRecommender,
     # MatrixFactorization_BPR_Cython,
     # MatrixFactorization_FunkSVD_Cython, # fix low values
     # MatrixFactorization_AsySVD_Cython, # fix low values
@@ -33,7 +31,7 @@ recommender_class_list = [
     # ItemKNNCFRecommender,
     # P3alphaRecommender,
     # SLIM_BPR_Cython,
-    RP3betaRecommender,
+    # RP3betaRecommender,
     # PureSVDRecommender,
     # NMFRecommender,
 
@@ -41,8 +39,12 @@ recommender_class_list = [
     # LightFMUserHybridRecommender, # UCM needed
     # LightFMItemHybridRecommender,
 
+    SLIMElasticNetRecommender,  # too slow to train
+    MultVAERecommender,
+    IALSRecommender,
+
     # Hybrid_SlimElastic_Rp3,
-    # Hybrid_SlimElastic_Rp3_ItemKNNCF
+    # Hybrid_SlimElastic_Rp3_ItemKNNCF,
 ]
 
 # If directory does not exist, create
@@ -78,7 +80,6 @@ def _get_instance(recommender_class, URM_train, ICM_all):
         recommender_object = recommender_class(URM_train, ICM_all)
     else:
         recommender_object = recommender_class(URM_train)
-        print('only using URM')
 
     return recommender_object
 
@@ -124,6 +125,8 @@ def evaluate_all_recommenders(URM_all, *ICMs):
             elif isinstance(recommender_object, RP3betaRecommender):
                 fit_params = {'topK': 40, 'alpha': 0.4208737801266599, 'beta': 0.5251543657397256,
                               'normalize_similarity': True}
+            elif isinstance(recommender_object, MultVAERecommender):
+                fit_params = {'topK': 615, 'l1_ratio': 0.007030044688343361, 'alpha': 0.07010526286528686}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
                 fit_params = {'alpha': 0.9}
             else:
@@ -162,11 +165,11 @@ def evaluate_best_saved_model(URM_all):
     evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10], exclude_seen=True)
 
     # set here the recommender you want to use
-    recommender_object = SLIMElasticNetRecommender(URM_train)
+    recommender_object = MultVAERecommender(URM_train)
 
     # rec_best_model_last.zip is the output of the run_hyperparameter_search (one best model for each rec class)
     # recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
-    recommender_object.load_model(output_root_path, file_name="saved_slim.zip")
+    recommender_object.load_model(output_root_path, file_name="MultVAERecommender_best_model.zip")
 
     results_run_1, results_run_string_1 = evaluator.evaluateRecommender(recommender_object)
 
@@ -188,5 +191,5 @@ if __name__ == '__main__':
 
     target_ids = load_target()
 
-    # evaluate_best_saved_model(URM_all)
+    #evaluate_best_saved_model(URM_all)
     evaluate_all_recommenders(URM_all, *ICMs)

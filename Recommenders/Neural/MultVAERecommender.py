@@ -263,13 +263,13 @@ class MultVAERecommender(BaseRecommender, Incremental_Training_Early_Stopping, B
 
     def fit(self,
             epochs=100,
-            learning_rate=0.00013619332579945415,
-            batch_size=512,
-            dropout=0.2573960714400234,
-            total_anneal_steps=153300,
-            anneal_cap=0.5962057122167358,
+            learning_rate=0.006017384673712059,
+            batch_size=1024,
+            dropout=0.7425598079545331,
+            total_anneal_steps=300010,
+            anneal_cap=0.3560565814327946,
             p_dims=None,
-            l2_reg=3.3361734773436696e-05,
+            l2_reg=0.0046660908735426465,
             temp_file_folder=None,
             **earlystopping_kwargs):
 

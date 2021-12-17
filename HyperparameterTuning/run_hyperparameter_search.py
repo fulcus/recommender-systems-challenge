@@ -108,7 +108,6 @@ def runHyperparameterSearch_FeatureWeighting(recommender_class, URM_train, W_tra
             "sgd_mode": Categorical(["adam"]),
             "l2_reg_D": Real(low=1e-6, high=1e1, prior='log-uniform'),
             "l2_reg_V": Real(low=1e-6, high=1e1, prior='log-uniform'),
-            "epochs": Categorical([300]),
         }
 
         recommender_input_args = SearchInputRecommenderArgs(
@@ -130,7 +129,6 @@ def runHyperparameterSearch_FeatureWeighting(recommender_class, URM_train, W_tra
             "sgd_mode": Categorical(["adam"]),
             "l1_reg": Real(low=1e-3, high=1e-2, prior='log-uniform'),
             "l2_reg": Real(low=1e-3, high=1e-1, prior='log-uniform'),
-            "epochs": Categorical([50]),
 
             "init_type": Categorical(["one", "random"]),
             "add_zeros_quota": Real(low=0.50, high=1.0, prior='uniform'),
@@ -162,7 +160,6 @@ def runHyperparameterSearch_FeatureWeighting(recommender_class, URM_train, W_tra
             "sgd_mode": Categorical(["adam"]),
             "l2_reg_D": Real(low=1e-6, high=1e1, prior='log-uniform'),
             "l2_reg_V": Real(low=1e-6, high=1e1, prior='log-uniform'),
-            "epochs": Categorical([100]),
 
             "add_zeros_quota": Real(low=0.50, high=1.0, prior='uniform'),
         }
@@ -473,7 +470,6 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
         elif recommender_class in [LightFMItemHybridRecommender, LightFMUserHybridRecommender]:
 
             hyperparameters_range_dictionary = {
-                "epochs": Categorical([300]),
                 "n_components": Integer(1, 200),
                 "loss": Categorical(['bpr', 'warp', 'warp-kos']),
                 "sgd_mode": Categorical(['adagrad', 'adadelta']),
@@ -728,6 +724,7 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
     :param similarity_type_list: List of strings with the similarity heuristics to be used for the KNNs
     """
     output_folder_path = os.path.join(os.path.dirname(__file__), output_folder_path)
+    print('line 727' + output_folder_path)
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
@@ -878,7 +875,6 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
 
             hyperparameters_range_dictionary = {
                 "sgd_mode": Categorical(["sgd", "adagrad", "adam"]),
-                "epochs": Categorical([500]),
                 "use_bias": Categorical([True, False]),
                 "batch_size": Categorical([1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]),
                 "num_factors": Integer(1, 200),
@@ -903,7 +899,6 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
         if recommender_class is MatrixFactorization_AsySVD_Cython:
             hyperparameters_range_dictionary = {
                 "sgd_mode": Categorical(["sgd", "adagrad", "adam"]),
-                "epochs": Categorical([500]),
                 "use_bias": Categorical([True, False]),
                 "batch_size": Categorical([1]),
                 "num_factors": Integer(1, 200),
@@ -926,7 +921,6 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
 
             hyperparameters_range_dictionary = {
                 "sgd_mode": Categorical(["sgd", "adagrad", "adam"]),
-                "epochs": Categorical([1500]),
                 "num_factors": Integer(1, 200),
                 "batch_size": Categorical([1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]),
                 "positive_reg": Real(low=1e-5, high=1e-2, prior='log-uniform'),
@@ -950,7 +944,6 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
         if recommender_class is IALSRecommender:
             hyperparameters_range_dictionary = {
                 "num_factors": Integer(1, 200),
-                "epochs": Categorical([300]),
                 "confidence_scaling": Categorical(["linear", "log"]),
                 "alpha": Real(low=1e-3, high=50.0, prior='log-uniform'),
                 "epsilon": Real(low=1e-3, high=10.0, prior='log-uniform'),
@@ -1015,7 +1008,6 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
         if recommender_class is SLIM_BPR_Cython:
             hyperparameters_range_dictionary = {
                 "topK": Integer(5, 1000),
-                "epochs": Categorical([1500]),
                 "symmetric": Categorical([True, False]),
                 "sgd_mode": Categorical(["sgd", "adagrad", "adam"]),
                 "lambda_i": Real(low=1e-5, high=1e-2, prior='log-uniform'),
@@ -1070,7 +1062,6 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
 
         if recommender_class is LightFMCFRecommender:
             hyperparameters_range_dictionary = {
-                "epochs": Categorical([300]),
                 "n_components": Integer(1, 200),
                 "loss": Categorical(['bpr', 'warp', 'warp-kos']),
                 "sgd_mode": Categorical(['adagrad', 'adadelta']),
@@ -1092,7 +1083,6 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
             n_items = URM_train.shape[1]
 
             hyperparameters_range_dictionary = {
-                "epochs": Categorical([300]),
                 "learning_rate": Real(low=1e-6, high=1e-2, prior="log-uniform"),
                 "l2_reg": Real(low=1e-6, high=1e-2, prior="log-uniform"),
                 "dropout": Real(low=0., high=0.8, prior="uniform"),

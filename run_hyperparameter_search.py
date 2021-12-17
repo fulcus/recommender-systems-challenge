@@ -69,7 +69,7 @@ def read_data_split_and_search():
         # SLIM_BPR_Cython,
         # SLIMElasticNetRecommender,
         # IALSRecommender,
-        MultVAERecommender
+        MultVAERecommender,
     ]
 
     content_algorithm_list = [
@@ -93,9 +93,9 @@ def read_data_split_and_search():
         # ScoresHybridSpecializedAdaptive,
         # ScoresHybridKNNCFKNNCBF,
         # ScoresHybridUserKNNCFKNNCBF,
-        # CFW_D_Similarity_Linalg
-        # ItemKNNScoresHybridRecommender
-        # RankingHybrid
+        # CFW_D_Similarity_Linalg,
+        # ItemKNNScoresHybridRecommender,
+        # RankingHybrid,
     ]
 
     cutoff_list = [10]

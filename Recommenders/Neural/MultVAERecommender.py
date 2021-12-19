@@ -263,16 +263,18 @@ class MultVAERecommender(BaseRecommender, Incremental_Training_Early_Stopping, B
 
     def fit(self,
             epochs=100,
-            learning_rate=1e-3,
-            batch_size=500,
-            dropout=0.5,
-            total_anneal_steps=200000,
-            anneal_cap=0.2,
+            learning_rate=0.006017384673712059,
+            batch_size=1024,
+            dropout=0.7425598079545331,
+            total_anneal_steps=300010,
+            anneal_cap=0.3560565814327946,
             p_dims=None,
-            l2_reg=0.01,
+            l2_reg=0.0046660908735426465,
             temp_file_folder=None,
             **earlystopping_kwargs):
 
+        if p_dims is None:
+            p_dims = [128, 768, 18059]
         self.temp_file_folder = self._get_unique_temp_folder(input_temp_file_folder=temp_file_folder)
 
         self.batch_size = batch_size
@@ -490,8 +492,8 @@ class MultVAERecommender(BaseRecommender, Incremental_Training_Early_Stopping, B
 
 class MultVAERecommender_OptimizerMask(MultVAERecommender):
 
-    def fit(self, epochs=100, batch_size=500, total_anneal_steps=200000, learning_rate=1e-3, l2_reg=0.01,
-            dropout=0.5, anneal_cap=0.2, encoding_size = 50, next_layer_size_multiplier = 2, max_layer_size = 5*1e3, max_n_hidden_layers = 3,
+    def fit(self, epochs=100, batch_size=512, total_anneal_steps=200000, learning_rate=1e-3, l2_reg=0.00010688494658866708,
+            dropout=0.5, anneal_cap=0.18207621037490748, encoding_size = 50, next_layer_size_multiplier = 2, max_layer_size = 5*1e3, max_n_hidden_layers = 3,
             temp_file_folder=None, **earlystopping_kwargs):
 
         assert next_layer_size_multiplier > 1.0, "next_layer_size_multiplier must be > 1.0"

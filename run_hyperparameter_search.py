@@ -5,13 +5,11 @@ Created on 22/11/17
 
 @author: Maurizio Ferrari Dacrema
 """
-import multiprocessing
-import os
-from functools import partial
-
 import numpy as np
-import scipy.sparse as sps
 
+from Recommenders.Hybrids.HybridWsparseSLIMRp3 import HybridWsparseSLIMRp3
+from Recommenders.Hybrids.ItemKNNScoresHybridRecommender import ItemKNNScoresHybridRecommender
+from Recommenders.Hybrids.RankingHybrid import RankingHybrid
 from Data_manager.split_functions.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 from Evaluation.Evaluator import EvaluatorHoldout
@@ -19,9 +17,27 @@ from HyperparameterTuning.run_hyperparameter_search import runHyperparameterSear
     runHyperparameterSearch_Hybrid
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
+from Recommenders.KNN.ItemKNNCustomSimilarityRecommender import ItemKNNCustomSimilarityRecommender
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
 from reader import load_urm, load_icm
+from Evaluation.Evaluator import EvaluatorHoldout
+
+import traceback
+import scipy.sparse as sps
+import os, multiprocessing
+from multiprocessing.pool import ThreadPool as Pool1
+from functools import partial
+
+from Data_manager.Movielens.Movielens1MReader import Movielens1MReader
+from Data_manager.split_functions.split_train_validation_random_holdout import \
+    split_train_in_two_percentage_global_sample
+
+from HyperparameterTuning.run_hyperparameter_search import runHyperparameterSearch_Collaborative, \
+    runHyperparameterSearch_Content
+
+from HyperparameterTuning.run_hyperparameter_search import runHyperparameterSearch_Hybrid
+from Utils.PoolWithSubprocess import PoolWithSubprocess
 
 import traceback
 import scipy.sparse as sps
@@ -55,12 +71,9 @@ def read_data_split_and_search():
     #
     ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
 
-    # STACKING URM-ICM
-    # tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
-    # tmp = tmp.multiply(14)
-    # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
+    ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
 
-    output_folder_path = os.path.join(os.path.dirname(__file__), "result_experiments/")
+    output_folder_path = "result_experiments/"
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
@@ -86,6 +99,8 @@ def read_data_split_and_search():
     ]
 
     hybrid_algorithm_list = [
+        HybridWsparseSLIMRp3,
+        # Hybrid_SlimElastic_Rp3_IALS,
         # ScoresHybridP3alphaKNNCBF,
         # ScoresHybridRP3betaKNNCBF,
         # ScoresHybridP3alphaPureSVD,
@@ -118,12 +133,16 @@ def read_data_split_and_search():
     evaluator_validation = EvaluatorHoldout(URM_validation, cutoff_list=cutoff_list)
     evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=cutoff_list)
 
+    ### STACKING URM-ICM
+    tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
+    # tmp = tmp.multiply(14)
+    URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     # COLLABORATIVE
     '''runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
                                                        URM_train=URM_train,
                                                        metric_to_optimize=metric_to_optimize,
-                                                       cutoff_to_optimize=cutoff_to_optimize,
+                                                      cutoff_to_optimize=cutoff_to_optimize,
                                                        n_cases=n_cases,
                                                        n_random_starts=n_random_starts,
                                                        evaluator_validation_earlystopping=evaluator_validation,
@@ -137,7 +156,7 @@ def read_data_split_and_search():
     pool_collab = multiprocessing.Pool(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
     pool_collab.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)'''
 
-    # CONTENT BASED
+    ### CONTENT RECS
     # pool = PoolWithSubprocess(processes=int(multiprocessing.cpu_count()-1), maxtasksperchild=1)
     # pool.map_async(runParameterSearch_Hybrid_partial, hybrid_algorithm_list)
     # pool.close()
@@ -179,7 +198,6 @@ def read_data_split_and_search():
 
     pool_collab = Pool1(processes=int(multiprocessing.cpu_count()))
     pool_collab.map(runParameterSearch_Hybrid_partial, hybrid_algorithm_list)
-
 
 if __name__ == '__main__':
     read_data_split_and_search()

@@ -6,6 +6,7 @@ import numpy as np
 import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
+from Recommenders.Hybrids.HybridWsparseSLIMRp3 import HybridWsparseSLIMRp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
@@ -38,6 +39,10 @@ recommender_class_list = [
     # Hybrid_SlimElastic_Rp3
 
     Hybrid_SlimElastic_Rp3_PureSVD
+    # Hybrid_SlimElastic_Rp3
+    # Hybrid_SlimElastic_Rp3_ItemKNNCF
+    HybridWsparseSLIMRp3
+
 ]
 
 output_root_path = os.path.join(os.path.dirname(__file__), "result_experiments/")
@@ -99,6 +104,10 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
                 fit_params = {'alpha': 0.9}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3_PureSVD):
                 fit_params = {'alpha': 0.9087371327370033, 'beta': 0.02399161350891344, 'gamma': 0.24457608798347447}
+            elif isinstance(recommender_object, HybridWsparseSLIMRp3):
+                fit_params = {'alpha': 0.9610229519605884, 'topK': 1199}
+            elif isinstance(recommender_object, PureSVDRecommender):
+                fit_params = {'num_factors': 29}
             else:
                 fit_params = {}
 
@@ -106,7 +115,6 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
 
             item_list = recommender_object.recommend(target_ids, cutoff=10, remove_seen_flag=True)
             create_csv(target_ids, item_list, recommender_class.RECOMMENDER_NAME)
-            # recommender_object.save_model(output_root_path, file_name="hybridslimrp3cf.zip")
 
         except Exception as e:
             traceback.print_exc()

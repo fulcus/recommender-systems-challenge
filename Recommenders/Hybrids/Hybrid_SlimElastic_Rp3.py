@@ -19,7 +19,7 @@ from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
 from sklearn import feature_extraction
 
-output_root_path = "./result_experiments/"
+output_root_path = os.path.join(os.path.dirname(__file__), "result_experiments/")
 
 
 class Hybrid_SlimElastic_Rp3(BaseRecommender):

@@ -1,13 +1,16 @@
+import os
+
 import pandas as pd
 import scipy.sparse as sps
 import numpy as np
 
-urm_path = "Data_manager_split_datasets/TVShows/data_train.csv"
-icm_path = "Data_manager_split_datasets/TVShows/"
-target_path = "Data_manager_split_datasets/TVShows/data_target_users_test.csv"
+# urm_path = "Data_manager_split_datasets/TVShows/data_train.csv"
+# icm_path = "Data_manager_split_datasets/TVShows/"
+# target_path = "Data_manager_split_datasets/TVShows/data_target_users_test.csv"
 
 
 def load_urm():
+    urm_path = os.path.join(os.path.dirname(__file__), 'Data_manager_split_datasets/TVShows/data_train.csv')
     df_original = pd.read_csv(filepath_or_buffer=urm_path, sep=',', header=0,
                               dtype={0: np.int32, 1: np.int32, 2: np.int32})
 
@@ -33,6 +36,8 @@ def load_urm():
 
 
 def load_target():
+    target_path = os.path.join(os.path.dirname(__file__), 'Data_manager_split_datasets/TVShows/data_target_users_test.csv')
+
     df_original = pd.read_csv(filepath_or_buffer=target_path, sep=',', header=0,
                               dtype={'UserID': np.int32})
 
@@ -51,6 +56,8 @@ def load_target():
 
 
 def load_icm(icm_file, weight=1):
+    icm_path = os.path.join(os.path.dirname(__file__), 'Data_manager_split_datasets/TVShows/')
+
     df_original = pd.read_csv(filepath_or_buffer=icm_path + icm_file, sep=',', header=0,
                               dtype={'ItemID': np.int32, 'Feature': np.int32, 'Data': np.int32})
 
@@ -62,12 +69,36 @@ def load_icm(icm_file, weight=1):
 
     csr_matrix = sps.csr_matrix((data_id_list, (item_id_list, feature_id_list)))
 
-    # print("DataReader:")
-    # print("\tLoading the asset ICM: " + icm_asset_path)
-    # print("\t\tAsset ICM size:" + str(csr_matrix.shape))
-    # print("\tAsset ICM loaded.")
+    return csr_matrix
+
+
+def load_merged_icm(icm_file, weight=1):
+    icm_path = os.path.join(os.path.dirname(__file__), 'Data_manager_split_datasets/TVShows/')
+
+    df_original = pd.read_csv(filepath_or_buffer=icm_path + icm_file, sep=',', header=0,
+                              dtype={'ItemID': np.int32, 'Feature': np.int32, 'Data': np.int32})
+
+    item_id_list = df_original['ItemID'].values
+    channel_list = df_original['Channel'].values
+    event_list = df_original['Event'].values
+    genre_list = df_original['Genre'].values
+    subgenre_list = df_original['Subgenre'].values
+
+    data_id_list = df_original['Data'].values * weight
+
+    # Error: invalid input format
+    csr_matrix = sps.csr_matrix((data_id_list, (item_id_list, channel_list, event_list, genre_list, subgenre_list)))
 
     return csr_matrix
+
+
+def load_all_icms():
+    ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
+    ICM_event = load_icm("data_ICM_event.csv", weight=1)
+    ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
+    ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
+
+    return ICM_channel, ICM_event, ICM_genre, ICM_subgenre
 
 
 # to delete

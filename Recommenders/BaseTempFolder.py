@@ -14,8 +14,9 @@ class BaseTempFolder(object):
 
     def __init__(self):
         super(BaseTempFolder, self).__init__()
+        folder = os.path.dirname(__file__) + '/../result_experiments/__Temp_{}_{}/'.format(self.RECOMMENDER_NAME, os.getpid())
+        self.DEFAULT_TEMP_FILE_FOLDER = os.path.join(os.path.dirname(__file__), folder)
 
-        self.DEFAULT_TEMP_FILE_FOLDER = './result_experiments/__Temp_{}_{}/'.format(self.RECOMMENDER_NAME, os.getpid())
 
 
     def _get_unique_temp_folder(self, input_temp_file_folder = None):

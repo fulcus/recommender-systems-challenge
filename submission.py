@@ -7,16 +7,11 @@ import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
-from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_ItemKNNCF import Hybrid_SlimElastic_Rp3_ItemKNNCF
-from Recommenders.Hybrids.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
-from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
+from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
 from reader import load_urm, load_icm, load_target
 from run_all_algorithms import _get_instance
-
-res_dir = 'result_experiments/csv'
-output_root_path = "./result_experiments/"
 
 recommender_class_list = [
     # ItemKNNCBFRecommender,
@@ -43,6 +38,9 @@ recommender_class_list = [
     # Hybrid_SlimElastic_Rp3_ItemKNNCF
 
 ]
+
+output_root_path = os.path.join(os.path.dirname(__file__), "result_experiments/")
+res_dir = os.path.join(output_root_path, "csv")
 
 # If directory does not exist, create
 if not os.path.exists(output_root_path):

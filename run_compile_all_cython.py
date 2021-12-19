@@ -32,7 +32,8 @@ if __name__ == '__main__':
     print("run_compile_all_cython: All files will be compiled using your current python environment: '{}'".format(sys.executable))
 
 
-    save_folder_path = "./result_experiments/"
+    save_folder_path = os.path.join(os.path.dirname(__file__), "result_experiments/")
+
     log_file_path = save_folder_path + "run_compile_all_cython.txt"
 
     # If directory does not exist, create

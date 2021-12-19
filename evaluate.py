@@ -80,13 +80,14 @@ def train_test_holdout(URM_all, train_perc=0.8):
     return URM_train, URM_test
 
 def evaluate_all_recommenders(URM_all, *ICMs):
-    ICM_all = ICMs[4]
+    ICM_genre, ICM_subgenre, ICM_channel, ICM_event, ICM_all = ICMs
+    # ICM_merged = load_merged_icm("ICM_merged.csv")
 
     # URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85)
 
     URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.90)
 
-    # tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
+    # tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
     # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
@@ -104,7 +105,7 @@ def evaluate_all_recommenders(URM_all, *ICMs):
         try:
             print("Algorithm: {}".format(recommender_class.RECOMMENDER_NAME))
             # URM_tfidf = feature_extraction.text.TfidfTransformer().fit_transform(URM_train)
-            recommender_object = _get_instance(recommender_class, URM_train, ICMs[2])
+            recommender_object = _get_instance(recommender_class, URM_train, ICM_channel)
 
             if isinstance(recommender_object, ItemKNNCBFWeightedSimilarityRecommender):
                 fit_params = {"ICMs": ICMs}
@@ -117,7 +118,10 @@ def evaluate_all_recommenders(URM_all, *ICMs):
                 # 'alpha': 0.0798650671543897, 'epsilon': 0.00205004763058707, 'reg': 0.008433763108035943
                 fit_params = {'n_factors' : 768, 'regularization' : 0.4489004525533907, 'iterations':76 }
             elif isinstance(recommender_object, RP3betaRecommender):
-                fit_params = {'topK': 40, 'alpha': 0.4208737801266599, 'beta': 0.5251543657397256,'normalize_similarity': True}
+                fit_params = {'topK': 40, 'alpha': 0.4208737801266599, 'beta': 0.5251543657397256,
+                              'normalize_similarity': True}
+            elif isinstance(recommender_object, MultVAERecommender):
+                fit_params = {'topK': 615, 'l1_ratio': 0.007030044688343361, 'alpha': 0.07010526286528686}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
                 fit_params = {'alpha': 0.9}
             else:
@@ -129,18 +133,17 @@ def evaluate_all_recommenders(URM_all, *ICMs):
             # recommender_object = _get_instance(recommender_class, URM_train, ICM_all)
             # recommender_object.load_model(output_root_path, file_name="temp_model.zip")
             # os.remove(output_root_path + "temp_model.zip")
-
-            results_run_2, results_run_string_2 = evaluator.evaluateRecommender(recommender_object)
+            # results_run_2, results_run_string_2 = evaluator.evaluateRecommender(recommender_object)
 
             print("1-Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
             logFile.write(
                 "1-Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_1))
 
             # print("2-Algorithm: {}, results: \n{}".format(recommender_class.RECOMMENDER_NAME, results_run_string_2))
-            # logFile.write( "2-Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_2))
-
-            if recommender_class not in [Random]:
-                assert results_run_1.equals(results_run_2)
+            # logFile.write(
+            #     "2-Algorithm: {}, results: \n{}\n".format(recommender_class.RECOMMENDER_NAME, results_run_string_2))
+            # if recommender_class not in [Random]:
+            #     assert results_run_1.equals(results_run_2)
             logFile.flush()
 
 

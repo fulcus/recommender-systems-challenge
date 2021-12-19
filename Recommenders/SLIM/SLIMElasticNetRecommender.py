@@ -150,7 +150,7 @@ class SLIMElasticNetRecommender(BaseItemSimilarityMatrixRecommender):
 
 
 
-
+'''
 from multiprocessing import Pool, cpu_count, shared_memory
 from functools import partial
 
@@ -278,3 +278,4 @@ class MultiThreadSLIM_SLIMElasticNetRecommender(SLIMElasticNetRecommender):
         # generate the sparse weight matrix
         self.W_sparse = sps.csr_matrix((values, (rows, cols)), shape=(self.n_items, self.n_items), dtype=np.float32)
         self.URM_train = self.URM_train.tocsr()
+'''

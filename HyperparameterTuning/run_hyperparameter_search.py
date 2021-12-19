@@ -17,7 +17,6 @@ from functools import partial
 from Recommenders.FeatureWeighting import CFW_D_Similarity_Linalg
 from Recommenders.Hybrids.HybridWsparseSLIMRp3 import HybridWsparseSLIMRp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
-from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_IALS import Hybrid_SlimElastic_Rp3_IALS
 from Recommenders.Hybrids.RankingHybrid import RankingHybrid
 from Recommenders.Hybrids.others.ScoresHybridKNNCFKNNCBF import ScoresHybridKNNCFKNNCBF
 from Recommenders.Hybrids.others.ScoresHybridP3alphaKNNCBF import ScoresHybridP3alphaKNNCBF
@@ -408,21 +407,6 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
                 FIT_POSITIONAL_ARGS=[],
                 FIT_KEYWORD_ARGS={}
             )
-
-        #########################################################################################################
-
-        if recommender_class is Hybrid_SlimElastic_Rp3_IALS:
-                hyperparameters_range_dictionary = {}
-                hyperparameters_range_dictionary["alpha"] = Real(low=0.6, high=0.7, prior='uniform')
-                hyperparameters_range_dictionary["beta"] = Real(low=0.2, high=0.25, prior='uniform')
-                hyperparameters_range_dictionary["gamma"] = Real(low=0.2, high=0.25, prior='uniform')
-
-                recommender_input_args = SearchInputRecommenderArgs(
-                    CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
-                    CONSTRUCTOR_KEYWORD_ARGS={},
-                    FIT_POSITIONAL_ARGS=[],
-                    FIT_KEYWORD_ARGS={}
-                )
 
         #########################################################################################################
 

@@ -7,9 +7,11 @@ import scipy.sparse as sps
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
+from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
+from Recommenders.MatrixFactorization.PureSVDRecommender import PureSVDItemRecommender
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
 from reader import load_urm, load_icm, load_target, load_merged_icm
@@ -33,8 +35,9 @@ recommender_class_list = [
     # ItemKNNCFRecommender,
     # P3alphaRecommender,
     # SLIM_BPR_Cython,
-    RP3betaRecommender,
+    # RP3betaRecommender,
     # PureSVDRecommender,
+    # PureSVDItemRecommender
     # NMFRecommender,
 
     # LightFMCFRecommender,
@@ -42,7 +45,7 @@ recommender_class_list = [
     # LightFMItemHybridRecommender,
 
     # Hybrid_SlimElastic_Rp3,
-    # Hybrid_SlimElastic_Rp3_ItemKNNCF
+    Hybrid_SlimElastic_Rp3_PureSVD
 ]
 
 # If directory does not exist, create
@@ -89,9 +92,9 @@ def evaluate_all_recommenders(URM_all, *ICMs):
 
     URM_train, URM_test = train_test_holdout(URM_all, train_perc=0.85)
 
-    # tmp = check_matrix(ICM_subgenre.T, 'csr', dtype=np.float32)
+    tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
-    # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
+    URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     # todo check URM_test, URM_train are consistently placed
     evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10], exclude_seen=True)
@@ -126,6 +129,8 @@ def evaluate_all_recommenders(URM_all, *ICMs):
                               'normalize_similarity': True}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
                 fit_params = {'alpha': 0.9}
+            elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3_PureSVD):
+                fit_params = {'alpha': 0.9, 'beta': 0.1, 'gamma': 0.1}
             else:
                 fit_params = {}
 

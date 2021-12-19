@@ -7,6 +7,7 @@ import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
+from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
@@ -16,7 +17,7 @@ from run_all_algorithms import _get_instance
 recommender_class_list = [
     # ItemKNNCBFRecommender,
     # ItemKNN_CFCBF_Hybrid_Recommender,
-    # SLIMElasticNetRecommender,  # slow to train, good
+    #SLIMElasticNetRecommender,  # slow to train, good
     # UserKNNCFRecommender,
     # IALSRecommender, # good
     # MatrixFactorization_BPR_Cython,
@@ -34,8 +35,9 @@ recommender_class_list = [
     # LightFMItemHybridRecommender,
 
     # ScoresHybridRP3betaKNNCBF
-    Hybrid_SlimElastic_Rp3
-    # Hybrid_SlimElastic_Rp3_ItemKNNCF
+    # Hybrid_SlimElastic_Rp3
+
+    Hybrid_SlimElastic_Rp3_PureSVD
 ]
 
 output_root_path = os.path.join(os.path.dirname(__file__), "result_experiments/")
@@ -64,9 +66,9 @@ def create_csv(target_ids, results, rec_name):
 def run_prediction_all_recommenders(URM_all, *ICMs):
     ICM_all = ICMs[4]
 
-    tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
+    # tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
-    URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
+    # URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
 
     evaluator = EvaluatorHoldout(URM_all, cutoff_list=[10], exclude_seen=True)
 
@@ -95,6 +97,8 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
                 fit_params = {'topK_P': 479, 'alpha_P': 0.66439892057927, 'normalize_similarity_P': False, 'topK': 1761, 'shrink': 4028, 'similarity': 'tversky', 'normalize': True, 'alpha': 0.9435088940853401, 'beta_P': 0.38444510929214876, 'feature_weighting': 'none'}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
                 fit_params = {'alpha': 0.9}
+            elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3_PureSVD):
+                fit_params = {'alpha': 0.9087371327370033, 'beta': 0.02399161350891344, 'gamma': 0.24457608798347447}
             else:
                 fit_params = {}
 
@@ -114,10 +118,12 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
 
 def run_prediction_best_saved_model(URM_all, ICM_all):
     # ******** set here the recommender you want to use
-    recommender_object = P3alphaRecommender(URM_all)
+    recommender_object = SLIMElasticNetRecommender(URM_all)
 
     # rec_best_model_last.zip is the output of the run_hyperparameter_search (one best model for each rec class)
-    recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
+    #recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
+
+    recommender_object.load_model(output_root_path, file_name="slimelastic_urmall.zip")
 
     # added for prediction
     item_list = recommender_object.recommend(target_ids, cutoff=10, remove_seen_flag=True)
@@ -136,3 +142,4 @@ if __name__ == '__main__':
     ICMs = [ICM_genre, ICM_subgenre, ICM_channel, ICM_event, ICM_all]
 
     run_prediction_all_recommenders(URM_all, *ICMs)
+    # run_prediction_best_saved_model(URM_all, ICM_all)

@@ -51,6 +51,7 @@ recommender_class_list = [
      # Hybrid_SlimElastic_Rp3_ItemKNNCF
 
     # IALSRecommender_implicit
+    # Hybrid_SlimElastic_Rp3,
     HybridWsparseSLIMRp3
 ]
 
@@ -124,6 +125,10 @@ def evaluate_all_recommenders(URM_all, *ICMs):
                 fit_params = {'topK': 615, 'l1_ratio': 0.007030044688343361, 'alpha': 0.07010526286528686}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
                 fit_params = {'alpha': 0.9}
+            elif isinstance(recommender_object, HybridWsparseSLIMRp3):
+                fit_params = {'alpha': 0.9610229519605884, 'topK': 1199}
+            elif isinstance(recommender_object, PureSVDRecommender):
+                fit_params = {'num_factors' :29}
             else:
                 fit_params = {}
 

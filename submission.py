@@ -6,6 +6,7 @@ import numpy as np
 import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
+from Recommenders.Hybrids.HybridWsparseSLIMRp3 import HybridWsparseSLIMRp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
 from Recommenders.Recommender_import_list import *
@@ -34,8 +35,9 @@ recommender_class_list = [
     # LightFMItemHybridRecommender,
 
     # ScoresHybridRP3betaKNNCBF
-    Hybrid_SlimElastic_Rp3
+    # Hybrid_SlimElastic_Rp3
     # Hybrid_SlimElastic_Rp3_ItemKNNCF
+    HybridWsparseSLIMRp3
 
 ]
 
@@ -65,9 +67,9 @@ def create_csv(target_ids, results, rec_name):
 def run_prediction_all_recommenders(URM_all, *ICMs):
     ICM_all = ICMs[4]
 
-    tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
+    # tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
-    URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
+    # URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
 
     evaluator = EvaluatorHoldout(URM_all, cutoff_list=[10], exclude_seen=True)
 
@@ -96,10 +98,10 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
                 fit_params = {'topK_P': 479, 'alpha_P': 0.66439892057927, 'normalize_similarity_P': False, 'topK': 1761, 'shrink': 4028, 'similarity': 'tversky', 'normalize': True, 'alpha': 0.9435088940853401, 'beta_P': 0.38444510929214876, 'feature_weighting': 'none'}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
                 fit_params = {'alpha': 0.9}
-            elif isinstance(recommender_object, Hybrid_SlimElastic_IALS):
-                fit_params = {'alpha': 0.95}
-            elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3_IALS):
-                fit_params = {'alpha': 0.9}
+            elif isinstance(recommender_object, HybridWsparseSLIMRp3):
+                fit_params = {'alpha': 0.9610229519605884, 'topK': 1199}
+            elif isinstance(recommender_object, PureSVDRecommender):
+                fit_params = {'num_factors': 29}
             else:
                 fit_params = {}
 

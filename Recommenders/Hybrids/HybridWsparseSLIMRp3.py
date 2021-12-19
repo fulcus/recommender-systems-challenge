@@ -50,7 +50,7 @@ class HybridWsparseSLIMRp3(BaseItemSimilarityMatrixRecommender):
 
     def fit(self, topK=250, alpha=0.95):
 
-        print(topK, alpha)
+        print('hyperparams: ' + str(topK), alpha)
 
         self.topK = topK
         self.alpha = alpha

@@ -7,7 +7,7 @@ Created on 22/11/17
 """
 import numpy as np
 
-from Recommenders.Hybrids.HybridWsparseSLIMRp3 import HybridWsparseSLIMRp3
+from Recommenders.Hybrids.HybridSimilarity_SLIMElastic_Rp3 import HybridWsparseSLIMRp3
 from Recommenders.Hybrids.ItemKNNScoresHybridRecommender import ItemKNNScoresHybridRecommender
 from Recommenders.Hybrids.RankingHybrid import RankingHybrid
 from Data_manager.split_functions.split_train_validation_random_holdout import \
@@ -88,7 +88,7 @@ def read_data_split_and_search():
         # MatrixFactorization_FunkSVD_Cython,
         # PureSVDRecommender,
         # SLIM_BPR_Cython,
-        SLIMElasticNetRecommender,
+        # SLIMElasticNetRecommender,
         # IALSRecommender
         # MultVAERecommender
     ]
@@ -134,9 +134,9 @@ def read_data_split_and_search():
     evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=cutoff_list)
 
     ### STACKING URM-ICM
-    tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
+   # tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
-    URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
+    # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     # COLLABORATIVE
     '''runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,

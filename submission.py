@@ -6,7 +6,7 @@ import numpy as np
 import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
-from Recommenders.Hybrids.HybridWsparseSLIMRp3 import HybridWsparseSLIMRp3
+from Recommenders.Hybrids.HybridSimilarity_SLIMElastic_Rp3 import HybridWsparseSLIMRp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
@@ -38,7 +38,7 @@ recommender_class_list = [
     # ScoresHybridRP3betaKNNCBF
     # Hybrid_SlimElastic_Rp3
 
-    Hybrid_SlimElastic_Rp3_PureSVD
+    Hybrid_SlimElastic_Rp3_PureSVD,
     # Hybrid_SlimElastic_Rp3
     # Hybrid_SlimElastic_Rp3_ItemKNNCF
     HybridWsparseSLIMRp3

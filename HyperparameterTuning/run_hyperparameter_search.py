@@ -15,7 +15,7 @@ from functools import partial
 ##########                                                  ##########
 ######################################################################
 from Recommenders.FeatureWeighting import CFW_D_Similarity_Linalg
-from Recommenders.Hybrids.HybridWsparseSLIMRp3 import HybridWsparseSLIMRp3
+from Recommenders.Hybrids.HybridSimilarity_SLIMElastic_Rp3 import HybridWsparseSLIMRp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.RankingHybrid import RankingHybrid

@@ -7,7 +7,7 @@ import scipy.sparse as sps
 from Data_manager.split_functions.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 from Evaluation.Evaluator import EvaluatorHoldout
-from Recommenders.Hybrids.HybridWsparseSLIMRp3 import HybridWsparseSLIMRp3
+from Recommenders.Hybrids.HybridSimilarity_SLIMElastic_Rp3 import HybridWsparseSLIMRp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
@@ -41,8 +41,8 @@ recommender_class_list = [
     # ItemKNNCFRecommender,
     # P3alphaRecommender,
     # SLIM_BPR_Cython,
-    # RP3betaRecommender,
-    # PureSVDRecommender,
+    RP3betaRecommender,
+    PureSVDRecommender,
     # PureSVDItemRecommender
     # NMFRecommender,
 
@@ -50,13 +50,11 @@ recommender_class_list = [
     # LightFMUserHybridRecommender, # UCM needed
     # LightFMItemHybridRecommender,
 
-    # Hybrid_SlimElastic_Rp3,
-    Hybrid_SlimElastic_Rp3_PureSVD
-     #Hybrid_SlimElastic_Rp3,
-     # Hybrid_SlimElastic_Rp3_ItemKNNCF
+    Hybrid_SlimElastic_Rp3,
+    Hybrid_SlimElastic_Rp3_PureSVD,
+    # Hybrid_SlimElastic_Rp3_ItemKNNCF
 
     # IALSRecommender_implicit
-    # Hybrid_SlimElastic_Rp3,
     HybridWsparseSLIMRp3
 ]
 

@@ -41,6 +41,7 @@ recommender_class_list = [
     # ScoresHybridRP3betaKNNCBF
     Hybrid_SlimElastic_Rp3
     # Hybrid_SlimElastic_Rp3_ItemKNNCF
+
 ]
 
 # If directory does not exist, create
@@ -97,6 +98,10 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
                 fit_params = {'topK_P': 479, 'alpha_P': 0.66439892057927, 'normalize_similarity_P': False, 'topK': 1761, 'shrink': 4028, 'similarity': 'tversky', 'normalize': True, 'alpha': 0.9435088940853401, 'beta_P': 0.38444510929214876, 'feature_weighting': 'none'}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
                 fit_params = {'alpha': 0.9}
+            elif isinstance(recommender_object, Hybrid_SlimElastic_IALS):
+                fit_params = {'alpha': 0.95}
+            elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3_IALS):
+                fit_params = {'alpha': 0.9}
             else:
                 fit_params = {}
 
@@ -104,7 +109,6 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
 
             item_list = recommender_object.recommend(target_ids, cutoff=10, remove_seen_flag=True)
             create_csv(target_ids, item_list, recommender_class.RECOMMENDER_NAME)
-            # recommender_object.save_model(output_root_path, file_name="hybridslimrp3cf.zip")
 
         except Exception as e:
             traceback.print_exc()

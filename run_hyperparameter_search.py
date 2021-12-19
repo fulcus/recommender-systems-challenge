@@ -6,6 +6,8 @@ Created on 22/11/17
 @author: Maurizio Ferrari Dacrema
 """
 import numpy as np
+
+from Recommenders.Hybrids.HybridWsparseSLIMRp3 import HybridWsparseSLIMRp3
 from Recommenders.Hybrids.ItemKNNScoresHybridRecommender import ItemKNNScoresHybridRecommender
 from Recommenders.Hybrids.RankingHybrid import RankingHybrid
 from Recommenders.Hybrids.ScoresHybridP3alphaPureSVD import ScoresHybridP3alphaPureSVD
@@ -85,7 +87,7 @@ def read_data_split_and_search():
         # MatrixFactorization_FunkSVD_Cython,
         # PureSVDRecommender,
         # SLIM_BPR_Cython,
-        # SLIMElasticNetRecommender,
+        SLIMElasticNetRecommender,
         # IALSRecommender
     ]
 
@@ -95,6 +97,8 @@ def read_data_split_and_search():
     ]
 
     hybrid_algorithm_list = [
+        HybridWsparseSLIMRp3,
+        # Hybrid_SlimElastic_Rp3_IALS,
         # ScoresHybridP3alphaKNNCBF,
         # ScoresHybridRP3betaKNNCBF,
         # ScoresHybridP3alphaPureSVD,
@@ -131,7 +135,7 @@ def read_data_split_and_search():
     URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     ### COLLAB RECS
-    runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
+    '''runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
                                                      URM_train=URM_train,
                                                        metric_to_optimize=metric_to_optimize,
                                                       cutoff_to_optimize=cutoff_to_optimize,
@@ -146,7 +150,7 @@ def read_data_split_and_search():
                                                        parallelizeKNN=False)
 
     pool_collab = multiprocessing.Pool(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
-    pool_collab.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)
+    pool_collab.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)'''
 
     ### CONTENT RECS
     # pool = PoolWithSubprocess(processes=int(multiprocessing.cpu_count()-1), maxtasksperchild=1)
@@ -173,7 +177,7 @@ def read_data_split_and_search():
     # pool_content.map(runParameterSearch_Content_partial, content_algorithm_list)
 
 
-    '''runParameterSearch_Hybrid_partial = partial(runHyperparameterSearch_Hybrid,
+    runParameterSearch_Hybrid_partial = partial(runHyperparameterSearch_Hybrid,
                                                 URM_train=URM_train,
                                                 # ICM_train=ICM_channel.T,
                                                 ICM_object=ICM_channel,
@@ -189,7 +193,7 @@ def read_data_split_and_search():
                                                 output_folder_path=output_folder_path)
 
     pool_collab = Pool1(processes=int(multiprocessing.cpu_count()))
-    pool_collab.map(runParameterSearch_Hybrid_partial, hybrid_algorithm_list)'''
+    pool_collab.map(runParameterSearch_Hybrid_partial, hybrid_algorithm_list)
 
 
 if __name__ == '__main__':

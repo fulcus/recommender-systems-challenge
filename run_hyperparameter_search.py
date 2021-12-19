@@ -7,7 +7,6 @@ Created on 22/11/17
 """
 import numpy as np
 
-from Recommenders.Hybrids.HybridSimilarity_SLIMElastic_Rp3 import HybridWsparseSLIMRp3
 from Recommenders.Hybrids.ItemKNNScoresHybridRecommender import ItemKNNScoresHybridRecommender
 from Recommenders.Hybrids.RankingHybrid import RankingHybrid
 from Data_manager.split_functions.split_train_validation_random_holdout import \
@@ -15,7 +14,6 @@ from Data_manager.split_functions.split_train_validation_random_holdout import \
 from Evaluation.Evaluator import EvaluatorHoldout
 from HyperparameterTuning.run_hyperparameter_search import runHyperparameterSearch_Collaborative, \
     runHyperparameterSearch_Hybrid
-from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
 from Recommenders.KNN.ItemKNNCustomSimilarityRecommender import ItemKNNCustomSimilarityRecommender
 from Recommenders.Recommender_import_list import *
@@ -99,7 +97,8 @@ def read_data_split_and_search():
     ]
 
     hybrid_algorithm_list = [
-        HybridWsparseSLIMRp3,
+        # ScoresHybridRecommender,
+        # HybridWsparseSLIMRp3,
         # Hybrid_SlimElastic_Rp3_IALS,
         # ScoresHybridP3alphaKNNCBF,
         # ScoresHybridRP3betaKNNCBF,
@@ -120,7 +119,7 @@ def read_data_split_and_search():
         # ItemKNNScoresHybridRecommender
         # RankingHybrid
 
-        Hybrid_SlimElastic_Rp3_PureSVD
+        # Hybrid_SlimElastic_Rp3_PureSVD
     ]
 
     cutoff_list = [10]
@@ -134,7 +133,7 @@ def read_data_split_and_search():
     evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=cutoff_list)
 
     ### STACKING URM-ICM
-   # tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
+    # tmp = check_matrix(ICM_channel.T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
     # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 

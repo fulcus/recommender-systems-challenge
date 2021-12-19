@@ -7,10 +7,12 @@ import scipy.sparse as sps
 from Data_manager.split_functions.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 from Evaluation.Evaluator import EvaluatorHoldout
-from Recommenders.Hybrids.HybridSimilarity_SLIMElastic_Rp3 import HybridWsparseSLIMRp3
+from Recommenders.Hybrids.HybridRatings_SLIM_Rp3 import HybridRatings_SLIM_Rp3
+from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
+from Recommenders.Hybrids.BaseHybridRatings import BaseHybridRatings
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
 from Recommenders.MatrixFactorization.PureSVDRecommender import PureSVDItemRecommender
@@ -41,8 +43,8 @@ recommender_class_list = [
     # ItemKNNCFRecommender,
     # P3alphaRecommender,
     # SLIM_BPR_Cython,
-    RP3betaRecommender,
-    PureSVDRecommender,
+    # RP3betaRecommender,
+    # PureSVDRecommender,
     # PureSVDItemRecommender
     # NMFRecommender,
 
@@ -50,12 +52,14 @@ recommender_class_list = [
     # LightFMUserHybridRecommender, # UCM needed
     # LightFMItemHybridRecommender,
 
-    Hybrid_SlimElastic_Rp3,
-    Hybrid_SlimElastic_Rp3_PureSVD,
+    # Hybrid_SlimElastic_Rp3,
+    # Hybrid_SlimElastic_Rp3_PureSVD,
     # Hybrid_SlimElastic_Rp3_ItemKNNCF
 
     # IALSRecommender_implicit
-    HybridWsparseSLIMRp3
+    # HybridWsparseSLIMRp3
+    HybridRatings_SLIM_Rp3,
+    HybridSimilarity_SLIM_Rp3
 ]
 
 # If directory does not exist, create
@@ -128,7 +132,9 @@ def evaluate_all_recommenders(URM_all, *ICMs):
                 fit_params = {'topK': 615, 'l1_ratio': 0.007030044688343361, 'alpha': 0.07010526286528686}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
                 fit_params = {'alpha': 0.9}
-            elif isinstance(recommender_object, HybridWsparseSLIMRp3):
+            elif isinstance(recommender_object, HybridRatings_SLIM_Rp3):
+                fit_params = {'alpha': 0.9}
+            elif isinstance(recommender_object, HybridSimilarity_SLIM_Rp3):
                 fit_params = {'alpha': 0.9610229519605884, 'topK': 1199}
             elif isinstance(recommender_object, PureSVDRecommender):
                 fit_params = {'num_factors' :29}

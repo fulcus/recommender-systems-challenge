@@ -85,7 +85,7 @@ def split_train_in_two_percentage_user_wise(URM_train, train_percentage = 0.1, v
 
 
 
-
+import random
 
 
 def split_train_in_two_percentage_global_sample(URM_all, train_percentage = 0.1):

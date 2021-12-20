@@ -52,12 +52,12 @@ recommender_class_list = [
     # LightFMUserHybridRecommender, # UCM needed
     # LightFMItemHybridRecommender,
 
-    # Hybrid_SlimElastic_Rp3,
-    # Hybrid_SlimElastic_Rp3_PureSVD,
+    Hybrid_SlimElastic_Rp3,
+    Hybrid_SlimElastic_Rp3_PureSVD,
     # Hybrid_SlimElastic_Rp3_ItemKNNCF
 
     # IALSRecommender_implicit
-    # HybridWsparseSLIMRp3
+
     HybridRatings_SLIM_Rp3,
     HybridSimilarity_SLIM_Rp3
 ]
@@ -99,7 +99,7 @@ def evaluate_all_recommenders(URM_all, *ICMs):
     # tmp = tmp.multiply(14)
     # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
-    evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10], exclude_seen=True)
+    evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10])
 
     earlystopping_keywargs = {"validation_every_n": 2,
                               "stop_on_validation": True,
@@ -126,8 +126,7 @@ def evaluate_all_recommenders(URM_all, *ICMs):
                 # 'alpha': 0.0798650671543897, 'epsilon': 0.00205004763058707, 'reg': 0.008433763108035943
                 fit_params = {'n_factors' : 768, 'regularization' : 0.4489004525533907, 'iterations':76 }
             elif isinstance(recommender_object, RP3betaRecommender):
-                fit_params = {'topK': 40, 'alpha': 0.4208737801266599, 'beta': 0.5251543657397256,
-                              'normalize_similarity': True}
+                fit_params = {'topK':40, 'alpha':0.4208737801266599, 'beta':0.5251543657397256, 'normalize_similarity':True}
             elif isinstance(recommender_object, MultVAERecommender):
                 fit_params = {'topK': 615, 'l1_ratio': 0.007030044688343361, 'alpha': 0.07010526286528686}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
@@ -137,9 +136,9 @@ def evaluate_all_recommenders(URM_all, *ICMs):
             elif isinstance(recommender_object, HybridSimilarity_SLIM_Rp3):
                 fit_params = {'alpha': 0.9610229519605884, 'topK': 1199}
             elif isinstance(recommender_object, PureSVDRecommender):
-                fit_params = {'num_factors' :29}
+                fit_params = {'num_factors': 28}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3_PureSVD):
-                fit_params = {'alpha': 0.9, 'beta': 0.1, 'gamma': 0.1}
+                fit_params = {'alpha': 0.95, 'beta': 0.1, 'gamma': 0.1}
             else:
                 fit_params = {}
 
@@ -172,14 +171,14 @@ def evaluate_all_recommenders(URM_all, *ICMs):
 def evaluate_best_saved_model(URM_all):
     URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.90)
 
-    evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10], exclude_seen=True)
+    evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10])
 
     # set here the recommender you want to use
     recommender_object = SLIMElasticNetRecommender(URM_train) # SLIMElasticNetRecommender(URM_train)
 
     # rec_best_model_last.zip is the output of the run_hyperparameter_search (one best model for each rec class)
     # recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
-    recommender_object.load_model(output_root_path, file_name="slimelastic_urmall.zip")
+    recommender_object.load_model(output_root_path, file_name="newslim_urmall_noremoveseen.zip")
 
     results_run_1, results_run_string_1 = evaluator.evaluateRecommender(recommender_object)
 
@@ -203,3 +202,4 @@ if __name__ == '__main__':
 
     # evaluate_best_saved_model(URM_all)
     evaluate_all_recommenders(URM_all, *ICMs)
+

@@ -18,7 +18,7 @@ from run_all_algorithms import _get_instance
 recommender_class_list = [
     # ItemKNNCBFRecommender,
     # ItemKNN_CFCBF_Hybrid_Recommender,
-    #SLIMElasticNetRecommender,  # slow to train, good
+    # SLIMElasticNetRecommender,  # slow to train, good
     # UserKNNCFRecommender,
     # IALSRecommender, # good
     # MatrixFactorization_BPR_Cython,
@@ -38,15 +38,15 @@ recommender_class_list = [
     # ScoresHybridRP3betaKNNCBF
     # Hybrid_SlimElastic_Rp3
 
-    Hybrid_SlimElastic_Rp3_PureSVD,
+    # Hybrid_SlimElastic_Rp3_PureSVD,
     # Hybrid_SlimElastic_Rp3
     # Hybrid_SlimElastic_Rp3_ItemKNNCF
     HybridSimilarity_SLIM_Rp3
 
 ]
 
-output_root_path = os.path.join(os.path.dirname(__file__), "result_experiments/")
-res_dir = os.path.join(output_root_path, "csv")
+res_dir = 'result_experiments/csv'
+output_root_path = "./result_experiments/"
 
 # If directory does not exist, create
 if not os.path.exists(output_root_path):
@@ -71,9 +71,9 @@ def create_csv(target_ids, results, rec_name):
 def run_prediction_all_recommenders(URM_all, *ICMs):
     ICM_all = ICMs[4]
 
-    # tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
+    tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
-    # URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
+    URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
 
     evaluator = EvaluatorHoldout(URM_all, cutoff_list=[10], exclude_seen=True)
 
@@ -94,7 +94,7 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
             #    fit_params = {'num_factors': 167, 'epochs': 25, 'confidence_scaling': 'log',
             #                  'alpha': 2.7491082249169008, 'epsilon': 0.2892328524505224, 'reg': 0.0003152844014605245}
             if isinstance(recommender_object, SLIMElasticNetRecommender):
-                fit_params = {"topK": 453, 'l1_ratio': 0.00029920499017254754, 'alpha': 0.10734084960757517}
+                fit_params = {'topK': 742, 'l1_ratio': 0.0004826899479303845, 'alpha': 0.12121987754356242}
             elif isinstance(recommender_object, IALSRecommender):
                 fit_params = {'num_factors': 167, 'epochs': 25, 'confidence_scaling': 'log',
                               'alpha': 2.7491082249169008, 'epsilon': 0.2892328524505224, 'reg': 0.0003152844014605245}
@@ -107,13 +107,14 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
             elif isinstance(recommender_object, HybridSimilarity_SLIM_Rp3):
                 fit_params = {'alpha': 0.9610229519605884, 'topK': 1199}
             elif isinstance(recommender_object, PureSVDRecommender):
-                fit_params = {'num_factors': 29}
+                fit_params = {'num_factors': 28}
             else:
                 fit_params = {}
 
             recommender_object.fit(**fit_params)
+            recommender_object.save_model(output_root_path, file_name="hybridsimilarityslimrp3withstack.zip")
 
-            item_list = recommender_object.recommend(target_ids, cutoff=10, remove_seen_flag=True)
+            item_list = recommender_object.recommend(target_ids, cutoff=10)
             create_csv(target_ids, item_list, recommender_class.RECOMMENDER_NAME)
 
         except Exception as e:

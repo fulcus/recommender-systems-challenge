@@ -19,7 +19,7 @@ class SVDFeature(BaseRecommender):
     FILE_MODEL_NAME = "svd_feature_train"
     FILE_TEST_NAME = "svd_feature_test"
     FILE_PREDICTION_NAME = "svd_feature_predicted"
-    DEFAULT_TEMP_FILE_FOLDER = os.path.join(os.path.dirname(__file__), "result_experiments/__Temp_SVDFeature/")
+    DEFAULT_TEMP_FILE_FOLDER = './result_experiments/__Temp_SVDFeature/'
 
     def __init__(self, URM_train, ICM=None, UCM=None):
 

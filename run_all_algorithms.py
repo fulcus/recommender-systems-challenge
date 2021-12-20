@@ -71,7 +71,7 @@ if __name__ == '__main__':
                               "validation_metric": "MAP",
                               }
 
-    output_root_path = os.path.join(os.path.dirname(__file__), "result_experiments/")
+    output_root_path = "./result_experiments/"
 
     # If directory does not exist, create
     if not os.path.exists(output_root_path):

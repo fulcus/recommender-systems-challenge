@@ -6,6 +6,7 @@ import numpy as np
 import scipy.sparse as sps
 
 from Evaluation.Evaluator import EvaluatorHoldout
+from Recommenders.Hybrids.HybridRatings_SLIM_PureSVD import HybridRatings_SLIM_PureSVD
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
@@ -112,6 +113,8 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
                 fit_params = {'num_factors': 28}
             elif isinstance(recommender_object, HybridSimilarity_withGroupedusers):
                 fit_params = {'alpha': 0.979326712891909, 'topK': 1349}
+            elif isinstance(recommender_object, HybridRatings_SLIM_PureSVD):
+                fit_params = {'alpha': 0.95}
             else:
                 fit_params = {}
 

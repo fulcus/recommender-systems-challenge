@@ -21,7 +21,6 @@ output_root_path = "./result_experiments/"
 
 
 class Hybrid_SlimElastic_Rp3_PureSVD(BaseRecommender):
-    """Hybrid_SlimElastic_Rp3_PureSVD"""
 
     RECOMMENDER_NAME = "HybridSlimElasticRp3PureSVD"
 

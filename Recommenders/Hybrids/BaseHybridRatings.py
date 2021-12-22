@@ -21,7 +21,7 @@ def _normalize(item_weights_1, item_weights_2):
 
 
 class BaseHybridRatings(BaseItemSimilarityMatrixRecommender):
-    """ BaseHybridRatings
+    """
     Hybrid of two prediction scores R = R1*alpha + R2*(1-alpha)
     """
 

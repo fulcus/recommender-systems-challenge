@@ -14,17 +14,16 @@ from Recommenders.SLIM.SLIMElasticNetRecommender import SLIMElasticNetRecommende
 output_root_path = "./result_experiments/"
 
 class BaseHybridSimilarity(BaseItemSimilarityMatrixRecommender):
-    """ BaseHybridSimilarity
-    Hybrid of two similarities S = S1*alpha + S2*(1-alpha)
+    """
+    Hybrid of two collaborative filtering models, obtained as weighted sum of their similarity matrices.
+    W_sparse_hybrid = recommender_1.W_sparse * alpha + recommender_2.W_sparse * (1 - alpha)
 
+    Note: recommender_1 and recommender_2 should already be fitted
     """
 
     RECOMMENDER_NAME = "BaseHybridSimilarity"
 
     def __init__(self, URM_train, recommender_1, recommender_2):
-        """
-        recommender_1 and recommender_2 should already be fitted
-        """
         super(BaseHybridSimilarity, self).__init__(URM_train, verbose=True)
 
         self.W_sparse = None

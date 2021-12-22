@@ -10,11 +10,8 @@ output_root_path = "./result_experiments/"
 
 
 class HybridRatings_SLIM_Rp3(BaseHybridRatings):
-    """ HybridRatings_SLIM_Rp3
-    Hybrid of two prediction scores R = R1*alpha + R2*(1-alpha)
-    """
 
-    RECOMMENDER_NAME = "HybridRatings_SLIM_Rp3"
+    RECOMMENDER_NAME = "HybridRatings_SLIM_PureSVD"
 
     def __init__(self, URM_train):
         self.recommender_1 = SLIMElasticNetRecommender(URM_train)

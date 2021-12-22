@@ -15,9 +15,6 @@ from Recommenders.SLIM.SLIMElasticNetRecommender import SLIMElasticNetRecommende
 output_root_path = "./result_experiments/"
 
 class HybridSimilarity_SLIM_Rp3(BaseHybridSimilarity):
-    """ HybridSimilarity_SLIM_Rp3
-    Hybrid of two similarities S = S1*alpha + S2*(1-alpha)
-    """
 
     RECOMMENDER_NAME = "HybridSimilarity_SLIM_Rp3"
 

@@ -16,6 +16,7 @@ from functools import partial
 ######################################################################
 from Recommenders.FeatureWeighting import CFW_D_Similarity_Linalg
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
+from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.RankingHybrid import RankingHybrid
@@ -438,6 +439,19 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
                     FIT_POSITIONAL_ARGS=[],
                     FIT_KEYWORD_ARGS={}
                 )
+
+        #########################################################################################################
+        if recommender_class is HybridSimilarity_withGroupedusers:
+            hyperparameters_range_dictionary = {}
+            hyperparameters_range_dictionary["alpha"] = Real(low=0.6, high=1.0, prior='uniform')
+            hyperparameters_range_dictionary["topK"] = Integer(100, 2000)
+
+            recommender_input_args = SearchInputRecommenderArgs(
+                CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
+                CONSTRUCTOR_KEYWORD_ARGS={},
+                FIT_POSITIONAL_ARGS=[],
+                FIT_KEYWORD_ARGS={}
+            )
 
         #########################################################################################################
 

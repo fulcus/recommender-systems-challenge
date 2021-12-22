@@ -7,6 +7,7 @@ import numpy as np
 # urm_path = "Data_manager_split_datasets/TVShows/data_train.csv"
 # icm_path = "Data_manager_split_datasets/TVShows/"
 # target_path = "Data_manager_split_datasets/TVShows/data_target_users_test.csv"
+from Evaluation.Evaluator import EvaluatorHoldout
 
 
 def load_urm():
@@ -109,3 +110,42 @@ def load_urm_icm():
     urm_icm = urm_icm.tocsr()
 
     return urm_icm
+
+
+
+def group_users_in_urm (URM_train, URM_test, group_to_test):
+    n_users = 13650
+    n_item = 18059
+    cutoff=10
+
+    profile_length = np.ediff1d(sps.csr_matrix(URM_train).indptr)
+    print("profile", profile_length, profile_length.shape)
+
+    block_size = int(len(profile_length) * 0.5)
+    print("block_size", block_size)
+
+    sorted_users = np.argsort(profile_length)
+    print("sorted users", sorted_users)
+
+    group_id = group_to_test
+    start_pos = group_id * block_size
+    end_pos = min((group_id + 1) * block_size, len(profile_length))
+
+    users_in_group = sorted_users[start_pos:end_pos]
+
+    users_in_group_p_len = profile_length[users_in_group]
+
+    print("Group {}, #users in group {}, average p.len {:.2f}, median {}, min {}, max {}".format(
+        group_id,
+        users_in_group.shape[0],
+        users_in_group_p_len.mean(),
+        np.median(users_in_group_p_len),
+        users_in_group_p_len.min(),
+        users_in_group_p_len.max()))
+
+    users_not_in_group_flag = np.isin(sorted_users, users_in_group, invert=True)
+    users_not_in_group = sorted_users[users_not_in_group_flag]
+
+    evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=[cutoff], ignore_users=users_not_in_group)
+
+    return evaluator_test

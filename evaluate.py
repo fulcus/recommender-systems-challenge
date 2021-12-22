@@ -9,6 +9,7 @@ from Data_manager.split_functions.split_train_validation_random_holdout import \
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Hybrids.HybridRatings_SLIM_Rp3 import HybridRatings_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
+from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
@@ -52,14 +53,16 @@ recommender_class_list = [
     # LightFMUserHybridRecommender, # UCM needed
     # LightFMItemHybridRecommender,
 
-    Hybrid_SlimElastic_Rp3,
-    Hybrid_SlimElastic_Rp3_PureSVD,
+    # Hybrid_SlimElastic_Rp3,
+    # Hybrid_SlimElastic_Rp3_PureSVD,
     # Hybrid_SlimElastic_Rp3_ItemKNNCF
 
     # IALSRecommender_implicit
 
-    HybridRatings_SLIM_Rp3,
-    HybridSimilarity_SLIM_Rp3
+    # HybridRatings_SLIM_Rp3,
+    HybridSimilarity_SLIM_Rp3,
+    # HybridSimilarity_withGroupedusers
+
 ]
 
 # If directory does not exist, create
@@ -135,6 +138,8 @@ def evaluate_all_recommenders(URM_all, *ICMs):
                 fit_params = {'alpha': 0.9}
             elif isinstance(recommender_object, HybridSimilarity_SLIM_Rp3):
                 fit_params = {'alpha': 0.9610229519605884, 'topK': 1199}
+            elif isinstance(recommender_object, HybridSimilarity_withGroupedusers):
+                fit_params = {'alpha': 0.979326712891909, 'topK': 1349}
             elif isinstance(recommender_object, PureSVDRecommender):
                 fit_params = {'num_factors': 28}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3_PureSVD):

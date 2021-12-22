@@ -7,6 +7,7 @@ Created on 22/11/17
 """
 import numpy as np
 
+from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
 from Recommenders.Hybrids.ItemKNNScoresHybridRecommender import ItemKNNScoresHybridRecommender
 from Recommenders.Hybrids.RankingHybrid import RankingHybrid
 from Data_manager.split_functions.split_train_validation_random_holdout import \
@@ -18,7 +19,7 @@ from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFW
 from Recommenders.KNN.ItemKNNCustomSimilarityRecommender import ItemKNNCustomSimilarityRecommender
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
-from reader import load_urm, load_icm
+from reader import load_urm, load_icm, group_users_in_urm
 from Evaluation.Evaluator import EvaluatorHoldout
 
 import traceback
@@ -84,7 +85,7 @@ def read_data_split_and_search():
         # UserKNNCFRecommender,
         # MatrixFactorization_BPR_Cython,  # bad
         # MatrixFactorization_FunkSVD_Cython,
-        PureSVDRecommender,
+        # PureSVDRecommender,
         # SLIM_BPR_Cython,
         # SLIMElasticNetRecommender,
         # IALSRecommender
@@ -120,6 +121,7 @@ def read_data_split_and_search():
         # RankingHybrid
 
         # Hybrid_SlimElastic_Rp3_PureSVD
+        HybridSimilarity_withGroupedusers
     ]
 
     cutoff_list = [10]
@@ -128,6 +130,9 @@ def read_data_split_and_search():
 
     n_cases = 100
     n_random_starts = int(n_cases / 3)
+
+    # new function to evaluate 1 group of users (for now split at 50%)
+    # evaluator_validation = group_users_in_urm(URM_train, URM_validation, 1)
 
     evaluator_validation = EvaluatorHoldout(URM_validation, cutoff_list=cutoff_list)
     evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=cutoff_list)
@@ -138,7 +143,7 @@ def read_data_split_and_search():
     # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     # COLLABORATIVE
-    runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
+    '''runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
                                                        URM_train=URM_train,
                                                        metric_to_optimize=metric_to_optimize,
                                                       cutoff_to_optimize=cutoff_to_optimize,
@@ -153,7 +158,7 @@ def read_data_split_and_search():
                                                        parallelizeKNN=False)
 
     pool_collab = multiprocessing.Pool(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
-    pool_collab.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)
+    pool_collab.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)'''
 
     ### CONTENT RECS
     # pool = PoolWithSubprocess(processes=int(multiprocessing.cpu_count()-1), maxtasksperchild=1)
@@ -180,7 +185,7 @@ def read_data_split_and_search():
     # pool_content.map(runParameterSearch_Content_partial, content_algorithm_list)
 
     # HYBRID
-    '''runParameterSearch_Hybrid_partial = partial(runHyperparameterSearch_Hybrid,
+    runParameterSearch_Hybrid_partial = partial(runHyperparameterSearch_Hybrid,
                                                  URM_train=URM_train,
                                                  # ICM_train=ICM_channel.T,
                                                  ICM_object=ICM_channel,
@@ -196,7 +201,7 @@ def read_data_split_and_search():
                                                  output_folder_path=output_folder_path)
 
     pool_collab = Pool1(processes=int(multiprocessing.cpu_count()))
-    pool_collab.map(runParameterSearch_Hybrid_partial, hybrid_algorithm_list)'''
+    pool_collab.map(runParameterSearch_Hybrid_partial, hybrid_algorithm_list)
 
 if __name__ == '__main__':
     read_data_split_and_search()

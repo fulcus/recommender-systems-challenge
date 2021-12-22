@@ -5,12 +5,9 @@ Created on 23/03/2019
 
 
 
+import implicit
+
 from Recommenders.BaseMatrixFactorizationRecommender import BaseMatrixFactorizationRecommender
-from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
-from Recommenders.Recommender_utils import check_matrix
-# import implicit
-from tqdm import tqdm
-import numpy as np
 
 
 class IALSRecommender_implicit(BaseMatrixFactorizationRecommender):

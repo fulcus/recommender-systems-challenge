@@ -6,7 +6,7 @@ numpy==1.20.1
 pandas==1.2.4
 scikit-learn==0.24.1
 scikit-optimize==0.8.1
-scipy==1.6.2
+scipy~=1.7.3
 tqdm==4.59.0
 RISE==5.6.1
 torch==1.7.1
@@ -15,3 +15,4 @@ jupyter-contrib-nbextensions==0.5.1
 tensorflow~=2.4.1
 setuptools~=59.2.0
 pytables
+implicit~=0.4.4

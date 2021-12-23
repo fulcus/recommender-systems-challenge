@@ -71,12 +71,10 @@ def create_csv(target_ids, results, rec_name):
             f.write(str(target_id) + ', ' + ' '.join(map(str, result)) + '\n')
 
 
-def run_prediction_all_recommenders(URM_all, *ICMs):
-    ICM_all = ICMs[4]
-
-    tmp = check_matrix(ICMs[2].T, 'csr', dtype=np.float32)
+def run_prediction_all_recommenders(URM_all, ICM=None):
+    # tmp = check_matrix(ICM.T, 'csr', dtype=np.float32)
     # tmp = tmp.multiply(14)
-    URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
+    # URM_all = sps.vstack((URM_all, tmp), format='csr', dtype=np.float32)
 
     evaluator = EvaluatorHoldout(URM_all, cutoff_list=[10], exclude_seen=True)
 
@@ -91,7 +89,7 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
 
         try:
             print("Algorithm: {}".format(recommender_class.RECOMMENDER_NAME))
-            recommender_object = _get_instance(recommender_class, URM_all, ICM_channel)
+            recommender_object = _get_instance(recommender_class, URM_all, ICM)
 
             # if isinstance(recommender_object, Incremental_Training_Early_Stopping):
             #    fit_params = {'num_factors': 167, 'epochs': 25, 'confidence_scaling': 'log',
@@ -132,14 +130,16 @@ def run_prediction_all_recommenders(URM_all, *ICMs):
 
 # Method to create prediction using a saved best model of a specific recommender class
 
-def run_prediction_best_saved_model(URM_all, ICM_all):
+def run_prediction_best_saved_model(URM_all, ICM=None):
     # ******** set here the recommender you want to use
-    recommender_object = SLIMElasticNetRecommender(URM_all)
+    # recommender_object = SLIMElasticNetRecommender(URM_all)
+    recommender_object = EASE_R_Recommender(URM_all)
 
     # rec_best_model_last.zip is the output of the run_hyperparameter_search (one best model for each rec class)
-    #recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
+    # recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
 
-    recommender_object.load_model(output_root_path, file_name="slimelastic_urmall.zip")
+    # recommender_object.load_model(output_root_path, file_name="slimelastic_urmall.zip")
+    recommender_object.load_model(output_root_path, file_name="EASE_R_Recommender_best_model.zip")
 
     # added for prediction
     item_list = recommender_object.recommend(target_ids, cutoff=10, remove_seen_flag=True)
@@ -148,14 +148,14 @@ def run_prediction_best_saved_model(URM_all, ICM_all):
 
 if __name__ == '__main__':
     URM_all, user_id_unique, item_id_unique = load_urm()
-    ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
-    ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
-    ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
-    ICM_event = load_icm("data_ICM_event.csv", weight=1)
     target_ids = load_target()
 
-    ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
-    ICMs = [ICM_genre, ICM_subgenre, ICM_channel, ICM_event, ICM_all]
+    # ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
+    # ICM_event = load_icm("data_ICM_event.csv", weight=1)
+    # ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
+    # ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
+    # ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
+    # ICMs = [ICM_genre, ICM_subgenre, ICM_channel, ICM_event, ICM_all]
 
-    run_prediction_all_recommenders(URM_all, *ICMs)
-    # run_prediction_best_saved_model(URM_all, ICM_all)
+    run_prediction_all_recommenders(URM_all)
+    # run_prediction_best_saved_model(URM_all)

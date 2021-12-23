@@ -8,7 +8,9 @@ from Data_manager.split_functions.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Hybrids.HybridGrouping_SLIM_TopPop import HybridGrouping_SLIM_TopPop
+from Recommenders.Hybrids.HybridRatings_PureSVD_EASE_R import HybridRatings_PureSVD_EASE_R
 from Recommenders.Hybrids.HybridRatings_SLIM_EASE_R import HybridRatings_SLIM_EASE_R
+from Recommenders.Hybrids.HybridRatings_SLIM_EASE_R_PureSVD import HybridRatings_SLIM_PureSVD_EASE_R
 from Recommenders.Hybrids.HybridRatings_SLIM_Rp3 import HybridRatings_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
@@ -62,10 +64,12 @@ recommender_class_list = [
     # IALSRecommender_implicit
 
     # HybridRatings_SLIM_Rp3,
-    # HybridSimilarity_SLIM_Rp3,
+    HybridSimilarity_SLIM_Rp3
     # HybridGrouping_SLIM_TopPop
     # EASE_R_Recommender
-    HybridRatings_SLIM_EASE_R
+    # HybridRatings_SLIM_EASE_R
+    # HybridRatings_PureSVD_EASE_R
+    # HybridRatings_SLIM_PureSVD_EASE_R
 ]
 
 # If directory does not exist, create
@@ -95,18 +99,16 @@ def evaluate_all_recommenders(URM_all, ICM=None):
         try:
             print("Algorithm: {}".format(recommender_class.RECOMMENDER_NAME))
             # URM_tfidf = feature_extraction.text.TfidfTransformer().fit_transform(URM_train)
-            recommender_object = _get_instance(recommender_class, URM_train, ICM_channel)
+            recommender_object = _get_instance(recommender_class, URM_train, ICM)
 
             if isinstance(recommender_object, ItemKNNCBFWeightedSimilarityRecommender):
-                fit_params = {"ICMs": ICMs}
+                fit_params = {"ICMs": ICM}
             elif isinstance(recommender_object, ItemKNNCFRecommender):
                 fit_params = {"topK": 200, "shrink": 200, "feature_weighting": "TF-IDF"}
             elif isinstance(recommender_object, SLIMElasticNetRecommender):
                 fit_params = {"topK": 453, 'l1_ratio': 0.00029920499017254754, 'alpha': 0.10734084960757517}
             elif isinstance(recommender_object, IALSRecommender_implicit):
-                # 'num_factors': 11, 'epochs': 36, 'confidence_scaling': 'linear',
-                # 'alpha': 0.0798650671543897, 'epsilon': 0.00205004763058707, 'reg': 0.008433763108035943
-                fit_params = {'num_factors': 768, 'reg': 0.4489004525533907, 'iterations': 76}
+                fit_params = {'n_factors': 50, 'regularization': 0.001847510119137634}
             elif isinstance(recommender_object, RP3betaRecommender):
                 fit_params = {'topK': 40, 'alpha': 0.4208737801266599, 'beta': 0.5251543657397256,
                               'normalize_similarity': True}
@@ -124,6 +126,12 @@ def evaluate_all_recommenders(URM_all, ICM=None):
                 fit_params = {'num_factors': 28, 'random_seed': 0}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3_PureSVD):
                 fit_params = {'alpha': 0.95, 'beta': 0.1, 'gamma': 0.1}
+            elif isinstance(recommender_object, HybridRatings_SLIM_EASE_R):
+                fit_params = {'alpha': 0.9610229519605884}
+            elif isinstance(recommender_object, HybridRatings_PureSVD_EASE_R):
+                fit_params = {'alpha': 0.5}
+            elif isinstance(recommender_object, HybridRatings_SLIM_PureSVD_EASE_R):
+                fit_params = {'alpha': 0.95}
             else:
                 fit_params = {}
 
@@ -161,11 +169,13 @@ def evaluate_best_saved_model(URM_all, ICM=None):
         URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     # set here the recommender you want to use
-    recommender_object = SLIMElasticNetRecommender(URM_train)  # SLIMElasticNetRecommender(URM_train)
+    # recommender_object = SLIMElasticNetRecommender(URM_train)  # SLIMElasticNetRecommender(URM_train)
+    recommender_object = EASE_R_Recommender(URM_train)  # SLIMElasticNetRecommender(URM_train)
 
     # rec_best_model_last.zip is the output of the run_hyperparameter_search (one best model for each rec class)
     # recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
-    recommender_object.load_model(output_root_path, file_name="slimelastic_urmall.zip")
+    # recommender_object.load_model(output_root_path, file_name="slimelastic_urmall.zip")
+    recommender_object.load_model(output_root_path, file_name="EASE_R_Recommender_best_model.zip")
 
     results_run_1, results_run_string_1 = evaluator.evaluateRecommender(recommender_object)
 
@@ -176,18 +186,17 @@ def evaluate_best_saved_model(URM_all, ICM=None):
 
 if __name__ == '__main__':
     URM_all, user_id_unique, item_id_unique = load_urm()
-    target_ids = load_target()
-    ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
-    ICM_event = load_icm("data_ICM_event.csv", weight=1)
-    ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
-    ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
-    ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
-    ICMs = [None, ICM_channel, ICM_event, ICM_genre, ICM_subgenre, ICM_all]
+    # ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
+    # ICM_event = load_icm("data_ICM_event.csv", weight=1)
+    # ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
+    # ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
+    # ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
+    # ICMs = [None, ICM_channel, ICM_event, ICM_genre, ICM_subgenre, ICM_all]
 
     # evaluate_best_saved_model(URM_all)
-    # evaluate_all_recommenders(URM_all)
+    evaluate_all_recommenders(URM_all)
 
-    names = ['NO ICM', 'ICM_channel', 'ICM_event', 'ICM_genre', 'ICM_subgenre', 'ICM_all']
-    for name, ICM in zip(names, ICMs):
-        print('Using ' + name)
-        evaluate_all_recommenders(URM_all, ICM)
+    # names = ['NO ICM', 'ICM_channel', 'ICM_event', 'ICM_genre', 'ICM_subgenre', 'ICM_all']
+    # for name, ICM in zip(names, ICMs):
+    #     print('Using ' + name)
+    #     evaluate_all_recommenders(URM_all, ICM)

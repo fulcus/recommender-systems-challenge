@@ -1,5 +1,4 @@
 import numpy as np
-from tqdm import tqdm
 
 from Recommenders.BaseSimilarityMatrixRecommender import BaseItemSimilarityMatrixRecommender
 from Recommenders.NonPersonalizedRecommender import TopPop
@@ -32,11 +31,11 @@ class HybridGrouping_SLIM_TopPop(BaseItemSimilarityMatrixRecommender):
 
         item_weights = np.empty([len(user_id_array), self.URM_train.shape[1]])
 
-        for i in tqdm(range(len(user_id_array))):
+        for i in range(len(user_id_array)):
 
             interactions = len(self.URM_train[user_id_array[i], :].indices)
 
-            if interactions > 10:
+            if interactions > 50:
                 w1 = self.recommender_1._compute_item_score(user_id_array[i], items_to_compute)
                 # w1 /= np.linalg.norm(w1, 2)
                 # w2 = self.ItemCF2._compute_item_score(user_id_array[i], items_to_compute)
@@ -44,8 +43,6 @@ class HybridGrouping_SLIM_TopPop(BaseItemSimilarityMatrixRecommender):
                 # w = w1 + w2
                 item_weights[i, :] = w1
             else:
-                print('few interactions')
-
                 w1 = self.recommender_2._compute_item_score([user_id_array[i]], items_to_compute)
                 # w2 = self.ItemCF1._compute_item_score(user_id_array[i], items_to_compute)
                 # w3 = w1 * 3.1354787809646 + w2 * 0.6847368170848224

@@ -57,8 +57,8 @@ class SLIMElasticNetRecommender(BaseItemSimilarityMatrixRecommender):
                                 copy_X=False,
                                 precompute=True,
                                 selection='random',
-                                max_iter=100,
-                                tol=1e-4)
+                                max_iter=max_iter,
+                                tol=tol)
 
         URM_train = check_matrix(self.URM_train, 'csc', dtype=np.float32)
 

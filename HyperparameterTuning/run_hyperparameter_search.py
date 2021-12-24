@@ -17,6 +17,7 @@ from functools import partial
 from Recommenders.FeatureWeighting import CFW_D_Similarity_Linalg
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
+from Recommenders.Hybrids.Hybrid_SLIM_EASE_R_IALS import Hybrid_SLIM_EASE_R_IALS
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.RankingHybrid import RankingHybrid
@@ -442,10 +443,26 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
                 )
 
         #########################################################################################################
+
         if recommender_class is HybridSimilarity_withGroupedusers:
             hyperparameters_range_dictionary = {}
             hyperparameters_range_dictionary["alpha"] = Real(low=0.6, high=1.0, prior='uniform')
             hyperparameters_range_dictionary["topK"] = Integer(100, 2000)
+
+            recommender_input_args = SearchInputRecommenderArgs(
+                CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
+                CONSTRUCTOR_KEYWORD_ARGS={},
+                FIT_POSITIONAL_ARGS=[],
+                FIT_KEYWORD_ARGS={}
+            )
+
+        #########################################################################################################
+
+        if recommender_class is Hybrid_SLIM_EASE_R_IALS:
+            hyperparameters_range_dictionary = {}
+            hyperparameters_range_dictionary["alpha"] = Real(low=0.0, high=1.0, prior='uniform')
+            hyperparameters_range_dictionary["beta"] = Real(low=0.0, high=1.0, prior='uniform')
+            hyperparameters_range_dictionary["gamma"] = Real(low=0.0, high=1.0, prior='uniform')
 
             recommender_input_args = SearchInputRecommenderArgs(
                 CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
@@ -1008,14 +1025,14 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
         if recommender_class is IALSRecommender_implicit:
             hyperparameters_range_dictionary = {
                 "n_factors": Integer(1, 200),
-                "regularization": Real(low=1e-5, high=1e-2, prior='log-uniform'),
+                "regularization": Real(low=1e-5, high=0.15, prior='log-uniform'),
             }
 
             recommender_input_args = SearchInputRecommenderArgs(
                 CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
                 CONSTRUCTOR_KEYWORD_ARGS={},
                 FIT_POSITIONAL_ARGS=[],
-                FIT_KEYWORD_ARGS=earlystopping_keywargs
+                FIT_KEYWORD_ARGS={}  # if necessary add here earlystopping
             )
 
         ##########################################################################################################

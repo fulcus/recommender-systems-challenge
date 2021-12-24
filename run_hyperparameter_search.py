@@ -13,7 +13,7 @@ from multiprocessing.pool import ThreadPool as Pool1
 from functools import partial
 
 from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
-from Recommenders.Hybrids.ItemKNNScoresHybridRecommender import ItemKNNScoresHybridRecommender
+from Recommenders.Hybrids.Hybrid_SLIM_EASE_R_IALS import Hybrid_SLIM_EASE_R_IALS
 from Recommenders.Hybrids.RankingHybrid import RankingHybrid
 from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
 from Recommenders.KNN.ItemKNNCustomSimilarityRecommender import ItemKNNCustomSimilarityRecommender
@@ -75,6 +75,7 @@ def read_data_split_and_search():
         # IALSRecommender
         # MultVAERecommender
         IALSRecommender_implicit
+        # EASE_R_Recommender
     ]
 
     content_algorithm_list = [
@@ -106,7 +107,8 @@ def read_data_split_and_search():
         # RankingHybrid
 
         # Hybrid_SlimElastic_Rp3_PureSVD
-        HybridSimilarity_withGroupedusers
+        # HybridSimilarity_withGroupedusers
+        Hybrid_SLIM_EASE_R_IALS
     ]
 
     cutoff_list = [10]
@@ -128,22 +130,22 @@ def read_data_split_and_search():
     # URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     # COLLABORATIVE
-    runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
-                                                       URM_train=URM_train,
-                                                       metric_to_optimize=metric_to_optimize,
-                                                       cutoff_to_optimize=cutoff_to_optimize,
-                                                       n_cases=n_cases,
-                                                       n_random_starts=n_random_starts,
-                                                       evaluator_validation_earlystopping=evaluator_validation,
-                                                       evaluator_validation=evaluator_validation,
-                                                       evaluator_test=evaluator_test,
-                                                       output_folder_path=output_folder_path,
-                                                       resume_from_saved=True,
-                                                       similarity_type_list=["cosine"],
-                                                       parallelizeKNN=False)
-
-    pool_collab = multiprocessing.Pool(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
-    pool_collab.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)
+    # runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
+    #                                                    URM_train=URM_train,
+    #                                                    metric_to_optimize=metric_to_optimize,
+    #                                                    cutoff_to_optimize=cutoff_to_optimize,
+    #                                                    n_cases=n_cases,
+    #                                                    n_random_starts=n_random_starts,
+    #                                                    evaluator_validation_earlystopping=evaluator_validation,
+    #                                                    evaluator_validation=evaluator_validation,
+    #                                                    evaluator_test=evaluator_test,
+    #                                                    output_folder_path=output_folder_path,
+    #                                                    resume_from_saved=True,
+    #                                                    similarity_type_list=["cosine"],
+    #                                                    parallelizeKNN=False)
+    #
+    # pool_collab = multiprocessing.Pool(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
+    # pool_collab.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)
 
     # CONTENT RECS
     # pool = PoolWithSubprocess(processes=int(multiprocessing.cpu_count()-1), maxtasksperchild=1)
@@ -170,23 +172,23 @@ def read_data_split_and_search():
     # pool_content.map(runParameterSearch_Content_partial, content_algorithm_list)
 
     # HYBRID
-    # runParameterSearch_Hybrid_partial = partial(runHyperparameterSearch_Hybrid,
-    #                                             URM_train=URM_train,
-    #                                             # ICM_train=ICM_channel.T,
-    #                                             ICM_object=ICM_channel,
-    #                                             ICM_name="ICM_all",
-    #                                             W_train=None,
-    #                                             metric_to_optimize="MAP",
-    #                                             cutoff_to_optimize=cutoff_to_optimize,
-    #                                             n_cases=100,
-    #                                             n_random_starts=20,
-    #                                             evaluator_validation_earlystopping=evaluator_validation,
-    #                                             evaluator_validation=evaluator_validation,
-    #                                             evaluator_test=evaluator_test,
-    #                                             output_folder_path=output_folder_path)
-    #
-    # pool_collab = Pool1(processes=int(multiprocessing.cpu_count()))
-    # pool_collab.map(runParameterSearch_Hybrid_partial, hybrid_algorithm_list)
+    runParameterSearch_Hybrid_partial = partial(runHyperparameterSearch_Hybrid,
+                                                URM_train=URM_train,
+                                                # ICM_train=ICM_channel.T,
+                                                ICM_object=ICM_channel,
+                                                ICM_name="ICM_all",
+                                                W_train=None,
+                                                metric_to_optimize="MAP",
+                                                cutoff_to_optimize=cutoff_to_optimize,
+                                                n_cases=100,
+                                                n_random_starts=20,
+                                                evaluator_validation_earlystopping=evaluator_validation,
+                                                evaluator_validation=evaluator_validation,
+                                                evaluator_test=evaluator_test,
+                                                output_folder_path=output_folder_path)
+
+    pool_collab = Pool1(processes=int(multiprocessing.cpu_count()))
+    pool_collab.map(runParameterSearch_Hybrid_partial, hybrid_algorithm_list)
 
 
 if __name__ == '__main__':

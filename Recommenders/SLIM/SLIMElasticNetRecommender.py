@@ -4,7 +4,6 @@
 @author: Massimo Quadrana, Cesare Bernardis
 """
 
-
 import numpy as np
 import scipy.sparse as sps
 from Recommenders.Recommender_utils import check_matrix
@@ -15,6 +14,7 @@ import time, sys
 from tqdm import tqdm
 from sklearn.utils._testing import ignore_warnings
 from sklearn.exceptions import ConvergenceWarning
+
 
 # os.environ["PYTHONWARNINGS"] = ('ignore::exceptions.ConvergenceWarning:sklearn.linear_model')
 # os.environ["PYTHONWARNINGS"] = ('ignore:Objective did not converge:ConvergenceWarning:')
@@ -36,18 +36,19 @@ class SLIMElasticNetRecommender(BaseItemSimilarityMatrixRecommender):
 
     RECOMMENDER_NAME = "SLIMElasticNetRecommender"
 
-    def __init__(self, URM_train, verbose = True):
-        super(SLIMElasticNetRecommender, self).__init__(URM_train, verbose = verbose)
+    def __init__(self, URM_train, verbose=True):
+        super(SLIMElasticNetRecommender, self).__init__(URM_train, verbose=verbose)
 
     @ignore_warnings(category=ConvergenceWarning)
-    def fit(self, l1_ratio=0.022, alpha=0.5, positive_only=True, topK=100, max_iter=100, tol=5e-5):
+    def fit(self, l1_ratio=0.00029920499017254754, alpha=0.10734084960757517, positive_only=False, topK=453,
+            max_iter=200, tol=5e-5):
 
-        assert l1_ratio>= 0 and l1_ratio<=1, "{}: l1_ratio must be between 0 and 1, provided value was {}".format(self.RECOMMENDER_NAME, l1_ratio)
+        assert 0 <= l1_ratio <= 1, "{}: l1_ratio must be between 0 and 1, provided value was {}".format(
+            self.RECOMMENDER_NAME, l1_ratio)
 
         self.l1_ratio = l1_ratio
         self.positive_only = positive_only
         self.topK = topK
-
 
         # initialize the ElasticNet model
         self.model = ElasticNet(alpha=alpha,
@@ -58,7 +59,8 @@ class SLIMElasticNetRecommender(BaseItemSimilarityMatrixRecommender):
                                 precompute=True,
                                 selection='random',
                                 max_iter=max_iter,
-                                tol=tol)
+                                tol=tol,
+                                random_state=0)
 
         URM_train = check_matrix(self.URM_train, 'csc', dtype=np.float32)
 
@@ -104,7 +106,7 @@ class SLIMElasticNetRecommender(BaseItemSimilarityMatrixRecommender):
             nonzero_model_coef_index = self.model.sparse_coef_.indices
             nonzero_model_coef_value = self.model.sparse_coef_.data
 
-            local_topK = min(len(nonzero_model_coef_value)-1, self.topK)
+            local_topK = min(len(nonzero_model_coef_value) - 1, self.topK)
 
             relevant_items_partition = (-nonzero_model_coef_value).argpartition(local_topK)[0:local_topK]
             relevant_items_partition_sorting = np.argsort(-nonzero_model_coef_value[relevant_items_partition])
@@ -116,7 +118,6 @@ class SLIMElasticNetRecommender(BaseItemSimilarityMatrixRecommender):
                     rows = np.concatenate((rows, np.zeros(dataBlock, dtype=np.int32)))
                     cols = np.concatenate((cols, np.zeros(dataBlock, dtype=np.int32)))
                     values = np.concatenate((values, np.zeros(dataBlock, dtype=np.float32)))
-
 
                 rows[numCells] = nonzero_model_coef_index[ranking[index]]
                 cols[numCells] = currentItem
@@ -130,14 +131,13 @@ class SLIMElasticNetRecommender(BaseItemSimilarityMatrixRecommender):
             elapsed_time = time.time() - start_time
             new_time_value, new_time_unit = seconds_to_biggest_unit(elapsed_time)
 
-
-            if time.time() - start_time_printBatch > 300 or currentItem == n_items-1:
+            if time.time() - start_time_printBatch > 300 or currentItem == n_items - 1:
                 self._print("Processed {} ({:4.1f}%) in {:.2f} {}. Items per second: {:.2f}".format(
-                    currentItem+1,
-                    100.0* float(currentItem+1)/n_items,
+                    currentItem + 1,
+                    100.0 * float(currentItem + 1) / n_items,
                     new_time_value,
                     new_time_unit,
-                    float(currentItem)/elapsed_time))
+                    float(currentItem) / elapsed_time))
 
                 sys.stdout.flush()
                 sys.stderr.flush()
@@ -147,7 +147,6 @@ class SLIMElasticNetRecommender(BaseItemSimilarityMatrixRecommender):
         # generate the sparse weight matrix
         self.W_sparse = sps.csr_matrix((values[:numCells], (rows[:numCells], cols[:numCells])),
                                        shape=(n_items, n_items), dtype=np.float32)
-
 
 
 '''

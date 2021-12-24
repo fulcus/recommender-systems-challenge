@@ -35,5 +35,5 @@ class Hybrid_SLIM_EASE_R_IALS(ItemKNNScoresHybridNRecommender):
         super(Hybrid_SLIM_EASE_R_IALS, self).__init__(URM_train, recommender_array, 3)
 
     @ignore_warnings()
-    def fit(self, alpha, beta, gamma):
+    def fit(self, alpha=0.8747407337453746, beta=0.3467502656911922, gamma=0.012212488901387934):
         self.weight_array = [alpha, beta, gamma]

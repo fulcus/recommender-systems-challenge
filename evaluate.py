@@ -14,6 +14,7 @@ from Recommenders.Hybrids.HybridRatings_SLIM_EASE_R_PureSVD import HybridRatings
 from Recommenders.Hybrids.HybridRatings_SLIM_Rp3 import HybridRatings_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
+from Recommenders.Hybrids.Hybrid_SLIM_EASE_R_IALS import Hybrid_SLIM_EASE_R_IALS
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
@@ -64,12 +65,13 @@ recommender_class_list = [
     # IALSRecommender_implicit
 
     # HybridRatings_SLIM_Rp3,
-    HybridSimilarity_SLIM_Rp3
+    # HybridSimilarity_SLIM_Rp3
     # HybridGrouping_SLIM_TopPop
     # EASE_R_Recommender
     # HybridRatings_SLIM_EASE_R
     # HybridRatings_PureSVD_EASE_R
     # HybridRatings_SLIM_PureSVD_EASE_R
+    Hybrid_SLIM_EASE_R_IALS
 ]
 
 # If directory does not exist, create
@@ -132,6 +134,8 @@ def evaluate_all_recommenders(URM_all, ICM=None):
                 fit_params = {'alpha': 0.5}
             elif isinstance(recommender_object, HybridRatings_SLIM_PureSVD_EASE_R):
                 fit_params = {'alpha': 0.95}
+            elif isinstance(recommender_object, Hybrid_SLIM_EASE_R_IALS):
+                fit_params = {'alpha': 0.3815016492157693, 'beta': 0.5802064204762605, 'gamma': 0.06145838241599496}
             else:
                 fit_params = {}
 

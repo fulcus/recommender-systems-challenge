@@ -20,7 +20,7 @@ class HybridRatings_SLIM_PureSVD(BaseHybridRatings):
         # self.recommender_1 = HybridSimilarity_SLIM_Rp3(URM_train)
         # self.recommender_1.fit(alpha=0.9610229519605884, topK=1199)
         self.recommender_1 = SLIMElasticNetRecommender(URM_train)
-        self.recommender_1.load_model(output_root_path, file_name="slimelastic_urmall.zip")
+        self.recommender_1.load_model(output_root_path, file_name="slimelastic_urmall_453.zip")
 
         self.recommender_2 = PureSVDRecommender(URM_train)
         self.recommender_2.fit(num_factors=29)

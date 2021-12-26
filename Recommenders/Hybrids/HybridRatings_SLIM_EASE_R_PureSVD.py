@@ -20,7 +20,7 @@ class HybridRatings_SLIM_PureSVD_EASE_R(BaseHybridRatings):
     def __init__(self, URM_train):
 
         self.recommender_1 = SLIMElasticNetRecommender(URM_train)
-        self.recommender_1.load_model(output_root_path, file_name="slimelastic_urmall.zip")
+        self.recommender_1.load_model(output_root_path, file_name="slimelastic_urmall_453.zip")
 
         self.recommender_2 = HybridRatings_PureSVD_EASE_R(URM_train)
         self.recommender_2.fit(alpha=0.5)

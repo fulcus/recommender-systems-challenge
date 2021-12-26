@@ -14,6 +14,7 @@ from Recommenders.Hybrids.HybridRatings_SLIM_EASE_R_PureSVD import HybridRatings
 from Recommenders.Hybrids.HybridRatings_SLIM_Rp3 import HybridRatings_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
+from Recommenders.Hybrids.HybridSimilarity_withSlimPerGroup import HybridSimilarity_withSlimPerGroup
 from Recommenders.Hybrids.Hybrid_SLIM_EASE_R_IALS import Hybrid_SLIM_EASE_R_IALS
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
@@ -65,13 +66,14 @@ recommender_class_list = [
     # IALSRecommender_implicit
 
     # HybridRatings_SLIM_Rp3,
-    # HybridSimilarity_SLIM_Rp3
+    HybridSimilarity_SLIM_Rp3,
     # HybridGrouping_SLIM_TopPop
     # EASE_R_Recommender
     # HybridRatings_SLIM_EASE_R
     # HybridRatings_PureSVD_EASE_R
     # HybridRatings_SLIM_PureSVD_EASE_R
-    Hybrid_SLIM_EASE_R_IALS
+    # Hybrid_SLIM_EASE_R_IALS
+    HybridSimilarity_withSlimPerGroup
 ]
 
 # If directory does not exist, create

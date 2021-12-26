@@ -34,8 +34,8 @@ class Hybrid_SlimElastic_Rp3_PureSVD(BaseRecommender):
         self.puresvd = PureSVDRecommender(URM_train)
 
     def fit(self, alpha=0.9, beta=0.1, gamma=0.1):
-        self.slim.load_model(output_root_path, file_name="newslim_urmall_noremoveseen.zip")
-        # self.slim.load_model(output_root_path, file_name="saved_slim.zip")
+        self.slim.load_model(output_root_path, file_name="slim742.zip")
+        # self.slim.load_model(output_root_path, file_name="slimwithwrongevalsplit.zip")
         self.puresvd.fit(num_factors=28)
         # self.slim.fit(topK=453, l1_ratio=0.00029920499017254754, alpha=0.10734084960757517)
         self.rp3.fit(topK=40, alpha=0.4208737801266599, beta=0.5251543657397256, normalize_similarity=True)

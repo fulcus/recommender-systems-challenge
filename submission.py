@@ -9,6 +9,7 @@ from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Hybrids.HybridRatings_SLIM_PureSVD import HybridRatings_SLIM_PureSVD
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
+from Recommenders.Hybrids.HybridSimilarity_withSlimPerGroup import HybridSimilarity_withSlimPerGroup
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
@@ -43,8 +44,9 @@ recommender_class_list = [
     # Hybrid_SlimElastic_Rp3_PureSVD,
     # Hybrid_SlimElastic_Rp3
     # Hybrid_SlimElastic_Rp3_ItemKNNCF
-    HybridSimilarity_SLIM_Rp3
+    # HybridSimilarity_SLIM_Rp3
     # HybridSimilarity_withGroupedusers
+    HybridSimilarity_withSlimPerGroup
 
 ]
 
@@ -117,7 +119,7 @@ def run_prediction_all_recommenders(URM_all, ICM=None):
                 fit_params = {}
 
             recommender_object.fit(**fit_params)
-            recommender_object.save_model(output_root_path, file_name="hybridsimilarityslimrp3withstack.zip")
+            #recommender_object.save_model(output_root_path, file_name="hybridsimilarityslimrp3withstack.zip")
 
             item_list = recommender_object.recommend(target_ids, cutoff=10)
             create_csv(target_ids, item_list, recommender_class.RECOMMENDER_NAME)
@@ -138,7 +140,7 @@ def run_prediction_best_saved_model(URM_all, ICM=None):
     # rec_best_model_last.zip is the output of the run_hyperparameter_search (one best model for each rec class)
     # recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
 
-    # recommender_object.load_model(output_root_path, file_name="slimelastic_urmall.zip")
+    # recommender_object.load_model(output_root_path, file_name="slimelastic_urmall_453.zip")
     recommender_object.load_model(output_root_path, file_name="EASE_R_Recommender_best_model.zip")
 
     # added for prediction

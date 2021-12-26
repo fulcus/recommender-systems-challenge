@@ -33,7 +33,7 @@ class HybridSimilarity_withGroupedusers(BaseItemSimilarityMatrixRecommender):
         rp3_g0 = RP3betaRecommender(URM_train)
         rp3_g1 = RP3betaRecommender(URM_train)
 
-        slim.load_model(output_root_path, file_name="newslim_urmall_noremoveseen.zip")
+        slim.load_model(output_root_path, file_name="slim742.zip")
         # self.slim.fit(topK=453, l1_ratio=0.00029920499017254754, alpha=0.10734084960757517)
         rp3_g0.fit( topK=725, alpha= 0.8, beta= 0.6533987658966547, normalize_similarity= True)
         rp3_g1.fit(topK= 42, alpha=0.0, beta=0.576800562870638, normalize_similarity=True)

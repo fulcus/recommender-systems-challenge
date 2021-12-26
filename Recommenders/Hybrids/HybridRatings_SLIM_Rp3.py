@@ -15,7 +15,7 @@ class HybridRatings_SLIM_Rp3(BaseHybridRatings):
 
     def __init__(self, URM_train):
         self.recommender_1 = SLIMElasticNetRecommender(URM_train)
-        self.recommender_1.load_model(output_root_path, file_name="newslim_urmall_noremoveseen.zip")
+        self.recommender_1.load_model(output_root_path, file_name="slim742.zip")
 
         self.recommender_2 = RP3betaRecommender(URM_train)
         self.recommender_2.fit(topK=40, alpha=0.4208737801266599, beta=0.5251543657397256, normalize_similarity=True)

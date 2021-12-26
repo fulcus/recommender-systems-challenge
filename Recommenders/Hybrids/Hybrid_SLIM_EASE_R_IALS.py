@@ -21,7 +21,7 @@ class Hybrid_SLIM_EASE_R_IALS(ItemKNNScoresHybridNRecommender):
     def __init__(self, URM_train):
 
         recommender_1 = SLIMElasticNetRecommender(URM_train)
-        recommender_1.load_model(output_root_path, file_name="slimelastic_urmall.zip")
+        recommender_1.load_model(output_root_path, file_name="slimelastic_urmall_453.zip")
 
         recommender_2 = EASE_R_Recommender(URM_train)
         recommender_2.fit()

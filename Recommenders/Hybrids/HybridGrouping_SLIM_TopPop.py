@@ -17,7 +17,7 @@ class HybridGrouping_SLIM_TopPop(BaseItemSimilarityMatrixRecommender):
         self.URM_train = check_matrix(URM_train.copy(), 'csr')
 
         self.recommender_1 = SLIMElasticNetRecommender(URM_train)
-        self.recommender_1.load_model(output_root_path, file_name="slimelastic_urmall.zip")
+        self.recommender_1.load_model(output_root_path, file_name="slimelastic_urmall_453.zip")
 
         self.recommender_2 = TopPop(URM_train)
         self.recommender_2.fit()

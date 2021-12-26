@@ -66,7 +66,7 @@ recommender_class_list = [
     # IALSRecommender_implicit
 
     # HybridRatings_SLIM_Rp3,
-    HybridSimilarity_SLIM_Rp3,
+    # HybridSimilarity_SLIM_Rp3,
     # HybridGrouping_SLIM_TopPop
     # EASE_R_Recommender
     # HybridRatings_SLIM_EASE_R
@@ -74,6 +74,7 @@ recommender_class_list = [
     # HybridRatings_SLIM_PureSVD_EASE_R
     # Hybrid_SLIM_EASE_R_IALS
     HybridSimilarity_withSlimPerGroup
+    # HybridSimilarity_withGroupedusers
 ]
 
 # If directory does not exist, create
@@ -175,13 +176,13 @@ def evaluate_best_saved_model(URM_all, ICM=None):
         URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     # set here the recommender you want to use
-    # recommender_object = SLIMElasticNetRecommender(URM_train)  # SLIMElasticNetRecommender(URM_train)
-    recommender_object = EASE_R_Recommender(URM_train)  # SLIMElasticNetRecommender(URM_train)
+    recommender_object = SLIMElasticNetRecommender(URM_train)  # SLIMElasticNetRecommender(URM_train)
+    # recommender_object = EASE_R_Recommender(URM_train)  # SLIMElasticNetRecommender(URM_train)
 
     # rec_best_model_last.zip is the output of the run_hyperparameter_search (one best model for each rec class)
     # recommender_object.load_model(output_root_path, file_name=recommender_object.RECOMMENDER_NAME + "_best_model.zip")
     # recommender_object.load_model(output_root_path, file_name="slimelastic_urmall.zip")
-    recommender_object.load_model(output_root_path, file_name="EASE_R_Recommender_best_model.zip")
+    recommender_object.load_model(output_root_path, file_name="slim750group1.zip")
 
     results_run_1, results_run_string_1 = evaluator.evaluateRecommender(recommender_object)
 

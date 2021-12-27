@@ -47,7 +47,7 @@ class BaseHybridSimilarity(BaseItemSimilarityMatrixRecommender):
         self.similarity_1 = check_matrix(similarity_1.copy(), 'csr')
         self.similarity_2 = check_matrix(similarity_2.copy(), 'csr')
 
-    def fit(self, topK=250, alpha=0.95):
+    def fit(self, topK=1199, alpha=0.961):
 
         print('{} hyperparams: topK: {}; alpha: {}'.format(self.RECOMMENDER_NAME, str(topK), alpha))
 

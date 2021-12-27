@@ -7,9 +7,10 @@ import scipy.sparse as sps
 from Data_manager.split_functions.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 from Evaluation.Evaluator import EvaluatorHoldout
+from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender
 from Recommenders.Hybrids.HybridGrouping_SLIM_TopPop import HybridGrouping_SLIM_TopPop
 from Recommenders.Hybrids.HybridRatings_PureSVD_EASE_R import HybridRatings_PureSVD_EASE_R
-from Recommenders.Hybrids.HybridRatings_SLIM_EASE_R import HybridRatings_SLIM_EASE_R
+from Recommenders.Hybrids.HybridRatings_EASE_R_hybrid_SLIM_Rp3 import HybridRatings_EASE_R_hybrid_SLIM_Rp3
 from Recommenders.Hybrids.HybridRatings_SLIM_EASE_R_PureSVD import HybridRatings_SLIM_PureSVD_EASE_R
 from Recommenders.Hybrids.HybridRatings_SLIM_Rp3 import HybridRatings_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
@@ -28,7 +29,6 @@ from Recommenders.MatrixFactorization.IALSRecommender_implicit import IALSRecomm
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
 from reader import load_urm, load_icm, load_target
-from run_all_algorithms import _get_instance
 from sklearn import feature_extraction
 
 res_dir = 'result_experiments/csv'
@@ -69,12 +69,13 @@ recommender_class_list = [
     # HybridSimilarity_SLIM_Rp3,
     # HybridGrouping_SLIM_TopPop
     # EASE_R_Recommender
-    # HybridRatings_SLIM_EASE_R
+    # HybridRatings_EASE_R_hybrid_SLIM_Rp3
     # HybridRatings_PureSVD_EASE_R
     # HybridRatings_SLIM_PureSVD_EASE_R
     # Hybrid_SLIM_EASE_R_IALS
-    HybridSimilarity_withSlimPerGroup
+    # HybridSimilarity_withSlimPerGroup
     # HybridSimilarity_withGroupedusers
+    HybridRatings_EASE_R_hybrid_SLIM_Rp3
 ]
 
 # If directory does not exist, create
@@ -84,13 +85,27 @@ if not os.path.exists(output_root_path):
 logFile = open(output_root_path + "result_all_algorithms.txt", "a")
 
 
+def _get_instance(recommender_class, URM_train, ICM_all):
+
+    if issubclass(recommender_class, HybridRatings_EASE_R_hybrid_SLIM_Rp3):
+        recommender_object = recommender_class(URM_train, ICM_all)
+    elif issubclass(recommender_class, BaseItemCBFRecommender):
+        recommender_object = recommender_class(URM_train, ICM_all)
+    elif issubclass(recommender_class, ScoresHybridRP3betaKNNCBF):
+        recommender_object = recommender_class(URM_train, ICM_all)
+    else:
+        recommender_object = recommender_class(URM_train)
+
+    return recommender_object
+
+
 def evaluate_all_recommenders(URM_all, ICM=None):
     URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.8)
     evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10])
 
-    if ICM is not None:
-        tmp = check_matrix(ICM.T, 'csr', dtype=np.float32)
-        URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
+    # if ICM is not None:
+    #     tmp = check_matrix(ICM.T, 'csr', dtype=np.float32)
+    #     URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     earlystopping_keywargs = {"validation_every_n": 2,
                               "stop_on_validation": True,
@@ -131,7 +146,7 @@ def evaluate_all_recommenders(URM_all, ICM=None):
                 fit_params = {'num_factors': 28, 'random_seed': 0}
             elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3_PureSVD):
                 fit_params = {'alpha': 0.95, 'beta': 0.1, 'gamma': 0.1}
-            elif isinstance(recommender_object, HybridRatings_SLIM_EASE_R):
+            elif isinstance(recommender_object, HybridRatings_EASE_R_hybrid_SLIM_Rp3):
                 fit_params = {'alpha': 0.9610229519605884}
             elif isinstance(recommender_object, HybridRatings_PureSVD_EASE_R):
                 fit_params = {'alpha': 0.5}
@@ -139,6 +154,8 @@ def evaluate_all_recommenders(URM_all, ICM=None):
                 fit_params = {'alpha': 0.95}
             elif isinstance(recommender_object, Hybrid_SLIM_EASE_R_IALS):
                 fit_params = {'alpha': 0.3815016492157693, 'beta': 0.5802064204762605, 'gamma': 0.06145838241599496}
+            elif isinstance(recommender_object, HybridRatings_EASE_R_hybrid_SLIM_Rp3):
+                fit_params = {'alpha': 0.95}
             else:
                 fit_params = {}
 
@@ -194,14 +211,14 @@ def evaluate_best_saved_model(URM_all, ICM=None):
 if __name__ == '__main__':
     URM_all, user_id_unique, item_id_unique = load_urm()
     # ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
-    # ICM_event = load_icm("data_ICM_event.csv", weight=1)
+    ICM_event = load_icm("data_ICM_event.csv", weight=1)
     # ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
     # ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
     # ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
     # ICMs = [None, ICM_channel, ICM_event, ICM_genre, ICM_subgenre, ICM_all]
 
     # evaluate_best_saved_model(URM_all)
-    evaluate_all_recommenders(URM_all)
+    evaluate_all_recommenders(URM_all, ICM_event)
 
     # names = ['NO ICM', 'ICM_channel', 'ICM_event', 'ICM_genre', 'ICM_subgenre', 'ICM_all']
     # for name, ICM in zip(names, ICMs):

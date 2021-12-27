@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import sparse as sps
 
 from Recommenders.BaseSimilarityMatrixRecommender import BaseItemSimilarityMatrixRecommender
 from Recommenders.EASE_R.EASE_R_Recommender import EASE_R_Recommender
@@ -12,16 +13,18 @@ from Recommenders.SLIM.SLIMElasticNetRecommender import SLIMElasticNetRecommende
 output_root_path = "./result_experiments/"
 
 
-class HybridRatings_SLIM_EASE_R(BaseHybridRatings):
+class HybridRatings_EASE_R_hybrid_SLIM_Rp3(BaseHybridRatings):
 
-    RECOMMENDER_NAME = "HybridRatings_SLIM_EASE_R"
+    RECOMMENDER_NAME = "HybridRatings_EASE_R_hybrid_SLIM_Rp3"
 
-    def __init__(self, URM_train):
+    def __init__(self, URM_train, ICM):
 
-        self.recommender_1 = SLIMElasticNetRecommender(URM_train)
-        self.recommender_1.load_model(output_root_path, file_name="slimelastic_urmall_453.zip")
+        self.recommender_1 = HybridSimilarity_SLIM_Rp3(URM_train)
+        self.recommender_1.fit()
 
-        self.recommender_2 = EASE_R_Recommender(URM_train)
+        tmp = check_matrix(ICM.T, 'csr', dtype=np.float32)
+        URM_ICM = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
+        self.recommender_2 = EASE_R_Recommender(URM_ICM)
         self.recommender_2.fit()
 
-        super(HybridRatings_SLIM_EASE_R, self).__init__(URM_train, self.recommender_1, self.recommender_2)
+        super(HybridRatings_EASE_R_hybrid_SLIM_Rp3, self).__init__(URM_train, self.recommender_1, self.recommender_2)

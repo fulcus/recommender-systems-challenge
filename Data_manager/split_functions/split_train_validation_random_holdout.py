@@ -111,7 +111,7 @@ def split_train_in_two_percentage_global_sample(URM_all, train_percentage = 0.1)
     URM_train = sps.coo_matrix(URM_all)
 
     indices_for_sampling = np.arange(0, URM_all.nnz, dtype=np.int)
-    # np.random.seed(seed=0)
+    np.random.seed(seed=0)
     np.random.shuffle(indices_for_sampling)
 
     n_train_interactions = round(URM_all.nnz * train_percentage)

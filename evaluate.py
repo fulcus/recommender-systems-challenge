@@ -7,6 +7,7 @@ import scipy.sparse as sps
 from Data_manager.split_functions.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 from Evaluation.Evaluator import EvaluatorHoldout
+from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender
 from Recommenders.Hybrids.HybridGrouping_SLIM_TopPop import HybridGrouping_SLIM_TopPop
 from Recommenders.Hybrids.HybridRatings_PureSVD_EASE_R import HybridRatings_PureSVD_EASE_R
@@ -69,6 +70,8 @@ recommender_class_list = [
     # HybridSimilarity_SLIM_Rp3,
     # HybridGrouping_SLIM_TopPop
     # EASE_R_Recommender
+    # HybridRatings_SLIM_EASE_R,
+    HybridSimilarity_SLIM_Rp3,
     # HybridRatings_EASE_R_hybrid_SLIM_Rp3
     # HybridRatings_PureSVD_EASE_R
     # HybridRatings_SLIM_PureSVD_EASE_R

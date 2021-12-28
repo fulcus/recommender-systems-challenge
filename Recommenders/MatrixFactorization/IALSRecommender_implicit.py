@@ -3,7 +3,7 @@ Created on 23/03/2019
 @author: Maurizio Ferrari Dacrema
 """
 
-import implicit
+# import implicit
 import numpy as np
 
 from Recommenders.BaseMatrixFactorizationRecommender import BaseMatrixFactorizationRecommender

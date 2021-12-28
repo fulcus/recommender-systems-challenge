@@ -29,9 +29,9 @@ def create_csv(target_ids, results, rec_name):
 
 
 def run_prediction_all_recommenders(URM_all, target_ids):
-    recommender_object = HybridRatings_EASE_R_hybrid_SLIM_Rp3(URM_all, ICM=ICM_event)
+    recommender_object = HybridRatings_EASE_R_hybrid_SLIM_Rp3(URM_all)
 
-    fit_params = {'alpha': 0.95}
+    fit_params = { 'alpha': 0.900186415700892, 'beta': 0.0627577167765089}
     recommender_object.fit(**fit_params)
     # recommender_object.save_model(output_root_path, file_name="hybridsimilarityslimrp3withstack.zip")
 

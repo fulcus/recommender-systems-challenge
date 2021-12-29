@@ -36,9 +36,12 @@ class BaseHybridRatings(BaseItemSimilarityMatrixRecommender):
         self.recommender_1 = recommender_1
         self.recommender_2 = recommender_2
 
-    def fit(self, alpha=0.95, beta=0.05):
+    def fit(self, alpha=0.95, beta=0.05, alpha1=0.96, beta1= 0.04, topK1=1199):
         self.alpha = alpha
         self.beta = beta
+
+        self.recommender_1.fit(alpha=alpha1, beta=beta1, topK=topK1)
+        self.recommender_2.fit()
 
         print('{} hyperparam: alpha: {}'.format(self.RECOMMENDER_NAME, alpha))
 

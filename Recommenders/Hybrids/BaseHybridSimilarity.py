@@ -54,7 +54,7 @@ class BaseHybridSimilarity(BaseItemSimilarityMatrixRecommender):
         self.topK = topK
         self.alpha = alpha
 
-        W_sparse = self.similarity_1 * self.alpha + self.similarity_2 * (1-self.alpha)
+        W_sparse = self.similarity_1 * self.alpha + self.similarity_2 * beta
 
         self.W_sparse = similarityMatrixTopK(W_sparse, k=self.topK)
         self.W_sparse = check_matrix(self.W_sparse, format='csr')

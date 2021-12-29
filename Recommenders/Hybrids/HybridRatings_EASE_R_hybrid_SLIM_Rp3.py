@@ -21,12 +21,12 @@ class HybridRatings_EASE_R_hybrid_SLIM_Rp3(BaseHybridRatings):
     def __init__(self, URM_train):
 
         self.recommender_1 = HybridSimilarity_SLIM_Rp3(URM_train)
-        self.recommender_1.fit()
+
 
         ICM = load_icm("data_ICM_event.csv", weight=1)
         tmp = check_matrix(ICM.T, 'csr', dtype=np.float32)
         URM_ICM = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
         self.recommender_2 = EASE_R_Recommender(URM_ICM)
-        self.recommender_2.fit()
+
 
         super(HybridRatings_EASE_R_hybrid_SLIM_Rp3, self).__init__(URM_train, self.recommender_1, self.recommender_2)

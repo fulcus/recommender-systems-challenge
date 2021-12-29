@@ -448,7 +448,11 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
         if recommender_class is HybridRatings_EASE_R_hybrid_SLIM_Rp3:
             hyperparameters_range_dictionary = {}
             hyperparameters_range_dictionary["alpha"] = Real(low=0.8, high=0.98, prior='uniform')
-            hyperparameters_range_dictionary["beta"] = Real(low=0.05, high=0.1, prior='uniform')
+            hyperparameters_range_dictionary["beta"] = Real(low=0.05, high=0.15, prior='uniform')
+            hyperparameters_range_dictionary["alpha1"] = Real(low=0.8, high=0.99, prior='uniform')
+            hyperparameters_range_dictionary["beta1"] = Real(low=0.05, high=0.2, prior='uniform')
+            hyperparameters_range_dictionary["topK1"] = Integer(500, 2000)
+
             # hyperparameters_range_dictionary["topK"] = Integer(400, 2000)
 
             recommender_input_args = SearchInputRecommenderArgs(

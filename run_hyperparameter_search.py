@@ -54,7 +54,7 @@ def read_data_split_and_search():
     ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
     ICM_all = sps.hstack([ICM_channel, ICM_event, ICM_genre, ICM_subgenre]).tocsr()
 
-    URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.90)
+    URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.99)
     URM_train, URM_validation = split_train_in_two_percentage_global_sample(URM_train, train_percentage=0.80)
 
     output_folder_path = "result_experiments/"

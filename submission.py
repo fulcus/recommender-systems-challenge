@@ -20,8 +20,6 @@ output_root_path = "./result_experiments/"
 if not os.path.exists(output_root_path):
     os.makedirs(output_root_path)
 
-logFile = open(output_root_path + "submission_all_algorithms.txt", "a")
-
 
 def create_csv(target_ids, results, rec_name):
     exp_dir = os.path.join(res_dir, rec_name)

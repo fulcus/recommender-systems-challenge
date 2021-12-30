@@ -11,23 +11,20 @@ from Recommenders.BaseSimilarityMatrixRecommender import BaseItemSimilarityMatri
 from Recommenders.Recommender_utils import similarityMatrixTopK
 from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 
-
 from CythonCompiler.run_compile_subprocess import run_compile_subprocess
 import os, sys
 
 
 def estimate_required_MB(n_items, symmetric):
-
-    requiredMB = 8 * n_items**2 / 1e+06
+    requiredMB = 8 * n_items ** 2 / 1e+06
 
     if symmetric:
-        requiredMB /=2
+        requiredMB /= 2
 
     return requiredMB
 
 
 def get_RAM_status():
-
     try:
         data_list = os.popen('free -t -m').readlines()[1].split()
         tot_m = float(data_list[1])
@@ -40,49 +37,37 @@ def get_RAM_status():
 
         tot_m, used_m, available_m = None, None, None
 
-
     return tot_m, used_m, available_m
 
 
-
-
-
 class SLIM_BPR_Cython(BaseItemSimilarityMatrixRecommender, Incremental_Training_Early_Stopping):
-
     RECOMMENDER_NAME = "SLIM_BPR_Recommender"
 
-
     def __init__(self, URM_train,
-                 verbose = True,
-                 free_mem_threshold = 0.5):
+                 verbose=True,
+                 free_mem_threshold=0.5):
 
+        super(SLIM_BPR_Cython, self).__init__(URM_train, verbose=verbose)
 
-        super(SLIM_BPR_Cython, self).__init__(URM_train, verbose = verbose)
-
-        assert free_mem_threshold>=0.0 and free_mem_threshold<=1.0, "SLIM_BPR_Recommender: free_mem_threshold must be between 0.0 and 1.0, provided was '{}'".format(free_mem_threshold)
+        assert free_mem_threshold >= 0.0 and free_mem_threshold <= 1.0, "SLIM_BPR_Recommender: free_mem_threshold must be between 0.0 and 1.0, provided was '{}'".format(
+            free_mem_threshold)
         self.free_mem_threshold = free_mem_threshold
 
-
-
     def fit(self, epochs=300,
-            positive_threshold_BPR = None,
-            train_with_sparse_weights = None,
-            allow_train_with_sparse_weights = True,
-            symmetric = True,
-            random_seed = None,
-            lambda_i = 0.0, lambda_j = 0.0, learning_rate = 1e-4, topK = 200,
-            sgd_mode='adagrad', gamma=0.995, beta_1=0.9, beta_2=0.999,
+            positive_threshold_BPR=None,
+            train_with_sparse_weights=None,
+            allow_train_with_sparse_weights=True,
+            symmetric=False,
+            random_seed=None,
+            lambda_i=0.0049661155804438094, lambda_j=0.0013625349002231288, learning_rate=0.020913285959253805, topK=871,
+            sgd_mode='sgd', gamma=0.995, beta_1=0.9, beta_2=0.999,
             **earlystopping_kwargs):
-
 
         # Import compiled module
         from Recommenders.SLIM.Cython.SLIM_BPR_Cython_Epoch import SLIM_BPR_Cython_Epoch
 
-
-
         self.symmetric = symmetric
         self.train_with_sparse_weights = train_with_sparse_weights
-
 
         if self.train_with_sparse_weights is None:
 
@@ -92,18 +77,18 @@ class SLIM_BPR_Cython(BaseItemSimilarityMatrixRecommender, Incremental_Training_
             total_m, _, available_m = get_RAM_status()
 
             if total_m is not None:
-                string = "Automatic selection of fastest train mode. Available RAM is {:.2f} MB ({:.2f}%) of {:.2f} MB, required is {:.2f} MB. ".format(available_m, available_m/total_m*100 , total_m, required_m)
+                string = "Automatic selection of fastest train mode. Available RAM is {:.2f} MB ({:.2f}%) of {:.2f} MB, required is {:.2f} MB. ".format(
+                    available_m, available_m / total_m * 100, total_m, required_m)
             else:
                 string = "Automatic selection of fastest train mode. Unable to get current RAM status, you may be using a non-Linux operating system. "
 
-            if total_m is None or required_m/available_m < self.free_mem_threshold:
+            if total_m is None or required_m / available_m < self.free_mem_threshold:
                 self._print(string + "Using dense matrix.")
                 self.train_with_sparse_weights = False
             else:
                 assert allow_train_with_sparse_weights, "Train with sparse matrix is required due to RAM constraint but not allowed by the allow_train_with_sparse_weights argument"
                 self._print(string + "Using sparse matrix.")
                 self.train_with_sparse_weights = True
-
 
         # Select only positive interactions
         URM_train_positive = self.URM_train.copy()
@@ -112,36 +97,32 @@ class SLIM_BPR_Cython(BaseItemSimilarityMatrixRecommender, Incremental_Training_
         self.sgd_mode = sgd_mode
         self.epochs = epochs
 
-
         if self.positive_threshold_BPR is not None:
             URM_train_positive.data = URM_train_positive.data >= self.positive_threshold_BPR
             URM_train_positive.eliminate_zeros()
 
             assert URM_train_positive.nnz > 0, "SLIM_BPR_Cython: URM_train_positive is empty, positive threshold is too high"
 
-
         self.cythonEpoch = SLIM_BPR_Cython_Epoch(URM_train_positive,
-                                                 train_with_sparse_weights = self.train_with_sparse_weights,
-                                                 final_model_sparse_weights = True,
+                                                 train_with_sparse_weights=self.train_with_sparse_weights,
+                                                 final_model_sparse_weights=True,
                                                  topK=topK,
                                                  learning_rate=learning_rate,
-                                                 li_reg = lambda_i,
-                                                 lj_reg = lambda_j,
-                                                 symmetric = self.symmetric,
-                                                 sgd_mode = sgd_mode,
-                                                 verbose = self.verbose,
-                                                 random_seed = random_seed,
+                                                 li_reg=lambda_i,
+                                                 lj_reg=lambda_j,
+                                                 symmetric=self.symmetric,
+                                                 sgd_mode=sgd_mode,
+                                                 verbose=self.verbose,
+                                                 random_seed=random_seed,
                                                  gamma=gamma,
                                                  beta_1=beta_1,
                                                  beta_2=beta_2)
 
-
-
-
-        if(topK != False and topK<1):
-            raise ValueError("TopK not valid. Acceptable values are either False or a positive integer value. Provided value was '{}'".format(topK))
+        if (topK != False and topK < 1):
+            raise ValueError(
+                "TopK not valid. Acceptable values are either False or a positive integer value. Provided value was '{}'".format(
+                    topK))
         self.topK = topK
-
 
         # self.batch_size = batch_size
         self.lambda_i = lambda_i
@@ -152,7 +133,7 @@ class SLIM_BPR_Cython(BaseItemSimilarityMatrixRecommender, Incremental_Training_
         self.S_best = self.S_incremental.copy()
 
         self._train_with_early_stopping(epochs,
-                                        algorithm_name = self.RECOMMENDER_NAME,
+                                        algorithm_name=self.RECOMMENDER_NAME,
                                         **earlystopping_kwargs)
 
         self.get_S_incremental_and_set_W()
@@ -161,19 +142,14 @@ class SLIM_BPR_Cython(BaseItemSimilarityMatrixRecommender, Incremental_Training_
 
         sys.stdout.flush()
 
-
-
-
     def _prepare_model_for_validation(self):
         self.get_S_incremental_and_set_W()
-
 
     def _update_best_model(self):
         self.S_best = self.S_incremental.copy()
 
     def _run_epoch(self, num_epoch):
-       self.cythonEpoch.epochIteration_Cython()
-
+        self.cythonEpoch.epochIteration_Cython()
 
     def get_S_incremental_and_set_W(self):
 
@@ -183,5 +159,5 @@ class SLIM_BPR_Cython(BaseItemSimilarityMatrixRecommender, Incremental_Training_
             self.W_sparse = self.S_incremental
             self.W_sparse = check_matrix(self.W_sparse, format='csr')
         else:
-            self.W_sparse = similarityMatrixTopK(self.S_incremental, k = self.topK)
+            self.W_sparse = similarityMatrixTopK(self.S_incremental, k=self.topK)
             self.W_sparse = check_matrix(self.W_sparse, format='csr')

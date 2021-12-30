@@ -9,6 +9,7 @@ from Data_manager.split_functions.split_train_validation_random_holdout import \
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.Hybrids.HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3 import \
     HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
+from Recommenders.Hybrids.HybridList_SLIM_EASE_R import HybridList_SLIM_EASE_R
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender
 from Recommenders.Hybrids.HybridGrouping_SLIM_TopPop import HybridGrouping_SLIM_TopPop
@@ -94,7 +95,7 @@ logFile = open(output_root_path + "result_all_algorithms.txt", "a")
 def _get_instance(recommender_class, URM_train, ICM_all):
 
     if issubclass(recommender_class, HybridRatings_EASE_R_hybrid_SLIM_Rp3):
-        recommender_object = recommender_class(URM_train, ICM_all)
+        recommender_object = recommender_class(URM_train)
     elif issubclass(recommender_class, BaseItemCBFRecommender):
         recommender_object = recommender_class(URM_train, ICM_all)
     elif issubclass(recommender_class, ScoresHybridRP3betaKNNCBF):

@@ -43,36 +43,95 @@ class BaseHybridList(BaseItemSimilarityMatrixRecommender):
 
         print('{} hyperparam: min_items_from_rec_1: {}'.format(self.RECOMMENDER_NAME, min_items_from_rec_1))
 
-    def recommend(self, user_id_array, cutoff=10, remove_seen_flag=True, items_to_compute=None,
+    def recommend(self, user_id_array, cutoff=None, remove_seen_flag=True, items_to_compute=None,
                   remove_top_pop_flag=False, remove_custom_items_flag=False, return_scores=False):
 
-        ranking_list_1 = self.recommender_1.recommend(user_id_array, user_id_array, cutoff=cutoff,
-                                                      remove_seen_flag=remove_seen_flag,
-                                                      items_to_compute=items_to_compute,
-                                                      remove_top_pop_flag=remove_top_pop_flag,
-                                                      remove_custom_items_flag=remove_custom_items_flag,
-                                                      return_scores=return_scores)
+        print('called recommend')
 
-        ranking_list_2 = self.recommender_2.recommend(user_id_array, user_id_array, cutoff=self.rec_2_evaluate_top_k,
-                                                      remove_seen_flag=remove_seen_flag,
-                                                      items_to_compute=items_to_compute,
-                                                      remove_top_pop_flag=remove_top_pop_flag,
-                                                      remove_custom_items_flag=remove_custom_items_flag,
-                                                      return_scores=return_scores)
+        # If is a scalar transform it in a 1-cell array
+        if cutoff is None:
+            cutoff = [10]
+        if np.isscalar(user_id_array):
+            user_id_array = np.atleast_1d(user_id_array)
+            single_user = True
+        else:
+            single_user = False
 
-        print('ranking_list_1: {}\nranking_list_2: {}'.format(ranking_list_1, ranking_list_2))
+        if cutoff is None:
+            cutoff = self.URM_train.shape[1] - 1
 
-        total_ranking_list = ranking_list_1[:self.min_items_from_rec_1]
+        cutoff = min(cutoff, self.URM_train.shape[1] - 1)
 
-        for item in ranking_list_2:
-            if item not in total_ranking_list:
-                total_ranking_list.append(item)
+        total_ranking_list = []
+        total_scores = []
 
-        while len(total_ranking_list) < cutoff:
-            for item in ranking_list_1:
-                if item not in total_ranking_list:
-                    total_ranking_list.append(item)
+        _, return_scores_1 = self.recommender_1.recommend(user_id_array, cutoff=cutoff,
+                                                          remove_seen_flag=remove_seen_flag,
+                                                          items_to_compute=items_to_compute,
+                                                          remove_top_pop_flag=remove_top_pop_flag,
+                                                          remove_custom_items_flag=remove_custom_items_flag,
+                                                          return_scores=True)
+        # print('ranking_list_1: {}\nscores_batch_1: {}'.format(ranking_list_1, scores_batch_1))
+        # print(type(scores_batch_1))
+        # print(type(scores_batch_1[0]))
 
-        print('final ranking list: ' + total_ranking_list)
+        for user_id in user_id_array:
+            ranking_list_1, scores_batch_1 = self.recommender_1.recommend(user_id, cutoff=cutoff,
+                                                                          remove_seen_flag=remove_seen_flag,
+                                                                          items_to_compute=items_to_compute,
+                                                                          remove_top_pop_flag=remove_top_pop_flag,
+                                                                          remove_custom_items_flag=remove_custom_items_flag,
+                                                                          return_scores=True)
 
-        return total_ranking_list
+            ranking_list_2, scores_batch_2 = self.recommender_2.recommend(user_id, cutoff=self.rec_2_evaluate_top_k,
+                                                                          remove_seen_flag=remove_seen_flag,
+                                                                          items_to_compute=items_to_compute,
+                                                                          remove_top_pop_flag=remove_top_pop_flag,
+                                                                          remove_custom_items_flag=remove_custom_items_flag,
+                                                                          return_scores=True)
+            scores_batch_1 = scores_batch_1[0]
+            scores_batch_2 = scores_batch_2[0]
+
+            # print('ranking_list_1: {}\nranking_list_2: {}'.format(ranking_list_1, ranking_list_2))
+            # print('scores_batch_1: {}\nscores_batch_2: {}'.format(scores_batch_1, scores_batch_2))
+
+            user_ranking_list = np.array(ranking_list_1[:self.min_items_from_rec_1])
+            user_scores = np.array(scores_batch_1[:self.min_items_from_rec_1])
+
+            # print('user list before: ' + str(user_ranking_list))
+
+            list_diff = list(set(ranking_list_2) - set(ranking_list_1))
+            # print('list difference: ' + str(list_diff))
+            indexes = [ranking_list_2.index(d_item) for d_item in list_diff]
+            scores_diff = [scores_batch_2[i] for i in indexes]
+
+            for item, score in zip(list_diff, scores_diff):
+                if user_ranking_list.shape[0] == cutoff:
+                    break
+                user_ranking_list = np.append(user_ranking_list, item)
+                user_scores = np.append(user_scores, score)
+
+            for item, score in zip(ranking_list_1, scores_batch_1):
+                if user_ranking_list.shape[0] == cutoff:
+                    break
+                if item not in user_ranking_list:
+                    user_ranking_list = np.append(user_ranking_list, item)
+                    user_scores = np.append(user_scores, score)
+
+            # total_ranking_list = np.append(total_ranking_list, user_ranking_list)
+            total_ranking_list.append(user_ranking_list)
+            total_scores.append(user_scores)
+
+            # print('final user ranking list: ' + str(total_ranking_list))
+
+        # print('ranking_list_1: {}\nscores_batch_1: {}'.format(total_ranking_list, total_scores))
+        # print(type(total_scores))
+        # print(type(total_scores[0]))
+
+        if single_user:
+            total_ranking_list = total_ranking_list[0]
+
+        if return_scores:
+            return total_ranking_list, return_scores_1  # np.array(total_scores)
+        else:
+            return total_ranking_list

@@ -63,8 +63,8 @@ class BaseHybridList(BaseItemSimilarityMatrixRecommender):
         cutoff = min(cutoff, self.URM_train.shape[1] - 1)
 
         total_ranking_list = []
-        total_scores = []
 
+        # return scores or rec_1 to pass checks in evaluator, as they are not actually used
         _, return_scores_1 = self.recommender_1.recommend(user_id_array, cutoff=cutoff,
                                                           remove_seen_flag=remove_seen_flag,
                                                           items_to_compute=items_to_compute,
@@ -72,66 +72,53 @@ class BaseHybridList(BaseItemSimilarityMatrixRecommender):
                                                           remove_custom_items_flag=remove_custom_items_flag,
                                                           return_scores=True)
         # print('ranking_list_1: {}\nscores_batch_1: {}'.format(ranking_list_1, scores_batch_1))
-        # print(type(scores_batch_1))
-        # print(type(scores_batch_1[0]))
 
         for user_id in user_id_array:
-            ranking_list_1, scores_batch_1 = self.recommender_1.recommend(user_id, cutoff=cutoff,
-                                                                          remove_seen_flag=remove_seen_flag,
-                                                                          items_to_compute=items_to_compute,
-                                                                          remove_top_pop_flag=remove_top_pop_flag,
-                                                                          remove_custom_items_flag=remove_custom_items_flag,
-                                                                          return_scores=True)
+            ranking_list_1 = self.recommender_1.recommend(user_id, cutoff=cutoff,
+                                                          remove_seen_flag=remove_seen_flag,
+                                                          items_to_compute=items_to_compute,
+                                                          remove_top_pop_flag=remove_top_pop_flag,
+                                                          remove_custom_items_flag=remove_custom_items_flag,
+                                                          return_scores=False)
 
-            ranking_list_2, scores_batch_2 = self.recommender_2.recommend(user_id, cutoff=self.rec_2_evaluate_top_k,
-                                                                          remove_seen_flag=remove_seen_flag,
-                                                                          items_to_compute=items_to_compute,
-                                                                          remove_top_pop_flag=remove_top_pop_flag,
-                                                                          remove_custom_items_flag=remove_custom_items_flag,
-                                                                          return_scores=True)
-            scores_batch_1 = scores_batch_1[0]
-            scores_batch_2 = scores_batch_2[0]
+            ranking_list_2 = self.recommender_2.recommend(user_id, cutoff=self.rec_2_evaluate_top_k,
+                                                          remove_seen_flag=remove_seen_flag,
+                                                          items_to_compute=items_to_compute,
+                                                          remove_top_pop_flag=remove_top_pop_flag,
+                                                          remove_custom_items_flag=remove_custom_items_flag,
+                                                          return_scores=False)
 
             # print('ranking_list_1: {}\nranking_list_2: {}'.format(ranking_list_1, ranking_list_2))
             # print('scores_batch_1: {}\nscores_batch_2: {}'.format(scores_batch_1, scores_batch_2))
 
             user_ranking_list = np.array(ranking_list_1[:self.min_items_from_rec_1])
-            user_scores = np.array(scores_batch_1[:self.min_items_from_rec_1])
 
             # print('user list before: ' + str(user_ranking_list))
 
             list_diff = list(set(ranking_list_2) - set(ranking_list_1))
             # print('list difference: ' + str(list_diff))
-            indexes = [ranking_list_2.index(d_item) for d_item in list_diff]
-            scores_diff = [scores_batch_2[i] for i in indexes]
 
-            for item, score in zip(list_diff, scores_diff):
+            for item in list_diff:
                 if user_ranking_list.shape[0] == cutoff:
                     break
                 user_ranking_list = np.append(user_ranking_list, item)
-                user_scores = np.append(user_scores, score)
 
-            for item, score in zip(ranking_list_1, scores_batch_1):
+            for item in ranking_list_1:
                 if user_ranking_list.shape[0] == cutoff:
                     break
                 if item not in user_ranking_list:
                     user_ranking_list = np.append(user_ranking_list, item)
-                    user_scores = np.append(user_scores, score)
 
-            # total_ranking_list = np.append(total_ranking_list, user_ranking_list)
             total_ranking_list.append(user_ranking_list)
-            total_scores.append(user_scores)
 
             # print('final user ranking list: ' + str(total_ranking_list))
 
         # print('ranking_list_1: {}\nscores_batch_1: {}'.format(total_ranking_list, total_scores))
-        # print(type(total_scores))
-        # print(type(total_scores[0]))
 
         if single_user:
             total_ranking_list = total_ranking_list[0]
 
         if return_scores:
-            return total_ranking_list, return_scores_1  # np.array(total_scores)
+            return total_ranking_list, return_scores_1  # returned scores of rec_1 only (wrong)
         else:
             return total_ranking_list

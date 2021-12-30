@@ -7,6 +7,8 @@ import scipy.sparse as sps
 from Data_manager.split_functions.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 from Evaluation.Evaluator import EvaluatorHoldout
+from Recommenders.Hybrids.HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3 import \
+    HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender
 from Recommenders.Hybrids.HybridGrouping_SLIM_TopPop import HybridGrouping_SLIM_TopPop
@@ -71,14 +73,15 @@ recommender_class_list = [
     # HybridGrouping_SLIM_TopPop
     # EASE_R_Recommender
     # HybridRatings_SLIM_EASE_R,
-    HybridSimilarity_SLIM_Rp3,
+    # HybridSimilarity_SLIM_Rp3,
     # HybridRatings_EASE_R_hybrid_SLIM_Rp3
     # HybridRatings_PureSVD_EASE_R
     # HybridRatings_SLIM_PureSVD_EASE_R
     # Hybrid_SLIM_EASE_R_IALS
     # HybridSimilarity_withSlimPerGroup
     # HybridSimilarity_withGroupedusers
-    HybridRatings_EASE_R_hybrid_SLIM_Rp3
+    # HybridRatings_EASE_R_hybrid_SLIM_Rp3
+    HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
 ]
 
 # If directory does not exist, create
@@ -159,6 +162,8 @@ def evaluate_all_recommenders(URM_all, ICM=None):
                 fit_params = {'alpha': 0.3815016492157693, 'beta': 0.5802064204762605, 'gamma': 0.06145838241599496}
             elif isinstance(recommender_object, HybridRatings_EASE_R_hybrid_SLIM_Rp3):
                 fit_params = {'alpha': 0.95}
+            elif isinstance(recommender_object,  HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3):
+                fit_params = {'alpha': 0.9560759641998946, 'beta': 0.09176984507557999, 'gamma': 0.25, 'alpha1': 0.9739242060693925, 'beta1': 0.2, 'topK1': 837}
             else:
                 fit_params = {}
 

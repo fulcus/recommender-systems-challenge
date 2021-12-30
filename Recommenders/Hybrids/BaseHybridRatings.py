@@ -47,7 +47,7 @@ class BaseHybridRatings(BaseItemSimilarityMatrixRecommender):
         self.recommender_2.fit()
         self.recommender_3.fit()
 
-        print('{} hyperparam: alpha: {}'.format(self.RECOMMENDER_NAME, self.alpha, self.beta, self.gamma))
+        print('{} hyperparam: alpha: {}, {}, {}'.format(self.RECOMMENDER_NAME, self.alpha, self.beta, self.gamma))
 
     def _compute_item_score(self, user_id_array, items_to_compute=None):
         item_weights_1 = self.recommender_1._compute_item_score(user_id_array)

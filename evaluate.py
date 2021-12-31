@@ -7,33 +7,25 @@ import scipy.sparse as sps
 from Data_manager.split_functions.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 from Evaluation.Evaluator import EvaluatorHoldout
+from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender
+from Recommenders.Hybrids.HybridRatings_EASE_R_hybrid_SLIM_Rp3 import HybridRatings_EASE_R_hybrid_SLIM_Rp3
 from Recommenders.Hybrids.HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3 import \
     HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
-from Recommenders.Hybrids.HybridList_SLIM_EASE_R import HybridList_SLIM_EASE_R
-from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
-from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender
-from Recommenders.Hybrids.HybridGrouping_SLIM_TopPop import HybridGrouping_SLIM_TopPop
 from Recommenders.Hybrids.HybridRatings_PureSVD_EASE_R import HybridRatings_PureSVD_EASE_R
-from Recommenders.Hybrids.HybridRatings_EASE_R_hybrid_SLIM_Rp3 import HybridRatings_EASE_R_hybrid_SLIM_Rp3
 from Recommenders.Hybrids.HybridRatings_SLIM_EASE_R_PureSVD import HybridRatings_SLIM_PureSVD_EASE_R
 from Recommenders.Hybrids.HybridRatings_SLIM_Rp3 import HybridRatings_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
-from Recommenders.Hybrids.HybridSimilarity_withSlimPerGroup import HybridSimilarity_withSlimPerGroup
 from Recommenders.Hybrids.Hybrid_SLIM_EASE_R_IALS import Hybrid_SLIM_EASE_R_IALS
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
+from Recommenders.Hybrids.MultiRecommender import MultiRecommender
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
-from Recommenders.Hybrids.BaseHybridRatings import BaseHybridRatings
-from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
-from Recommenders.MatrixFactorization.PureSVDRecommender import PureSVDItemRecommender, ScaledPureSVDRecommender
-from Recommenders.KNN.ItemKNNCustomSimilarityRecommender import ItemKNNCustomSimilarityRecommender
 from Recommenders.MatrixFactorization.IALSRecommender_implicit import IALSRecommender_implicit
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
-from reader import load_urm, load_icm, load_target
-from sklearn import feature_extraction
+from reader import load_urm, load_icm
 
 res_dir = 'result_experiments/csv'
 output_root_path = "./result_experiments/"
@@ -47,10 +39,11 @@ recommender_class_list = [
     # SLIMElasticNetRecommender,  # too slow to train
     # UserKNNCFRecommender,
     # IALSRecommender,
+    # IALSRecommender_implicit,
     # MatrixFactorization_BPR_Cython,
     # MatrixFactorization_FunkSVD_Cython, # fix low values
     # MatrixFactorization_AsySVD_Cython, # fix low values
-    # EASE_R_Recommender, # fix low values
+    # EASE_R_Recommender,
     # ItemKNNCFRecommender,
     # P3alphaRecommender,
     # SLIM_BPR_Cython,
@@ -66,23 +59,20 @@ recommender_class_list = [
     # Hybrid_SlimElastic_Rp3,
     # Hybrid_SlimElastic_Rp3_PureSVD,
     # Hybrid_SlimElastic_Rp3_ItemKNNCF
+    # Hybrid_SLIM_EASE_R_IALS
 
-    # IALSRecommender_implicit
+    # HybridSimilarity_SLIM_Rp3,
+    # HybridSimilarity_withSlimPerGroup
+    # HybridSimilarity_withGroupedusers
+    # HybridGrouping_SLIM_TopPop
 
     # HybridRatings_SLIM_Rp3,
-    # HybridSimilarity_SLIM_Rp3,
-    # HybridGrouping_SLIM_TopPop
-    # EASE_R_Recommender
     # HybridRatings_SLIM_EASE_R,
-    # HybridSimilarity_SLIM_Rp3,
     # HybridRatings_EASE_R_hybrid_SLIM_Rp3
     # HybridRatings_PureSVD_EASE_R
     # HybridRatings_SLIM_PureSVD_EASE_R
-    # Hybrid_SLIM_EASE_R_IALS
-    # HybridSimilarity_withSlimPerGroup
-    # HybridSimilarity_withGroupedusers
-    # HybridRatings_EASE_R_hybrid_SLIM_Rp3
-    HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
+    # HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
+    MultiRecommender
 ]
 
 # If directory does not exist, create
@@ -93,7 +83,6 @@ logFile = open(output_root_path + "result_all_algorithms.txt", "a")
 
 
 def _get_instance(recommender_class, URM_train, ICM_all):
-
     if issubclass(recommender_class, HybridRatings_EASE_R_hybrid_SLIM_Rp3):
         recommender_object = recommender_class(URM_train)
     elif issubclass(recommender_class, BaseItemCBFRecommender):
@@ -110,9 +99,9 @@ def evaluate_all_recommenders(URM_all, ICM=None):
     URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.8)
     evaluator = EvaluatorHoldout(URM_test, cutoff_list=[10])
 
-    # if ICM is not None:
-    #     tmp = check_matrix(ICM.T, 'csr', dtype=np.float32)
-    #     URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
+    if ICM is not None:
+        tmp = check_matrix(ICM.T, 'csr', dtype=np.float32)
+        URM_train = sps.vstack((URM_train, tmp), format='csr', dtype=np.float32)
 
     earlystopping_keywargs = {"validation_every_n": 2,
                               "stop_on_validation": True,
@@ -163,8 +152,11 @@ def evaluate_all_recommenders(URM_all, ICM=None):
                 fit_params = {'alpha': 0.3815016492157693, 'beta': 0.5802064204762605, 'gamma': 0.06145838241599496}
             elif isinstance(recommender_object, HybridRatings_EASE_R_hybrid_SLIM_Rp3):
                 fit_params = {'alpha': 0.95}
-            elif isinstance(recommender_object,  HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3):
-                fit_params = {'alpha': 0.9560759641998946, 'beta': 0.09176984507557999, 'gamma': 0.25, 'alpha1': 0.9739242060693925, 'beta1': 0.2, 'topK1': 837}
+            elif isinstance(recommender_object, HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3):
+                fit_params = {'alpha': 0.9560759641998946, 'beta': 0.09176984507557999, 'gamma': 0.25,
+                              'alpha1': 0.9739242060693925, 'beta1': 0.2, 'topK1': 837}
+            elif isinstance(recommender_object, MultiRecommender):
+                fit_params = {'weight_array': [0.95, 0.09, 0.25, 0.4, 0.2]}  # [slim, rp3, ease_r, ials, pure_svd]
             else:
                 fit_params = {}
 
@@ -217,19 +209,22 @@ def evaluate_best_saved_model(URM_all, ICM=None):
         "1-Algorithm: {}, results: \n{}\n".format(recommender_object.RECOMMENDER_NAME, results_run_string_1))
 
 
+def evaluate_all_ICMs(URM_all):
+    ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
+    ICM_event = load_icm("data_ICM_event.csv", weight=1)
+    ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
+    ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
+    ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
+    ICMs = [None, ICM_channel, ICM_event, ICM_genre, ICM_subgenre, ICM_all]
+    names = ['NO ICM', 'ICM_channel', 'ICM_event', 'ICM_genre', 'ICM_subgenre', 'ICM_all']
+
+    for name, ICM in zip(names, ICMs):
+        print('Using ' + name)
+        evaluate_all_recommenders(URM_all, ICM)
+
+
 if __name__ == '__main__':
     URM_all, user_id_unique, item_id_unique = load_urm()
-    # ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
-    ICM_event = load_icm("data_ICM_event.csv", weight=1)
-    # ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
-    # ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
-    # ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
-    # ICMs = [None, ICM_channel, ICM_event, ICM_genre, ICM_subgenre, ICM_all]
-
+    evaluate_all_recommenders(URM_all)
     # evaluate_best_saved_model(URM_all)
-    evaluate_all_recommenders(URM_all, ICM_event)
-
-    # names = ['NO ICM', 'ICM_channel', 'ICM_event', 'ICM_genre', 'ICM_subgenre', 'ICM_all']
-    # for name, ICM in zip(names, ICMs):
-    #     print('Using ' + name)
-    #     evaluate_all_recommenders(URM_all, ICM)
+    # evaluate_all_ICMs(URM_all)

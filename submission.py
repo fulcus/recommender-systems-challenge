@@ -1,15 +1,7 @@
 import os
 from datetime import datetime
 
-from Recommenders.Hybrids.HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3 import \
-    HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
-from Recommenders.Hybrids.HybridRatings_SLIM_PureSVD import HybridRatings_SLIM_PureSVD
-from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
-from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
-from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
-from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
-from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
-from Recommenders.Hybrids.HybridRatings_EASE_R_hybrid_SLIM_Rp3 import HybridRatings_EASE_R_hybrid_SLIM_Rp3
+from Recommenders.Hybrids.MultiRecommender import MultiRecommender
 from Recommenders.Recommender_import_list import *
 from reader import load_urm, load_target, load_icm
 
@@ -34,36 +26,40 @@ def create_csv(target_ids, results, rec_name):
             f.write(str(target_id) + ', ' + ' '.join(map(str, result)) + '\n')
 
 
-def run_prediction_all_recommenders(URM_all, target_ids):
-    recommender_object = HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3(URM_all)
+def run_prediction_on_target(URM_all, target_ids):
+    recommender_object = MultiRecommender(URM_all)
 
-    fit_params = { 'alpha': 0.9560759641998946, 'beta': 0.09176984507557999, 'gamma': 0.25, 'alpha1': 0.9739242060693925, 'beta1': 0.2, 'topK1': 837}
+    fit_params = {'weight_array': [0.95, 0.09, 0.25, 0.4, 0.2]}
     recommender_object.fit(**fit_params)
     # recommender_object.save_model(output_root_path, file_name="hybridsimilarityslimrp3withstack.zip")
 
-    if isinstance(recommender_object, SLIMElasticNetRecommender):
-        fit_params = {'topK': 742, 'l1_ratio': 0.0004826899479303845, 'alpha': 0.12121987754356242}
-    elif isinstance(recommender_object, IALSRecommender):
-        fit_params = {'num_factors': 167, 'epochs': 25, 'confidence_scaling': 'log',
-                      'alpha': 2.7491082249169008, 'epsilon': 0.2892328524505224, 'reg': 0.0003152844014605245}
-    elif isinstance(recommender_object, ScoresHybridRP3betaKNNCBF):
-        fit_params = {'topK_P': 479, 'alpha_P': 0.66439892057927, 'normalize_similarity_P': False, 'topK': 1761,
-                      'shrink': 4028, 'similarity': 'tversky', 'normalize': True, 'alpha': 0.9435088940853401,
-                      'beta_P': 0.38444510929214876, 'feature_weighting': 'none'}
-    elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
-        fit_params = {'alpha': 0.9}
-    elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3_PureSVD):
-        fit_params = {'alpha': 0.9087371327370033, 'beta': 0.02399161350891344, 'gamma': 0.24457608798347447}
-    elif isinstance(recommender_object, HybridSimilarity_SLIM_Rp3):
-        fit_params = {'alpha': 0.9610229519605884, 'topK': 1199}
-    elif isinstance(recommender_object, PureSVDRecommender):
-        fit_params = {'num_factors': 28}
-    elif isinstance(recommender_object, HybridSimilarity_withGroupedusers):
-        fit_params = {'alpha': 0.979326712891909, 'topK': 1349}
-    elif isinstance(recommender_object, HybridRatings_SLIM_PureSVD):
-        fit_params = {'alpha': 0.95}
-    else:
-        fit_params = {}
+    # if isinstance(recommender_object, SLIMElasticNetRecommender):
+    #     fit_params = {'topK': 742, 'l1_ratio': 0.0004826899479303845, 'alpha': 0.12121987754356242}
+    # elif isinstance(recommender_object, IALSRecommender):
+    #     fit_params = {'num_factors': 167, 'epochs': 25, 'confidence_scaling': 'log',
+    #                   'alpha': 2.7491082249169008, 'epsilon': 0.2892328524505224, 'reg': 0.0003152844014605245}
+    # elif isinstance(recommender_object, ScoresHybridRP3betaKNNCBF):
+    #     fit_params = {'topK_P': 479, 'alpha_P': 0.66439892057927, 'normalize_similarity_P': False, 'topK': 1761,
+    #                   'shrink': 4028, 'similarity': 'tversky', 'normalize': True, 'alpha': 0.9435088940853401,
+    #                   'beta_P': 0.38444510929214876, 'feature_weighting': 'none'}
+    # elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3):
+    #     fit_params = {'alpha': 0.9}
+    # elif isinstance(recommender_object, Hybrid_SlimElastic_Rp3_PureSVD):
+    #     fit_params = {'alpha': 0.9087371327370033, 'beta': 0.02399161350891344, 'gamma': 0.24457608798347447}
+    # elif isinstance(recommender_object, HybridSimilarity_SLIM_Rp3):
+    #     fit_params = {'alpha': 0.9610229519605884, 'topK': 1199}
+    # elif isinstance(recommender_object, PureSVDRecommender):
+    #     fit_params = {'num_factors': 28}
+    # elif isinstance(recommender_object, HybridSimilarity_withGroupedusers):
+    #     fit_params = {'alpha': 0.979326712891909, 'topK': 1349}
+    # elif isinstance(recommender_object, HybridRatings_SLIM_PureSVD):
+    #     fit_params = {'alpha': 0.95}
+    # elif isinstance(recommender_object, HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3):
+    #     fit_params = {'alpha': 0.95}
+    # elif isinstance(recommender_object, MultiRecommender):
+    #     fit_params = {'weights': [0.95, 0.09, 0.25, 0.4, 0.2]}  # [slim, rp3, ease_r, ials, pure_svd]
+    # else:
+    #     fit_params = {}
 
     item_list = recommender_object.recommend(target_ids, cutoff=10)
     create_csv(target_ids, item_list, recommender_object.RECOMMENDER_NAME)
@@ -98,5 +94,5 @@ if __name__ == '__main__':
     # ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()
     # ICMs = [ICM_genre, ICM_subgenre, ICM_channel, ICM_event, ICM_all]
 
-    run_prediction_all_recommenders(URM_all, target_ids)
+    run_prediction_on_target(URM_all, target_ids)
     # run_prediction_best_saved_model(URM_all)

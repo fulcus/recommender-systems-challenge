@@ -4,14 +4,14 @@ from sklearn.utils._testing import ignore_warnings
 
 from Recommenders.BaseSimilarityMatrixRecommender import BaseItemSimilarityMatrixRecommender
 from Recommenders.EASE_R.EASE_R_Recommender import EASE_R_Recommender
-from Recommenders.Hybrids.ItemKNNScoresHybridRecommender import ItemKNNScoresHybridNRecommender
+from Recommenders.Hybrids.BaseHybridMultiRecommender import BaseHybridMultiRecommender
 from Recommenders.MatrixFactorization.IALSRecommender_implicit import IALSRecommender_implicit
 from Recommenders.Recommender_utils import check_matrix
 from Recommenders.SLIM.SLIMElasticNetRecommender import SLIMElasticNetRecommender
 
 output_root_path = "./result_experiments/"
 
-class Hybrid_SLIM_EASE_R_IALS(ItemKNNScoresHybridNRecommender):
+class Hybrid_SLIM_EASE_R_IALS(BaseHybridMultiRecommender):
     """ Hybrid_SLIM_EASE_R_IALS
     Hybrid of N prediction scores R
     """

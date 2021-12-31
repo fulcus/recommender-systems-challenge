@@ -1,29 +1,14 @@
 import numpy as np
-import operator
-import os
-import os
-import traceback
 
-import numpy as np
-import scipy.sparse as sps
-
-from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.BaseRecommender import BaseRecommender
 from Recommenders.DataIO import DataIO
-from Recommenders.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
-from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
-from Recommenders.KNN.ItemKNNCustomSimilarityRecommender import ItemKNNCustomSimilarityRecommender
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
-from reader import load_urm, load_icm, load_target
-from run_all_algorithms import _get_instance
-from sklearn import feature_extraction
 
 output_root_path = "./result_experiments/"
 
 
 class Hybrid_SlimElastic_Rp3(BaseRecommender):
-
     RECOMMENDER_NAME = "HybridSlimElasticRp3"
 
     def __init__(self, URM_train):

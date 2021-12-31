@@ -1,23 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on 15/04/18
-
-@author: Maurizio Ferrari Dacrema
-"""
 import numpy as np
+import scipy.sparse as sps
 from tqdm import tqdm
 
-from Recommenders.GraphBased.RP3betaRecommender import RP3betaRecommender
-from Recommenders.Hybrids.BaseHybridSimilarity import BaseHybridSimilarity
-from Recommenders.Recommender_utils import check_matrix, similarityMatrixTopK
 from Recommenders.BaseSimilarityMatrixRecommender import BaseItemSimilarityMatrixRecommender
+from Recommenders.GraphBased.RP3betaRecommender import RP3betaRecommender
+from Recommenders.Recommender_utils import check_matrix, similarityMatrixTopK
 from Recommenders.SLIM.SLIMElasticNetRecommender import SLIMElasticNetRecommender
 
-import scipy.sparse as sps
-
-
 output_root_path = "./result_experiments/"
+
 
 class HybridSimilarity_withSlimPerGroup(BaseItemSimilarityMatrixRecommender):
     """ HybridSimilarity_SLIM_Rp3
@@ -33,10 +26,10 @@ class HybridSimilarity_withSlimPerGroup(BaseItemSimilarityMatrixRecommender):
         slim_g1 = SLIMElasticNetRecommender(URM_train)
         rp3 = RP3betaRecommender(URM_train)
 
-        #slim_g0.fit(topK=453, l1_ratio=0.00029920499017254754, alpha=0.10734084960757517)
+        # slim_g0.fit(topK=453, l1_ratio=0.00029920499017254754, alpha=0.10734084960757517)
 
         # self.slim.fit(topK=453, l1_ratio=0.00029920499017254754, alpha=0.10734084960757517)
-        #slim_g1.fit(topK=453, l1_ratio=0.00029920499017254754, alpha=0.10734084960757517)
+        # slim_g1.fit(topK=453, l1_ratio=0.00029920499017254754, alpha=0.10734084960757517)
 
         slim_g0.load_model(output_root_path, file_name="slim737group0.zip")
         slim_g1.load_model(output_root_path, file_name="slim750group1.zip")
@@ -75,7 +68,7 @@ class HybridSimilarity_withSlimPerGroup(BaseItemSimilarityMatrixRecommender):
 
         ##### groups
 
-        group_id=0
+        group_id = 0
 
         profile_length = np.ediff1d(sps.csr_matrix(URM_train).indptr)
         print("profile", profile_length, profile_length.shape)
@@ -125,9 +118,6 @@ class HybridSimilarity_withSlimPerGroup(BaseItemSimilarityMatrixRecommender):
 
         self.W_sparse = self.W_sparse_0
 
-
-
-
     def _compute_item_score(self, user_id_array, items_to_compute=None):
         """
         URM_train and W_sparse must have the same format, CSR
@@ -138,8 +128,6 @@ class HybridSimilarity_withSlimPerGroup(BaseItemSimilarityMatrixRecommender):
         # print("users target ", user_id_array)
 
         self._check_format()
-
-
 
         '''users_not_in_group_flag = np.isin(user_id_array, self.users_not_in_group0 , invert=True)
         user_id_array_1 = user_id_array[users_not_in_group_flag]
@@ -179,7 +167,7 @@ class HybridSimilarity_withSlimPerGroup(BaseItemSimilarityMatrixRecommender):
             interactions = len(self.URM_train[user_id_array[i], :].indices)
 
             if interactions < 300:
-                self.W_sparse= self.W_sparse_0
+                self.W_sparse = self.W_sparse_0
                 # w = BaseItemSimilarityMatrixRecommender._compute_item_score(user_id_array[i],items_to_compute)
                 # item_scores[i, :] = w
 

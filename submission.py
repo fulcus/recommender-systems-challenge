@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
 
+from Recommenders.Hybrids.HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3 import \
+    HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
 from Recommenders.Hybrids.MultiRecommender import MultiRecommender
 from Recommenders.Recommender_import_list import *
 from reader import load_urm, load_target, load_icm
@@ -27,9 +29,10 @@ def create_csv(target_ids, results, rec_name):
 
 
 def run_prediction_on_target(URM_all, target_ids):
-    recommender_object = MultiRecommender(URM_all)
+    recommender_object = HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3(URM_all)
 
-    fit_params = {'weight_array': [0.95, 0.09, 0.25, 0.4, 0.2]}
+    fit_params = { 'alpha': 0.9560759641998946, 'beta': 0.4, 'gamma': 0.3, 'alpha1': 0.9739242060693925, 'beta1': 0.3, 'topK1': 837}
+    # fit_params = {'weight_array': [0.95, 0.09, 0.25, 0.4, 0.2]}
     recommender_object.fit(**fit_params)
     # recommender_object.save_model(output_root_path, file_name="hybridsimilarityslimrp3withstack.zip")
 

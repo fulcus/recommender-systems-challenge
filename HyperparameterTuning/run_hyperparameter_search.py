@@ -16,6 +16,8 @@ from functools import partial
 ######################################################################
 from Recommenders.FeatureWeighting import CFW_D_Similarity_Linalg
 from Recommenders.Hybrids.HybridRatings_EASE_R_hybrid_SLIM_Rp3 import HybridRatings_EASE_R_hybrid_SLIM_Rp3
+from Recommenders.Hybrids.HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3 import \
+    HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_SLIM_Rp3 import HybridSimilarity_SLIM_Rp3
 from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilarity_withGroupedusers
 from Recommenders.Hybrids.Hybrid_SLIM_EASE_R_IALS import Hybrid_SLIM_EASE_R_IALS
@@ -454,6 +456,20 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
             hyperparameters_range_dictionary["topK1"] = Integer(500, 2000)
 
             # hyperparameters_range_dictionary["topK"] = Integer(400, 2000)
+
+            recommender_input_args = SearchInputRecommenderArgs(
+                CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
+                CONSTRUCTOR_KEYWORD_ARGS={},
+                FIT_POSITIONAL_ARGS=[],
+                FIT_KEYWORD_ARGS={}
+            )
+        #########################################################################################################
+
+        if recommender_class is HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3:
+            hyperparameters_range_dictionary = {}
+            hyperparameters_range_dictionary["beta"] = Real(low=0.4, high=0.41, prior='uniform')
+            hyperparameters_range_dictionary["gamma"] = Real(low=0.3, high=0.31, prior='uniform')
+            hyperparameters_range_dictionary["beta1"] = Real(low=0.3, high=0.31, prior='uniform')
 
             recommender_input_args = SearchInputRecommenderArgs(
                 CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],

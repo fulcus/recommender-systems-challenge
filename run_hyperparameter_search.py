@@ -10,7 +10,6 @@ import os
 from functools import partial
 from multiprocessing.pool import ThreadPool as Pool1
 
-from Data_manager.split_functions.kfoldCV import split_kfold
 from Data_manager.split_functions.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 from Evaluation.Evaluator import EvaluatorHoldout
@@ -20,7 +19,7 @@ from Recommenders.Hybrids.HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3 impor
     HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
 from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
 from Recommenders.Recommender_import_list import *
-from reader import load_urm, load_icm
+from reader import load_urm, load_icm, get_k_folds_URM
 
 output_folder_path = "result_experiments/"
 
@@ -29,9 +28,7 @@ if not os.path.exists(output_folder_path):
     os.makedirs(output_folder_path)
 
 
-
 def read_data_split_and_search(k=3):
-
     collaborative_algorithm_list = [
         # P3alphaRecommender,
         # RP3betaRecommender,
@@ -102,7 +99,6 @@ def read_data_split_and_search(k=3):
 
     evaluator_validation = EvaluatorHoldout(URM_validation, cutoff_list=cutoff_list)
     evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=cutoff_list)
-
 
     # COLLABORATIVE
     '''runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
@@ -193,13 +189,10 @@ def kfold_search(k=3):
         HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
     ]
 
-    URM_all, user_id_unique, item_id_unique = load_urm()
-    # ICM_channel = load_icm("data_ICM_channel.csv")
+    URM_train_list, URM_test_list = get_k_folds_URM(k=k)
+    evaluator_list = [EvaluatorHoldout(URM_test, cutoff_list=[10]) for URM_test in URM_test_list]
 
-    evaluator_list, URM_train_list, URM_validation_list = split_kfold(URM_all=URM_all, k=k)
-
-    for evaluator_validation, URM_train, URM_validation in zip(evaluator_list, URM_train_list, URM_validation_list):
-
+    for evaluator_validation, URM_train in zip(evaluator_list, URM_train_list):
         metric_to_optimize = "MAP"
         cutoff_to_optimize = 10
 
@@ -220,7 +213,7 @@ def kfold_search(k=3):
                                                            resume_from_saved=True,
                                                            similarity_type_list=["cosine"],
                                                            parallelizeKNN=False)
-    
+
         pool_collab = multiprocessing.Pool(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
         pool_collab.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)
 
@@ -246,3 +239,4 @@ def kfold_search(k=3):
 
 if __name__ == '__main__':
     read_data_split_and_search()
+    # kfold_search()

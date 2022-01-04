@@ -3,8 +3,8 @@ import traceback
 
 import numpy as np
 import scipy.sparse as sps
+from tqdm import tqdm
 
-from Data_manager.split_functions.kfoldCV import split_kfold
 from Data_manager.split_functions.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 from Evaluation.Evaluator import EvaluatorHoldout
@@ -26,13 +26,13 @@ from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFW
 from Recommenders.MatrixFactorization.IALSRecommender_implicit import IALSRecommender_implicit
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
-from reader import load_urm, load_icm
+from reader import load_urm, load_icm, get_k_folds_URM
 
 res_dir = 'result_experiments/csv'
 output_root_path = "./result_experiments/"
 
 recommender_class_list = [
-    # UserKNNCBFRecommender, # UCM needed
+    ItemKNNCFRecommender
     # ItemKNNCBFRecommender,
     # ItemKNNCBFWeightedSimilarityRecommender,  # new
     # UserKNN_CFCBF_Hybrid_Recommender, # UCM needed
@@ -72,7 +72,7 @@ recommender_class_list = [
     # HybridRatings_EASE_R_hybrid_SLIM_Rp3
     # HybridRatings_PureSVD_EASE_R
     # HybridRatings_SLIM_PureSVD_EASE_R
-    HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
+    # HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
     # MultiRecommender
 ]
 
@@ -209,28 +209,37 @@ def evaluate_best_saved_model(URM_all, ICM=None):
         "1-Algorithm: {}, results: \n{}\n".format(recommender_object.RECOMMENDER_NAME, results_run_string_1))
 
 
-def evaluate_kfold(URM_all, k=3):
-    evaluator_list, URM_train_list, URM_validation_list = split_kfold(URM_all=URM_all, k=k)
+def evaluate_kfold(k=5):
+    URM_train_list, URM_test_list = get_k_folds_URM(k=k)
+    evaluator_list = [EvaluatorHoldout(URM_test, cutoff_list=[10]) for URM_test in URM_test_list]
+
     MAP_list = []
-    for i in range(k):
-        recommender_object = HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3(URM_train=URM_train_list[i])
-        fit_params = {'alpha': 0.9560759641998946, 'beta': 0.09176984507557999, 'gamma': 0.25,
-                      'alpha1': 0.9739242060693925, 'beta1': 0.2, 'topK1': 837}
 
-        recommender_object.fit(**fit_params)
+    for i in tqdm(range(k), desc='Evaluating k folds'):
 
-        _, results_run_string_1 = evaluator_list[i].evaluateRecommender(recommender_object)
-        MAP_list.append(float(results_run_string_1))
+        # recommender_object = HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3(URM_train=URM_train_list[i])
+        recommender_object = EASE_R_Recommender(URM_train=URM_train_list[i])
+        # fit_params = {'alpha': 0.9560759641998946, 'beta': 0.09176984507557999, 'gamma': 0.25,
+        #               'alpha1': 0.9739242060693925, 'beta1': 0.2, 'topK1': 837}
+        # recommender_object.fit(**fit_params)
+        recommender_object.fit()
 
-        print("Fold {} - Algorithm: {}, results: \n{}".format(k, recommender_object.RECOMMENDER_NAME, results_run_string_1))
+
+        result_df, results_run_string_1 = evaluator_list[i].evaluateRecommender(recommender_object)
+        MAP_list.append(float(result_df['MAP']))
+
+        # saved_name = "{}-fold{}".format(recommender_object.RECOMMENDER_NAME, i)
+        # recommender_object.save_model(output_root_path, file_name=saved_name)
+
+        print("Fold {} - Algorithm: {}, results: \n{}".format(i, recommender_object.RECOMMENDER_NAME,
+                                                              results_run_string_1))
         logFile.write(
-            "Fold {} -Algorithm: {}, results: \n{}\n".format(k, recommender_object.RECOMMENDER_NAME, results_run_string_1))
+            "Fold {} -Algorithm: {}, results: \n{}\n".format(i, recommender_object.RECOMMENDER_NAME,
+                                                             results_run_string_1))
 
     avg_MAP = sum(MAP_list) / k
 
-    print("average MAP: " + str(avg_MAP))
-
-    # for evaluator, URM_train, URM_validation in zip(evaluator_list, URM_train_list, URM_validation_list):
+    print("Average {}-fold MAP: {}".format(k, avg_MAP))
 
 
 def evaluate_all_ICMs(URM_all):
@@ -249,6 +258,7 @@ def evaluate_all_ICMs(URM_all):
 
 if __name__ == '__main__':
     URM_all, user_id_unique, item_id_unique = load_urm()
-    evaluate_all_recommenders(URM_all)
+    evaluate_kfold(k=5)
+    # evaluate_all_recommenders(URM_all)
     # evaluate_best_saved_model(URM_all)
     # evaluate_all_ICMs(URM_all)

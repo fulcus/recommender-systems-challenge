@@ -7,15 +7,13 @@ import numpy as np
 # urm_path = "Data_manager_split_datasets/TVShows/data_train.csv"
 # icm_path = "Data_manager_split_datasets/TVShows/"
 # target_path = "Data_manager_split_datasets/TVShows/data_target_users_test.csv"
+from tqdm import tqdm
+
 from Evaluation.Evaluator import EvaluatorHoldout
 
 
 def load_urm():
-    urm_path = os.path.join(os.path.dirname(__file__), 'Data_manager_split_datasets/TVShows/data_train.csv')
-    df_original = pd.read_csv(filepath_or_buffer=urm_path, sep=',', header=0,
-                              dtype={0: np.int32, 1: np.int32, 2: np.int32})
-
-    df_original.columns = ["UserID", "ItemID", "Data"]
+    df_original = load_urm_df()
 
     user_id_list = df_original['UserID'].values
     item_id_list = df_original['ItemID'].values
@@ -37,7 +35,8 @@ def load_urm():
 
 
 def load_target():
-    target_path = os.path.join(os.path.dirname(__file__), 'Data_manager_split_datasets/TVShows/data_target_users_test.csv')
+    target_path = os.path.join(os.path.dirname(__file__),
+                               'Data_manager_split_datasets/TVShows/data_target_users_test.csv')
 
     df_original = pd.read_csv(filepath_or_buffer=target_path, sep=',', header=0,
                               dtype={'UserID': np.int32})
@@ -112,11 +111,10 @@ def load_urm_icm():
     return urm_icm
 
 
-
-def group_users_in_urm (URM_train, URM_test, group_to_test):
+def group_users_in_urm(URM_train, URM_test, group_to_test):
     n_users = 13650
     n_item = 18059
-    cutoff=10
+    cutoff = 10
 
     profile_length = np.ediff1d(sps.csr_matrix(URM_train).indptr)
     print("profile", profile_length, profile_length.shape)
@@ -149,3 +147,47 @@ def group_users_in_urm (URM_train, URM_test, group_to_test):
     evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=[cutoff], ignore_users=users_not_in_group)
 
     return evaluator_test
+
+
+def load_urm_df():
+    urm_path = os.path.join(os.path.dirname(__file__), 'Data_manager_split_datasets/TVShows/data_train.csv')
+    df_original = pd.read_csv(filepath_or_buffer=urm_path, sep=',', header=0,
+                              dtype={0: np.int32, 1: np.int32, 2: np.int32})
+
+    df_original.columns = ["UserID", "ItemID", "Data"]
+
+    return df_original
+
+
+def load_urm_coo():
+    URM_df = load_urm_df()
+    URM_coo = sps.coo_matrix((URM_df["Data"].values, (URM_df["UserID"].values, URM_df["ItemID"].values)))
+    return URM_coo
+
+
+def get_k_folds_URM(k=3):
+    URM_coo = load_urm_coo()
+
+    n_interactions = URM_coo.nnz
+    n_interactions_per_fold = int(URM_coo.nnz / k) + 1
+    temp = np.arange(k).repeat(n_interactions_per_fold)
+    np.random.shuffle(temp)
+    assignment_to_fold = temp[:n_interactions]
+
+    URM_trains = []
+    URM_tests = []
+
+    for i in tqdm(range(k), desc='Generating folds'):
+        train_mask = assignment_to_fold != i
+        test_mask = assignment_to_fold == i
+        URM_train_csr = sps.csr_matrix((URM_coo.data[train_mask],
+                                        (URM_coo.row[train_mask], URM_coo.col[train_mask])),
+                                       shape=URM_coo.shape)
+        URM_test_csr = sps.csr_matrix((URM_coo.data[test_mask],
+                                       (URM_coo.row[test_mask], URM_coo.col[test_mask])),
+                                      shape=URM_coo.shape)
+
+        URM_trains.append(URM_train_csr)
+        URM_tests.append(URM_test_csr)
+
+    return URM_trains, URM_tests

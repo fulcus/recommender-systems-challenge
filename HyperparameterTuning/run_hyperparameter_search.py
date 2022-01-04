@@ -941,7 +941,6 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
             hyperparameters_range_dictionary = {
                 "topK": Integer(5, 1000),
                 "alpha": Real(low=0, high=2, prior='uniform'),
-                "normalize_similarity": Categorical([True, False]),
             }
 
             recommender_input_args = SearchInputRecommenderArgs(
@@ -955,9 +954,9 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
 
         if recommender_class is RP3betaRecommender:
             hyperparameters_range_dictionary = {
-                "topK": Integer(5, 1000),
-                "alpha": Real(low=0, high=0.8, prior='uniform'),
-                "beta": Real(low=0, high=0.8, prior='uniform'),
+                "topK": Integer(10, 500),
+                "alpha": Real(low=0, high=0.5, prior='uniform'),
+                "beta": Real(low=0, high=0.5, prior='uniform'),
                 "normalize_similarity": Categorical([True, False]),
             }
 
@@ -1161,10 +1160,7 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
 
         if recommender_class is EASE_R_Recommender:
             hyperparameters_range_dictionary = {
-                "topK": Integer(5, 3000),
-                "normalize_matrix": Categorical([False]),
                 "l2_norm": Real(low=1e0, high=1e7, prior='log-uniform'),
-                # "topK": Categorical([None]),  # Integer(5, 3000),
             }
 
             recommender_input_args = SearchInputRecommenderArgs(

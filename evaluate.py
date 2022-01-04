@@ -71,8 +71,8 @@ recommender_class_list = [
     # HybridRatings_EASE_R_hybrid_SLIM_Rp3
     # HybridRatings_PureSVD_EASE_R
     # HybridRatings_SLIM_PureSVD_EASE_R
-    # HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
-    MultiRecommender
+    HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
+    # MultiRecommender
 ]
 
 # If directory does not exist, create
@@ -153,8 +153,8 @@ def evaluate_all_recommenders(URM_all, ICM=None):
             elif isinstance(recommender_object, HybridRatings_EASE_R_hybrid_SLIM_Rp3):
                 fit_params = {'alpha': 0.95}
             elif isinstance(recommender_object, HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3):
-                fit_params = {'alpha': 0.9560759641998946, 'beta': 0.09176984507557999, 'gamma': 0.25,
-                              'alpha1': 0.9739242060693925, 'beta1': 0.2, 'topK1': 837}
+                fit_params = {'alpha': 0.9560759641998946, 'beta': 0.7550858561550403, 'gamma': 0.5227204586158875,
+                              'alpha1': 0.9739242060693925, 'beta1': 0.32744235125291515, 'topK1': 837}
             elif isinstance(recommender_object, MultiRecommender):
                 fit_params = {'weight_array': [0.95, 0.09, 0.25, 0.4, 0.2]}  # [slim, rp3, ease_r, ials, pure_svd]
             else:

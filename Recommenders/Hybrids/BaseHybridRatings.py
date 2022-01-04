@@ -38,7 +38,7 @@ class BaseHybridRatings(BaseItemSimilarityMatrixRecommender):
         self.recommender_2 = recommender_2
         self.recommender_3 = recommender_3
 
-    def fit(self, alpha=0.9560759641998946, beta=0.3, gamma=0.3, alpha1=0.9739242060693925, beta1=0.3, topK1=837):
+    def fit(self, alpha=0.9560759641998946, beta=0.3, gamma=0.3, alpha1=0.9739242060693925, beta1=0.32744235125291515, topK1=837):
         self.alpha = alpha
         self.beta = beta
         self.gamma = gamma

@@ -28,7 +28,18 @@ if not os.path.exists(output_folder_path):
     os.makedirs(output_folder_path)
 
 
-def read_data_split_and_search(k=3):
+def read_data_split_and_search():
+    """
+    This function provides a simple example on how to tune parameters of a given algorithm
+
+    The BayesianSearch object will save:
+        - A .txt file with all the cases explored and the recommendation quality
+        - A _best_model file which contains the trained model and can be loaded with recommender.load_model()
+        - A _best_parameter file which contains a dictionary with all the fit parameters, it can be passed to recommender.fit(**_best_parameter)
+        - A _best_result_validation file which contains a dictionary with the results of the best solution on the validation
+        - A _best_result_test file which contains a dictionary with the results, on the test set, of the best solution chosen using the validation set
+    """
+
     collaborative_algorithm_list = [
         # P3alphaRecommender,
         # RP3betaRecommender,
@@ -65,17 +76,6 @@ def read_data_split_and_search(k=3):
         HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
     ]
 
-    """
-    This function provides a simple example on how to tune parameters of a given algorithm
-
-    The BayesianSearch object will save:
-        - A .txt file with all the cases explored and the recommendation quality
-        - A _best_model file which contains the trained model and can be loaded with recommender.load_model()
-        - A _best_parameter file which contains a dictionary with all the fit parameters, it can be passed to recommender.fit(**_best_parameter)
-        - A _best_result_validation file which contains a dictionary with the results of the best solution on the validation
-        - A _best_result_test file which contains a dictionary with the results, on the test set, of the best solution chosen using the validation set
-    """
-
     URM_all, user_id_unique, item_id_unique = load_urm()
 
     ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
@@ -84,8 +84,8 @@ def read_data_split_and_search(k=3):
     # ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
     # ICM_all = sps.hstack([ICM_channel, ICM_event, ICM_genre, ICM_subgenre]).tocsr()
 
-    URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.9999999999)
-    URM_train, URM_validation = split_train_in_two_percentage_global_sample(URM_train, train_percentage=0.80)
+    # URM_train, URM_test = split_train_in_two_percentage_global_sample(URM_all=URM_all, train_percentage=0.9999999999)
+    URM_train, URM_validation = split_train_in_two_percentage_global_sample(URM_all, train_percentage=0.80)
 
     cutoff_list = [10]
     metric_to_optimize = "MAP"
@@ -98,7 +98,7 @@ def read_data_split_and_search(k=3):
     # evaluator_validation = group_users_in_urm(URM_train, URM_validation, 1)
 
     evaluator_validation = EvaluatorHoldout(URM_validation, cutoff_list=cutoff_list)
-    evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=cutoff_list)
+    # evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=cutoff_list)
 
     # COLLABORATIVE
     '''runParameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
@@ -145,17 +145,16 @@ def read_data_split_and_search(k=3):
     # HYBRID
     runParameterSearch_Hybrid_partial = partial(runHyperparameterSearch_Hybrid,
                                                 URM_train=URM_train,
-                                                # ICM_train=ICM_event.T,
+                                                W_train=None,
                                                 ICM_object=ICM_channel,
                                                 ICM_name="ICM_all",
-                                                W_train=None,
                                                 metric_to_optimize=metric_to_optimize,
                                                 cutoff_to_optimize=cutoff_to_optimize,
-                                                n_cases=100,
+                                                n_cases=n_cases,
                                                 n_random_starts=n_random_starts,
                                                 evaluator_validation_earlystopping=evaluator_validation,
                                                 evaluator_validation=evaluator_validation,
-                                                evaluator_test=evaluator_test,
+                                                evaluator_test=None,
                                                 output_folder_path=output_folder_path)
 
     pool_collab = Pool1(processes=int(multiprocessing.cpu_count()))
@@ -210,7 +209,7 @@ def kfold_search(k=3):
                                                            evaluator_validation=evaluator_validation,
                                                            evaluator_test=None,
                                                            output_folder_path=output_folder_path,
-                                                           resume_from_saved=True,
+                                                           resume_from_saved=False,
                                                            similarity_type_list=["cosine"],
                                                            parallelizeKNN=False)
 

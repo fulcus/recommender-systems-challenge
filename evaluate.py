@@ -216,14 +216,12 @@ def evaluate_kfold(k=5):
     MAP_list = []
 
     for i in tqdm(range(k), desc='Evaluating k folds'):
-
         # recommender_object = HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3(URM_train=URM_train_list[i])
         recommender_object = EASE_R_Recommender(URM_train=URM_train_list[i])
         # fit_params = {'alpha': 0.9560759641998946, 'beta': 0.09176984507557999, 'gamma': 0.25,
         #               'alpha1': 0.9739242060693925, 'beta1': 0.2, 'topK1': 837}
         # recommender_object.fit(**fit_params)
         recommender_object.fit()
-
 
         result_df, results_run_string_1 = evaluator_list[i].evaluateRecommender(recommender_object)
         MAP_list.append(float(result_df['MAP']))

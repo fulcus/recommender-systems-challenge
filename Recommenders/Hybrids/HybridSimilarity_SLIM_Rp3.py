@@ -12,7 +12,8 @@ class HybridSimilarity_SLIM_Rp3(BaseHybridSimilarity):
 
     def __init__(self, URM_train):
         slim = SLIMElasticNetRecommender(URM_train)
-        slim.load_model(output_root_path, file_name="slim742.zip")
+        # slim.load_model(output_root_path, file_name="slim742.zip")
+        slim.load_model(output_root_path, file_name="slim_splitforeval742.zip")
         # self.slim.fit(topK=453, l1_ratio=0.00029920499017254754, alpha=0.10734084960757517)
 
         rp3 = RP3betaRecommender(URM_train)

@@ -36,7 +36,7 @@ class EASE_R_Recommender(BaseItemSimilarityMatrixRecommender):
         super(EASE_R_Recommender, self).__init__(URM_train)
         self.sparse_threshold_quota = sparse_threshold_quota
 
-    def fit(self, topK=None, l2_norm=3935, normalize_matrix=False, verbose=True):
+    def fit(self, topK=None, l2_norm=1e3, normalize_matrix=False, verbose=True):  # l2_norm=3935
 
         self.verbose = verbose
 

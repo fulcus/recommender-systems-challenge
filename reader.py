@@ -171,6 +171,7 @@ def get_k_folds_URM(k=3):
     n_interactions = URM_coo.nnz
     n_interactions_per_fold = int(URM_coo.nnz / k) + 1
     temp = np.arange(k).repeat(n_interactions_per_fold)
+    np.random.seed(0)
     np.random.shuffle(temp)
     assignment_to_fold = temp[:n_interactions]
 

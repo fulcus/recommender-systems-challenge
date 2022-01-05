@@ -76,7 +76,7 @@ def read_data_split_and_search():
         HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
     ]
 
-    URM_all, user_id_unique, item_id_unique = load_urm()
+    URM_all = load_urm()
 
     ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
     # ICM_event = load_icm("data_ICM_event.csv", weight=1)

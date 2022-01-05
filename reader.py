@@ -19,19 +19,10 @@ def load_urm():
     item_id_list = df_original['ItemID'].values
     rating_id_list = df_original['Data'].values
 
-    user_id_unique = np.unique(user_id_list)
-    item_id_unique = np.unique(item_id_list)
-
     csr_matrix = sps.csr_matrix((rating_id_list, (user_id_list, item_id_list)))
     csr_matrix = csr_matrix.astype(dtype=np.int32)
-    # print("DataReader:")
-    # print("\tLoading the URM:")
-    # print("\t\tURM size:" + str(csr_matrix.shape))
-    # print("\t\tURM unique users:" + str(user_id_unique.size))
-    # print("\t\tURM unique items:" + str(item_id_unique.size))
-    # print("\tURM loaded.")
 
-    return csr_matrix, user_id_unique, item_id_unique
+    return csr_matrix
 
 
 def load_target():
@@ -103,7 +94,7 @@ def load_all_icms():
 
 # to delete
 def load_urm_icm():
-    urm, _, _ = load_urm()
+    urm = load_urm()
     icm = load_icm("data_ICM_subgenre.csv", 1)
     urm_icm = sps.vstack([urm, icm.T])
     urm_icm = urm_icm.tocsr()

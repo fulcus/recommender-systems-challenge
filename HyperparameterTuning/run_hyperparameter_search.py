@@ -42,7 +42,8 @@ from Recommenders.EASE_R.EASE_R_Recommender import EASE_R_Recommender
 
 # KNN machine learning
 from Recommenders.SLIM.Cython.SLIM_BPR_Cython import SLIM_BPR_Cython
-from Recommenders.SLIM.SLIMElasticNetRecommender import SLIMElasticNetRecommender # MultiThreadSLIM_SLIMElasticNetRecommender
+from Recommenders.SLIM.SLIMElasticNetRecommender import \
+    SLIMElasticNetRecommender  # MultiThreadSLIM_SLIMElasticNetRecommender
 
 # Matrix Factorization
 from Recommenders.MatrixFactorization.PureSVDRecommender import PureSVDRecommender, PureSVDItemRecommender
@@ -94,8 +95,6 @@ def runHyperparameterSearch_FeatureWeighting(recommender_class, URM_train, W_tra
                                              save_model="best",
                                              output_folder_path="result_experiments/",
                                              similarity_type_list=None):
-
-
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
         os.makedirs(output_folder_path)
@@ -230,7 +229,6 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
     :param allow_weighting:     Boolean value, if True it enables the use of TF-IDF and BM25 to weight features, users and items in KNNs
     :param similarity_type_list: List of strings with the similarity heuristics to be used for the KNNs
     """
-
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
@@ -434,17 +432,17 @@ def runHyperparameterSearch_Hybrid(recommender_class, URM_train, W_train, ICM_ob
         #########################################################################################################
 
         if recommender_class is HybridSimilarity_SLIM_Rp3:
-                hyperparameters_range_dictionary = {}
-                hyperparameters_range_dictionary["alpha"] = Real(low=0.7, high=0.99, prior='uniform')
-                hyperparameters_range_dictionary["beta"] = Real(low=0.05, high=0.6, prior='uniform')
-                hyperparameters_range_dictionary["topK"] = Integer(300, 2000)
+            hyperparameters_range_dictionary = {}
+            hyperparameters_range_dictionary["alpha"] = Real(low=0.7, high=0.99, prior='uniform')
+            hyperparameters_range_dictionary["beta"] = Real(low=0.05, high=0.6, prior='uniform')
+            hyperparameters_range_dictionary["topK"] = Integer(300, 2000)
 
-                recommender_input_args = SearchInputRecommenderArgs(
-                    CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
-                    CONSTRUCTOR_KEYWORD_ARGS={},
-                    FIT_POSITIONAL_ARGS=[],
-                    FIT_KEYWORD_ARGS={}
-                )
+            recommender_input_args = SearchInputRecommenderArgs(
+                CONSTRUCTOR_POSITIONAL_ARGS=[URM_train],
+                CONSTRUCTOR_KEYWORD_ARGS={},
+                FIT_POSITIONAL_ARGS=[],
+                FIT_KEYWORD_ARGS={}
+            )
         #########################################################################################################
 
         if recommender_class is HybridRatings_EASE_R_hybrid_SLIM_Rp3:
@@ -640,10 +638,10 @@ def run_KNNRecommender_on_similarity_type(similarity_type, hyperparameterSearch,
     original_hyperparameter_search_space = hyperparameter_search_space
 
     hyperparameters_range_dictionary = {
-        "topK": Integer(5, 1000),
+        "topK": Integer(10, 1000),
         "shrink": Integer(0, 1000),
         "similarity": Categorical([similarity_type]),
-        "normalize": Categorical([True, False]),
+        # "normalize": Categorical([True, False]),
     }
 
     is_set_similarity = similarity_type in ["tversky", "dice", "jaccard", "tanimoto"]
@@ -722,7 +720,6 @@ def runHyperparameterSearch_Content(recommender_class, URM_train, ICM_object, IC
     :param allow_bias_ICM:      Boolean value, if True it enables the use of bias to shift the values of the ICM
     :param similarity_type_list: List of strings with the similarity heuristics to be used for the KNNs
     """
-
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
@@ -823,7 +820,6 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
     :param allow_dropout_MF:    Boolean value, if True it enables the use of dropout on the latent factors of MF algorithms
     :param similarity_type_list: List of strings with the similarity heuristics to be used for the KNNs
     """
-
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
@@ -1140,7 +1136,7 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
 
         ##########################################################################################################
 
-        if recommender_class is SLIMElasticNetRecommender: #or recommender_class is MultiThreadSLIM_SLIMElasticNetRecommender:
+        if recommender_class is SLIMElasticNetRecommender:  # or recommender_class is MultiThreadSLIM_SLIMElasticNetRecommender:
             hyperparameters_range_dictionary = {
                 "topK": Integer(200, 750),  # (5, 1000),
                 "l1_ratio": Real(low=1e-4, high=1e-2, prior='log-uniform'),
@@ -1224,7 +1220,7 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
         else:
             recommender_input_args_last_test = None
 
-        ## Final step, after the hyperparameter range has been defined for each type of algorithm
+        # Final step, after the hyperparameter range has been defined for each type of algorithm
         hyperparameterSearch.search(recommender_input_args,
                                     hyperparameter_search_space=hyperparameters_range_dictionary,
                                     n_cases=n_cases,
@@ -1250,81 +1246,3 @@ def runHyperparameterSearch_Collaborative(recommender_class, URM_train, URM_trai
         error_file = open(output_folder_path + "ErrorLog.txt", "a")
         error_file.write("On recommender {} Exception {}\n".format(recommender_class, str(e)))
         error_file.close()
-
-
-def read_data_split_and_search():
-    """
-    This function provides a simple example on how to tune parameters of a given algorithm
-
-    The BayesianSearch object will save:
-        - A .txt file with all the cases explored and the recommendation quality
-        - A _best_model file which contains the trained model and can be loaded with recommender.load_model()
-        - A _best_parameter file which contains a dictionary with all the fit parameters, it can be passed to recommender.fit(**_best_parameter)
-        - A _best_result_validation file which contains a dictionary with the results of the best solution on the validation
-        - A _best_result_test file which contains a dictionary with the results, on the test set, of the best solution chosen using the validation set
-    """
-
-    from Data_manager.Movielens.Movielens1MReader import Movielens1MReader
-    from Data_manager.DataSplitter_k_fold_stratified import DataSplitter_Warm_k_fold
-
-    dataset_object = Movielens1MReader()
-
-    dataSplitter = DataSplitter_Warm_k_fold(dataset_object)
-
-    dataSplitter.load_data()
-
-    URM_train, URM_validation, URM_test = dataSplitter.get_holdout_split()
-
-
-
-    # If directory does not exist, create
-    if not os.path.exists(output_folder_path):
-        os.makedirs(output_folder_path)
-
-    collaborative_algorithm_list = [
-        Random,
-        TopPop,
-        P3alphaRecommender,
-        RP3betaRecommender,
-        ItemKNNCFRecommender,
-        UserKNNCFRecommender,
-        # MatrixFactorization_BPR_Cython,
-        # MatrixFactorization_FunkSVD_Cython,
-        # PureSVDRecommender,
-        # SLIM_BPR_Cython,
-        # SLIMElasticNetRecommender
-    ]
-
-    from Evaluation.Evaluator import EvaluatorHoldout
-
-    evaluator_validation = EvaluatorHoldout(URM_validation, cutoff_list=[5])
-    evaluator_test = EvaluatorHoldout(URM_test, cutoff_list=[5, 10])
-
-    runHyperparameterSearch_Collaborative_partial = partial(runHyperparameterSearch_Collaborative,
-                                                            URM_train=URM_train,
-                                                            metric_to_optimize="MAP",
-                                                            n_cases=8,
-                                                            evaluator_validation_earlystopping=evaluator_validation,
-                                                            evaluator_validation=evaluator_validation,
-                                                            evaluator_test=evaluator_test,
-                                                            output_folder_path=output_folder_path)
-
-    # pool = PoolWithSubprocess(processes=int(multiprocessing.cpu_count()), maxtasksperchild=1)
-    # resultList = pool.map(runParameterSearch_Collaborative_partial, collaborative_algorithm_list)
-    # pool.close()
-    # pool.join()
-
-    for recommender_class in collaborative_algorithm_list:
-
-        try:
-
-            runHyperparameterSearch_Collaborative_partial(recommender_class)
-
-        except Exception as e:
-
-            print("On recommender {} Exception {}".format(recommender_class, str(e)))
-            traceback.print_exc()
-
-
-if __name__ == '__main__':
-    read_data_split_and_search()

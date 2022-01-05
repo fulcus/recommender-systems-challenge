@@ -97,7 +97,8 @@ def _get_instance(recommender_class, URM_train, ICM=None):
 
 def _get_params(recommender_object):
     if isinstance(recommender_object, ItemKNNCFRecommender):
-        fit_params = {"topK": 200, "shrink": 200, "feature_weighting": "TF-IDF"}
+        fit_params = {'topK': 189, 'shrink': 0, 'similarity': 'cosine', 'normalize': True,
+                      'feature_weighting': 'TF-IDF'}
     elif isinstance(recommender_object, SLIMElasticNetRecommender):
         fit_params = {"topK": 453, 'l1_ratio': 0.00029920499017254754, 'alpha': 0.10734084960757517}
     elif isinstance(recommender_object, IALSRecommender_implicit):
@@ -185,8 +186,8 @@ def evaluate_best_saved_model(URM_all, ICM=None):
 
     results_run, results_run_string = evaluator.evaluateRecommender(recommender_object)
 
-    print("1-Algorithm: {}, results: \n{}".format(recommender_object.RECOMMENDER_NAME, results_run_string))
-    logFile.write("1-Algorithm: {}, results: \n{}\n".format(recommender_object.RECOMMENDER_NAME, results_run_string))
+    print("Algorithm: {}, results: \n{}".format(recommender_object.RECOMMENDER_NAME, results_run_string))
+    logFile.write("Algorithm: {}, results: \n{}\n".format(recommender_object.RECOMMENDER_NAME, results_run_string))
     logFile.flush()
 
 
@@ -197,15 +198,15 @@ def evaluate_kfold(k=5):
     MAP_list = []
 
     for i in tqdm(range(k), desc='Evaluating k folds'):
-        recommender_object = RP3betaRecommender(URM_train=URM_train_list[i])
+        recommender_object = EASE_R_Recommender(URM_train=URM_train_list[i])
         fit_params = _get_params(recommender_object)
         recommender_object.fit(**fit_params)
 
         results_run, results_run_string = evaluator_list[i].evaluateRecommender(recommender_object)
         MAP_list.append(float(results_run['MAP']))
 
-        # saved_name = "{}-fold{}".format(recommender_object.RECOMMENDER_NAME, i)
-        # recommender_object.save_model(output_root_path, file_name=saved_name)
+        saved_name = "{}-fold{}".format(recommender_object.RECOMMENDER_NAME, i)
+        recommender_object.save_model(output_root_path, file_name=saved_name)
 
         print("Fold {} - Algorithm: {}, results: \n{}"
               .format(i, recommender_object.RECOMMENDER_NAME, results_run_string))
@@ -213,9 +214,9 @@ def evaluate_kfold(k=5):
                       .format(i, recommender_object.RECOMMENDER_NAME, results_run_string))
 
     avg_MAP = sum(MAP_list) / k
-
-    print("Average {}-fold MAP: {:.7f}".format(k, avg_MAP))
-    logFile.write("Average {}-fold MAP: {:.7f}".format(k, avg_MAP))
+    diff_MAP = max(MAP_list) - min(MAP_list)
+    print("Average {}-fold MAP: {:.7f}, diff: {:.7f}".format(k, avg_MAP, diff_MAP))
+    logFile.write("Average {}-fold MAP: {:.7f}, diff: {:.7f}".format(k, avg_MAP, diff_MAP))
     logFile.flush()
 
 

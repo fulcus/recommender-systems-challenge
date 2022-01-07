@@ -4,9 +4,9 @@ import pandas as pd
 import scipy.sparse as sps
 import numpy as np
 
-# urm_path = "Data_manager_split_datasets/TVShows/data_train.csv"
-# icm_path = "Data_manager_split_datasets/TVShows/"
-# target_path = "Data_manager_split_datasets/TVShows/data_target_users_test.csv"
+# urm_path = "Data_manager_split_datasets/Data/data_train.csv"
+# icm_path = "Data_manager_split_datasets/Data/"
+# target_path = "Data_manager_split_datasets/Data/data_target_users_test.csv"
 from tqdm import tqdm
 
 from Evaluation.Evaluator import EvaluatorHoldout
@@ -27,7 +27,7 @@ def load_urm():
 
 def load_target():
     target_path = os.path.join(os.path.dirname(__file__),
-                               'Data_manager_split_datasets/TVShows/data_target_users_test.csv')
+                               'Data/data_target_users_test.csv')
 
     df_original = pd.read_csv(filepath_or_buffer=target_path, sep=',', header=0,
                               dtype={'UserID': np.int32})
@@ -47,7 +47,7 @@ def load_target():
 
 
 def load_icm(icm_file, weight=1):
-    icm_path = os.path.join(os.path.dirname(__file__), 'Data_manager_split_datasets/TVShows/')
+    icm_path = os.path.join(os.path.dirname(__file__), 'Data/')
 
     df_original = pd.read_csv(filepath_or_buffer=icm_path + icm_file, sep=',', header=0,
                               dtype={'ItemID': np.int32, 'Feature': np.int32, 'Data': np.int32})
@@ -64,7 +64,7 @@ def load_icm(icm_file, weight=1):
 
 
 def load_merged_icm(icm_file, weight=1):
-    icm_path = os.path.join(os.path.dirname(__file__), 'Data_manager_split_datasets/TVShows/')
+    icm_path = os.path.join(os.path.dirname(__file__), 'Data/')
 
     df_original = pd.read_csv(filepath_or_buffer=icm_path + icm_file, sep=',', header=0,
                               dtype={'ItemID': np.int32, 'Feature': np.int32, 'Data': np.int32})
@@ -141,7 +141,7 @@ def group_users_in_urm(URM_train, URM_test, group_to_test):
 
 
 def load_urm_df():
-    urm_path = os.path.join(os.path.dirname(__file__), 'Data_manager_split_datasets/TVShows/data_train.csv')
+    urm_path = os.path.join(os.path.dirname(__file__), 'Data/data_train.csv')
     df_original = pd.read_csv(filepath_or_buffer=urm_path, sep=',', header=0,
                               dtype={0: np.int32, 1: np.int32, 2: np.int32})
 

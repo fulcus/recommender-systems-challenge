@@ -122,9 +122,9 @@ class BaseRecommender(object):
     def recommend(self, user_id_array, cutoff=None, remove_seen_flag=True, items_to_compute=None,
                   remove_top_pop_flag=False, remove_custom_items_flag=False, return_scores=False):
 
-        # If is a scalar transform it in a 1-cell array
         if cutoff is None:
-            cutoff = [10]
+            cutoff = 10
+        # If is a scalar transform it in a 1-cell array
         if np.isscalar(user_id_array):
             user_id_array = np.atleast_1d(user_id_array)
             single_user = True

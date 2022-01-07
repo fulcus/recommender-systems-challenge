@@ -10,10 +10,13 @@ output_root_path = "./result_experiments/"
 class HybridSimilarity_SLIM_Rp3(BaseHybridSimilarity):
     RECOMMENDER_NAME = "HybridSimilarity_SLIM_Rp3"
 
-    def __init__(self, URM_train):
+    def __init__(self, URM_train, fold=None):
         slim = SLIMElasticNetRecommender(URM_train)
-        # slim.load_model(output_root_path, file_name="slim742.zip")
-        slim.load_model(output_root_path, file_name="slim_splitforeval742.zip")
+        if fold is not None:
+            slim_name = 'SLIMElasticNetRecommender-fold{}.zip'.format(fold)
+        else:
+            slim_name = 'slim742.zip'
+        slim.load_model(output_root_path, file_name=slim_name)
         # self.slim.fit(topK=453, l1_ratio=0.00029920499017254754, alpha=0.10734084960757517)
 
         rp3 = RP3betaRecommender(URM_train)

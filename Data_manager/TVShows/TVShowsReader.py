@@ -14,7 +14,7 @@ from Data_manager.TVShows._utils_tvshows_parser import _loadURM, _loadICM
 
 class TVShowsReader(DataReader):
 
-    DATASET_SUBFOLDER = "TVShows/"
+    DATASET_SUBFOLDER = "Data/"
     AVAILABLE_URM = ["URM_all"]
     AVAILABLE_ICM = ["ICM_channel", "ICM_event", "ICM_genre", "ICM_subgenre"]
 

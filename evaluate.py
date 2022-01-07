@@ -20,9 +20,7 @@ from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilar
 from Recommenders.Hybrids.Hybrid_SLIM_EASE_R_IALS import Hybrid_SLIM_EASE_R_IALS
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
-from Recommenders.Hybrids.MultiRecommender import MultiRecommender
 from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
-from Recommenders.KNN.ItemKNNCBFWeightedSimilarityRecommender import ItemKNNCBFWeightedSimilarityRecommender
 from Recommenders.MatrixFactorization.IALSRecommender_implicit import IALSRecommender_implicit
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
@@ -99,6 +97,9 @@ def _get_params(recommender_object):
     if isinstance(recommender_object, ItemKNNCFRecommender):
         fit_params = {'topK': 189, 'shrink': 0, 'similarity': 'cosine', 'normalize': True,
                       'feature_weighting': 'TF-IDF'}
+    elif isinstance(recommender_object, ItemKNNCBFRecommender):
+        fit_params = {'topK': 1000, 'shrink': 1000, 'similarity': 'cosine', 'normalize': False,
+                      'feature_weighting': 'TF-IDF'}
     elif isinstance(recommender_object, SLIMElasticNetRecommender):
         fit_params = {"topK": 453, 'l1_ratio': 0.00029920499017254754, 'alpha': 0.10734084960757517}
     elif isinstance(recommender_object, IALSRecommender_implicit):
@@ -130,10 +131,11 @@ def _get_params(recommender_object):
     elif isinstance(recommender_object, HybridRatings_EASE_R_hybrid_SLIM_Rp3):
         fit_params = {'alpha': 0.95}
     elif isinstance(recommender_object, HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3):
-        fit_params = {'alpha': 0.9560759641998946, 'beta': 0.7550858561550403, 'gamma': 0.5227204586158875,
-                      'alpha1': 0.9739242060693925, 'beta1': 0.32744235125291515, 'topK1': 837}
-    elif isinstance(recommender_object, MultiRecommender):
-        fit_params = {'weight_array': [0.95, 0.09, 0.25, 0.4, 0.2]}  # [slim, rp3, ease_r, ials, pure_svd]
+        # Average 5-fold MAP: 0.2478493, diff: 0.0022057
+        # fit_params = {'alpha': 0.9560759641998946, 'beta': 0.7550858561550403, 'gamma': 0.5227204586158875,
+        #               'alpha1': 0.9739242060693925, 'beta1': 0.32744235125291515, 'topK1': 837}
+        fit_params = {'alpha': 0.8, 'beta': 0.55, 'gamma': 0.52,
+                      'alpha1': 0.9739, 'beta1': 0.3274, 'topK1': 837}
     else:
         fit_params = {}
 
@@ -198,20 +200,20 @@ def evaluate_kfold(k=5):
     MAP_list = []
 
     for i in tqdm(range(k), desc='Evaluating k folds'):
-        recommender_object = EASE_R_Recommender(URM_train=URM_train_list[i])
+        recommender_object = HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3(URM_train_list[i], fold=i)
         fit_params = _get_params(recommender_object)
         recommender_object.fit(**fit_params)
 
         results_run, results_run_string = evaluator_list[i].evaluateRecommender(recommender_object)
         MAP_list.append(float(results_run['MAP']))
 
-        saved_name = "{}-fold{}".format(recommender_object.RECOMMENDER_NAME, i)
-        recommender_object.save_model(output_root_path, file_name=saved_name)
-
         print("Fold {} - Algorithm: {}, results: \n{}"
               .format(i, recommender_object.RECOMMENDER_NAME, results_run_string))
         logFile.write("Fold {} -Algorithm: {}, results: \n{}\n"
                       .format(i, recommender_object.RECOMMENDER_NAME, results_run_string))
+
+        # saved_name = "{}-fold{}".format(recommender_object.RECOMMENDER_NAME, i)
+        # recommender_object.save_model(output_root_path, file_name=saved_name)
 
     avg_MAP = sum(MAP_list) / k
     diff_MAP = max(MAP_list) - min(MAP_list)

@@ -12,7 +12,7 @@ from reader import load_icm
 class HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3(BaseHybridRatings):
     RECOMMENDER_NAME = "HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3"
 
-    def __init__(self, URM_train, fold):
+    def __init__(self, URM_train, fold=None):
         self.recommender_1 = HybridSimilarity_SLIM_Rp3(URM_train, fold)
         ICM_event = load_icm("data_ICM_event.csv", weight=1)
         ICM_event = check_matrix(ICM_event.T, 'csr', dtype=np.float32)

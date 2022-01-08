@@ -16,3 +16,4 @@ tensorflow~=2.4.1
 setuptools~=59.2.0
 pytables
 implicit~=0.4.4
+skopt

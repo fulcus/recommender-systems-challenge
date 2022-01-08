@@ -3,7 +3,6 @@ from datetime import datetime
 
 from Recommenders.Hybrids.HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3 import \
     HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
-from Recommenders.Hybrids.MultiRecommender import MultiRecommender
 from Recommenders.Recommender_import_list import *
 from evaluate import _get_params
 from reader import load_urm, load_target, load_icm
@@ -30,7 +29,7 @@ def create_csv(target_ids, results, rec_name):
 
 
 def run_prediction_on_target(URM_all, target_ids):
-    recommender_object = ItemKNNCFRecommender(URM_all)
+    recommender_object = HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3(URM_all)
     fit_params = _get_params(recommender_object)
     recommender_object.fit(**fit_params)
 
@@ -38,9 +37,10 @@ def run_prediction_on_target(URM_all, target_ids):
     create_csv(target_ids, item_list, recommender_object.RECOMMENDER_NAME)
 
 
-# Method to create prediction using a saved best model of a specific recommender class
-
 def run_prediction_best_saved_model(URM_all, ICM=None):
+    """
+    Create prediction using a saved best model of a specific recommender class
+    """
     # ******** set here the recommender you want to use
     # recommender_object = SLIMElasticNetRecommender(URM_all)
     recommender_object = EASE_R_Recommender(URM_all)
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     target_ids = load_target()
 
     # ICM_channel = load_icm("data_ICM_channel.csv", weight=1)
-    ICM_event = load_icm("data_ICM_event.csv", weight=1)
+    # ICM_event = load_icm("data_ICM_event.csv", weight=1)
     # ICM_genre = load_icm("data_ICM_genre.csv", weight=1)
     # ICM_subgenre = load_icm("data_ICM_subgenre.csv", weight=1)
     # ICM_all = sps.hstack([ICM_genre, ICM_subgenre, ICM_channel, ICM_event]).tocsr()

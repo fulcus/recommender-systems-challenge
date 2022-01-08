@@ -131,11 +131,9 @@ def _get_params(recommender_object):
     elif isinstance(recommender_object, HybridRatings_EASE_R_hybrid_SLIM_Rp3):
         fit_params = {'alpha': 0.95}
     elif isinstance(recommender_object, HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3):
-        # Average 5-fold MAP: 0.2478493, diff: 0.0022057
-        # fit_params = {'alpha': 0.9560759641998946, 'beta': 0.7550858561550403, 'gamma': 0.5227204586158875,
-        #               'alpha1': 0.9739242060693925, 'beta1': 0.32744235125291515, 'topK1': 837}
-        fit_params = {'alpha': 0.8, 'beta': 0.55, 'gamma': 0.52,
-                      'alpha1': 0.9739, 'beta1': 0.3274, 'topK1': 837}
+        # Average 5-fold MAP: 0.2480472, diff: 0.0020975
+        fit_params = {'alpha': 0.9560759641998946, 'beta': 0.7550858561550403, 'gamma': 0.5227204586158875,
+                      'alpha1': 0.9739242060693925, 'beta1': 0.32744235125291515, 'topK1': 837}
     else:
         fit_params = {}
 

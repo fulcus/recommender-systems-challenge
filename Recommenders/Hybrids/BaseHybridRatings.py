@@ -46,7 +46,7 @@ class BaseHybridRatings(BaseItemSimilarityMatrixRecommender):
 
         self.recommender_1.fit(alpha=alpha1, beta=beta1, topK=topK1)
 
-        if isinstance(self.recommender_2, EASE_R_Recommender) and self.fold is not None:
+        if self.fold is not None and isinstance(self.recommender_2, EASE_R_Recommender):
             easer_name = 'EASE_R_Recommender-fold{}.zip'.format(self.fold)
             self.recommender_2.load_model(output_root_path, file_name=easer_name)
         else:

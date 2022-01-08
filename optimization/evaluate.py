@@ -47,5 +47,3 @@ def evaluate_algorithm(URM_test, recommender_object):
     cumulative_MAP /= num_eval
 
     return cumulative_precision, cumulative_recall, cumulative_MAP
-
-

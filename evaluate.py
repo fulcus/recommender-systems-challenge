@@ -5,7 +5,7 @@ import numpy as np
 import scipy.sparse as sps
 from tqdm import tqdm
 
-from Data_manager.split_functions.split_train_validation_random_holdout import \
+from Utils.split_train_validation_random_holdout import \
     split_train_in_two_percentage_global_sample
 from Evaluation.Evaluator import EvaluatorHoldout
 from Recommenders.BaseCBFRecommender import BaseItemCBFRecommender
@@ -20,7 +20,7 @@ from Recommenders.Hybrids.HybridSimilarity_withGroupedUsers import HybridSimilar
 from Recommenders.Hybrids.Hybrid_SLIM_EASE_R_IALS import Hybrid_SLIM_EASE_R_IALS
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3 import Hybrid_SlimElastic_Rp3
 from Recommenders.Hybrids.Hybrid_SlimElastic_Rp3_PureSVD import Hybrid_SlimElastic_Rp3_PureSVD
-from Recommenders.Hybrids.others.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
+from Recommenders.Hybrids.scores.ScoresHybridRP3betaKNNCBF import ScoresHybridRP3betaKNNCBF
 from Recommenders.MatrixFactorization.IALSRecommender_implicit import IALSRecommender_implicit
 from Recommenders.Recommender_import_list import *
 from Recommenders.Recommender_utils import check_matrix
@@ -236,7 +236,7 @@ def evaluate_all_ICMs(URM_all):
 
 if __name__ == '__main__':
     URM_all = load_urm()
-    evaluate_kfold(k=5)
-    # evaluate_all_recommenders(URM_all)
+    # evaluate_kfold(k=5)
+    evaluate_all_recommenders(URM_all)
     # evaluate_best_saved_model(URM_all)
     # evaluate_all_ICMs(URM_all)

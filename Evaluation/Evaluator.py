@@ -284,7 +284,7 @@ class Evaluator(object):
                     if precision_ + recall_ != 0:
                         # F1 micro averaged: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.104.8244&rep=rep1&type=pdf
                         results_current_cutoff[EvaluatorMetrics.F1.value] = 2 * (precision_ * recall_) / (
-                                    precision_ + recall_)
+                                precision_ + recall_)
 
 
         else:

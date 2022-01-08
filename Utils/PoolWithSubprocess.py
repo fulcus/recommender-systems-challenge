@@ -59,9 +59,3 @@ def test():
 
 if __name__ == '__main__':
     test()
-
-
-    # from Base.PoolWithSubprocess import PoolWithSubprocess
-    #
-    # pool = PoolWithSubprocess(processes=int(multiprocessing.cpu_count()/4), maxtasksperchild=1)
-    # resultList = pool.map(run_pipeline_for_collaborative_class_partial, ICM_name_list)

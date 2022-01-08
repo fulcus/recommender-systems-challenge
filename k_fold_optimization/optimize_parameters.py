@@ -3,11 +3,11 @@ import pandas as pd
 import skopt
 from skopt.utils import use_named_args
 
-import optimization.evaluate
-import optimization.dataset
+import k_fold_optimization.evaluate
+import k_fold_optimization.dataset
 from Recommenders.Hybrids.HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3 import \
     HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
-from optimization.hyperparam_def import names, spaces
+from k_fold_optimization.hyperparam_def import names, spaces
 
 output_root_path = "./optimization_data/"
 
@@ -65,11 +65,11 @@ def optimize_parameters(URMrecommender_class: type, n_calls=100, k=5, validation
 
     if validation_percentage > 0:
         print("Using randomized datasets. k={}, val_percentage={}".format(k, validation_percentage))
-        URM_trains, URM_tests, ICM_trains = optimization.dataset.give_me_randomized_k_folds_with_val_percentage(k,
-                                                                                                                validation_percentage)
+        URM_trains, URM_tests, ICM_trains = k_fold_optimization.dataset.give_me_randomized_k_folds_with_val_percentage(k,
+                                                                                                                       validation_percentage)
     else:
         print("Splitting original datasets in N_folds:{}".format(k))
-        URM_trains, URM_tests, ICM_trains = optimization.dataset.give_me_k_folds(k)
+        URM_trains, URM_tests, ICM_trains = k_fold_optimization.dataset.give_me_k_folds(k)
 
     if len(URM_trains) > limit_at:
         URM_trains = URM_trains[:limit_at]
@@ -89,7 +89,7 @@ def optimize_parameters(URMrecommender_class: type, n_calls=100, k=5, validation
             scores = []
             for recommender, test in zip(recommenders, URM_tests):
                 recommender.fit(**params)
-                _, _, MAP = optimization.evaluate.evaluate_algorithm(test, recommender)
+                _, _, MAP = k_fold_optimization.evaluate.evaluate_algorithm(test, recommender)
                 scores.append(-MAP)
             print("Just Evaluated this: {}".format(params))
             return sum(scores) / len(scores)
@@ -101,7 +101,7 @@ def optimize_parameters(URMrecommender_class: type, n_calls=100, k=5, validation
             for URM_train_csr, test in zip(URM_trains, URM_tests):
                 recommender = URMrecommender_class(URM_train_csr, **params)
                 recommender.fit()
-                _, _, MAP = optimization.evaluate.evaluate_algorithm(test, recommender)
+                _, _, MAP = k_fold_optimization.evaluate.evaluate_algorithm(test, recommender)
                 scores.append(-MAP)
                 print("MAP: {}".format(MAP))
 

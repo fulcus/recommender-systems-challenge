@@ -34,8 +34,8 @@ The evaluation metric was MAP@10.
 * Private leaderboard score: 0.48656 (7th)
 
 ## Credits
-This repository contains code from the [course framework repo](https://github.com/MaurizioFD/RecSys_Course_AT_PoliMi), that provides recommender implementations and utility code. The optimization
-package, that implements kfold bayesian optimization for hyperparameter search was taken from [this repo](https://github.com/LCarmi/recommender-systems-2020-challenge-polimi).
+This repository contains code from the [course framework repo](https://github.com/MaurizioFD/RecSys_Course_AT_PoliMi), that provides recommender implementations and utility code. The k_fold_optimization
+code was taken from [this repo](https://github.com/LCarmi/recommender-systems-2020-challenge-polimi).
 
 ## Team
 [Arianna Galzerano](https://github.com/arigalzi) & [Francesco Gonzales](https://github.com/fulcus)

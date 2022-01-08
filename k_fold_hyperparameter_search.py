@@ -1,6 +1,6 @@
 from Recommenders.Hybrids.HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3 import \
     HybridRatings_IALS_hybrid_EASE_R_hybrid_SLIM_Rp3
-from optimization.optimize_parameters import optimize_parameters
+from k_fold_optimization.optimize_parameters import optimize_parameters
 
 if __name__ == '__main__':
     val_percentage = 0

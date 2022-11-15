@@ -2,7 +2,7 @@
 
 [![Kaggle](https://img.shields.io/badge/open-kaggle-blue)](https://www.kaggle.com/c/recommender-system-2021-challenge-polimi)
 
-This repository contains the source code for the 2020 Polimi Recommender System Challenge on [kaggle](https://www.kaggle.com/c/recommender-system-2021-challenge-polimi).
+This repository contains the source code for the 2021 Polimi Recommender System Challenge on [kaggle](https://www.kaggle.com/c/recommender-system-2021-challenge-polimi).
 
 The goal of the competition was to create the recommender system for TV programs by providing 10 recommended products to each user. 
 
@@ -17,6 +17,11 @@ The ICMs contained information about the channels, episodes, genre and subgenre 
 All data was anonymized, so it was not possible to perform text analysis, genre grouping, correlation between text and popularity and so on.
 
 ## Recommender
+
+<p align="center">
+  <img src="docs/hybrid_graph.png" width="600" title="hybrid graph">
+</p>
+
 
 Our final recommender was a hybrid, obtained combining of the following models:
 * SLIM ElasticNet
